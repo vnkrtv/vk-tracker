@@ -1,0 +1,2 @@
+from VK_UserInfo import VK_UserInfo
+from VK_UserAnalizer import VK_UserAnalizer
