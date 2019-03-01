@@ -360,3 +360,8 @@ def cmpWall(self):
             changeCommList, changeLikesList = [], []
 
     return changeList
+
+
+if __name__ == '__main__':
+    from neo4j import GraphDatabase
+    
