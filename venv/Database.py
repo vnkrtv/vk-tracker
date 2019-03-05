@@ -1,4 +1,4 @@
-from neo4j import GraphDatabase
+from  import GraphDatabase
 
 
 class Database(object):
@@ -18,7 +18,7 @@ class Database(object):
 
         user['first_name'] = user['main_info']['first_name']
         user['last_name']  = user['main_info']['last_name']
-        user['id']         = user['main_info']['id']
+        user['id']         = user['main_info'fit ]['id']
 
         tx.run(
             """
