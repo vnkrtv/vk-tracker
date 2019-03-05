@@ -1,7 +1,9 @@
 import os
 import shelve
 import vk
+
 from time import sleep, clock, ctime
+from Database import GraphDatabase
 
 token = 'b224a255a3de4e95ece62460ff0e8bfa11e67e965daa7eec3b4394c0726540412befb451396083a646007'
 domain = 'durov'
@@ -156,14 +158,8 @@ class VK_UserInfo:
         return groups
 
     def userAllInfo(self):
-        foulder = s._user_name + ' ' + s._user_surname + '[id' + str(s._id) + ']'
 
-        try:
-            os.makedirs('../userdata/' + foulder + '/' + ctime().replace(':', '.'))
-        except:
-            pass
-
-        info = shelve.open('../userdata/' + foulder + '/' + ctime().replace(':', '.') + '/info', flag='n')
+        info = {}
         start = clock()
 
         print('\nStart loading information about %s' % (self._user_name + ' ' + self._user_surname))
@@ -186,16 +182,19 @@ class VK_UserInfo:
         info['photos'] = self.userPhotos()
         print('[%d s]Photos were loaded...' % (clock() - start))
 
-        print('Information about ' + foulder[0:-13] + ' was successfully loaded to ' + foulder + '/' + ctime().replace(':', '.'))
+        db = GraphDatabase()
+        db.addUser(info)
 
+        print('Information about %s was successfully loaded to Graph Database' % (self._user_name + ' ' + self._user_surname))
 
 
 if __name__ == '__main__':
     try:
-        s = VK_UserInfo(token=token, domain='n_oriharov')
+        domain = input('Enter domain: ')
+        s = VK_UserInfo(token=token, domain=domain)
         s.userAllInfo()
     except vk.exceptions.VkAPIError:
         print('Error: invalid token')
-    except BaseException:
-        print('Error: no connection to the internet')
+    except:
+        print('Error!')
 

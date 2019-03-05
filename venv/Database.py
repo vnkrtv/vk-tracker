@@ -1,40 +1,21 @@
-from  import GraphDatabase
+from py2neo import Graph, Node, Relationship
 
+class GraphDatabase(object):
 
-class Database(object):
+    def __init__(self, url="bolt://localhost:7687", user='neo4j', password='admin'):
+        self._graph = Graph(url, user=user, password=password)
 
-    def __init__(self, uri, user, password):
-        self._driver = GraphDatabase.driver(uri, auth=(user, password))
+    def getGraph(self):
+        return self._graph
 
-    def close(self):
-        self._driver.close()
+    def addUser(self, user):
 
-    def print_greeting(self, user):
-        with self._driver.session() as session:
-            session.write_transaction(self.addUser, user)
+        user_info = {
+            'first_name': user['main_info']['first_name'],
+            'last_name':  user['main_info']['last_name'],
+            'domain':     user['main_info']['domain'],
+            'id':         user['main_info']['id']
+        }
 
-    @staticmethod
-    def addUser(tx, user):
-
-        user['first_name'] = user['main_info']['first_name']
-        user['last_name']  = user['main_info']['last_name']
-        user['id']         = user['main_info'fit ]['id']
-
-        tx.run(
-            """
-            CREATE (
-                {id}:User {
-                            first_name: {first_name},
-                            last_name:  {last_name},
-                            main_info:  {main_info},
-                            friends:    {friends},
-                            followers:  {followers},
-                            groups:     {groups},
-                            wall:       {wall},
-                            photos:     {photos}
-                        }                                       
-                )
-            """.format(**user)
-        )
-
-
+        person = Node('Person', **user_info)
+        self._graph.create(person)
