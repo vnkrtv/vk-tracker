@@ -142,10 +142,10 @@ class VK_UserInfo:
     def userGroups(self):
         try:
             groups = {}
-            groups['groups'] = self._user.groups.get(user_id=self._id, count=200, extended=1,
+            groups = self._user.groups.get(user_id=self._id, count=200, extended=1,
                                                      fields='id,name,screen_name', v='5.65')
 
-            for item in groups['groups']['items']:
+            for item in groups['items']:
                 item.pop('is_advertiser')
                 item.pop('is_member')
                 item.pop('photo_200')
@@ -187,6 +187,8 @@ class VK_UserInfo:
 
         print('Information about %s was successfully loaded to Graph Database' % (self._user_name + ' ' + self._user_surname))
 
+        return info
+
 
 if __name__ == '__main__':
     try:
@@ -195,6 +197,4 @@ if __name__ == '__main__':
         s.userAllInfo()
     except vk.exceptions.VkAPIError:
         print('Error: invalid token')
-    except:
-        print('Error!')
 
