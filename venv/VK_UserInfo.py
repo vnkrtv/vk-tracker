@@ -5,10 +5,6 @@ import vk
 from time import sleep, clock, ctime
 from Database import GraphDatabase
 
-token = 'b224a255a3de4e95ece62460ff0e8bfa11e67e965daa7eec3b4394c0726540412befb451396083a646007'
-domain = 'durov'
-
-
 class VK_UserInfo:
     _timeout = 0.35
 
