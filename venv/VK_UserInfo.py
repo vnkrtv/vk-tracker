@@ -1,13 +1,8 @@
-import os
-import shelve
 import vk
 
+from tkinter import *
 from time import sleep, clock, ctime
 from Database import GraphDatabase
-
-f = open('../token/token.txt')
-token =  f.read()
-f.close()
 
 class VK_UserInfo:
     _timeout = 0.35
@@ -157,43 +152,108 @@ class VK_UserInfo:
         sleep(self._timeout)
         return groups
 
-    def userAllInfo(self):
+    def userAllInfo(self, stream = sys.stdout):
+
+        sys.stdout = stream
 
         info = {}
         start = clock()
 
-        print('\nStart loading information about %s' % (self._user_name + ' ' + self._user_surname))
+        mes = ('Start loading information about %s\n' % (self._user_name + ' ' + self._user_surname))
+        print(mes)
 
         info['main_info'] = self.userMainInfo()
-        print('[%d s]Main information was loaded...' % (clock() - start))
+        stream.delete(0.0, END)
+        mes += ('[%d s]Main information was loaded...\n' % (clock() - start))
+        print(mes)
 
         info['friends'] = self.userFriends()
-        print('[%d s]Friends were loaded...' % (clock() - start))
+        stream.delete(0.0, END)
+        mes += ('[%d s]Friends were loaded...\n' % (clock() - start))
+        print(mes)
 
         info['followers'] = self.userFollowers()
-        print('[%d s]Followers were loaded...' % (clock() - start))
+        stream.delete(0.0, END)
+        mes += ('[%d s]Followers were loaded...\n' % (clock() - start))
+        print(mes)
 
         info['groups'] = self.userGroups()
-        print('[%d s]Groups were loaded...' % (clock() - start))
+        stream.delete(0.0, END)
+        mes += ('[%d s]Groups were loaded...\n' % (clock() - start))
+        print(mes)
 
         info['wall'] = self.userWall()
-        print('[%d s]Wallposts were loaded...' % (clock() - start))
+        stream.delete(0.0, END)
+        mes += ('[%d s]Wallposts were loaded...\n' % (clock() - start))
+        print(mes)
 
         info['photos'] = self.userPhotos()
-        print('[%d s]Photos were loaded...' % (clock() - start))
+        stream.delete(0.0, END)
+        mes += ('[%d s]Photos were loaded...\n' % (clock() - start))
+        print(mes)
 
         GraphDatabase().addUser(info)
 
-        print('Information about %s was successfully loaded to Graph Database' % (self._user_name + ' ' + self._user_surname))
+        stream.delete(0.0, END)
+        mes += ('Information about %s was successfully loaded to Graph Database\n' % (self._user_name + ' ' + self._user_surname))
+        print(mes)
 
         return info
 
 
+
+class UserInterface(Frame):
+
+    def __init__(self, master):
+
+        super(UserInterface, self).__init__(master)
+        self.grid()
+        self.create_widgets()
+
+    def create_widgets(self):
+
+        self.info_lbl = Label(self, text = "Enter user domain:")
+        self.info_lbl.grid(row = 0, column = 0, sticky = 'W')
+
+        self.dom_ent = Entry(self)
+        self.dom_ent.grid(row = 1, columnspan = 3, sticky = 'W')
+
+        self.submit_bttn = Button(self, text = "Download information", command = self.download)
+        self.submit_bttn.grid(row = 2, column = 0, columnspan = 3, sticky = 'W')
+
+        self.status_txt = Text(self, width = 70, height = 70, wrap = WORD)
+        self.status_txt.grid(row = 3, column = 0)
+
+    def download(self):
+
+        self.status_txt.delete(0.0, END)
+
+        try:
+            token = open('../token/token.txt').read()
+            domain = self.dom_ent.get()
+
+            stream = self.status_txt
+            stream.write = lambda message: self.status_txt.insert(0.0, message)
+
+            s = VK_UserInfo(token=token, domain=domain)
+            self.status_txt.delete(0.0, END)
+            s.userAllInfo(stream)
+
+        except vk.exceptions.VkAPIError:
+            self.status_txt.delete(0.0, END)
+            self.status_txt.insert(0.0, 'Error: invalid domain')
+        except:
+            self.status_txt.delete(0.0, END)
+            self.status_txt.insert(0.0, 'Error!')
+
+
 if __name__ == '__main__':
-    try:
-        domain = input('Enter domain: ')
-        s = VK_UserInfo(token=token, domain=domain)
-        s.userAllInfo()
-    except vk.exceptions.VkAPIError:
-        print('Error: invalid token')
+
+    root = Tk()
+    root.title('VkUserInfo')
+    root.geometry('400x500')
+
+    app = UserInterface(root)
+
+    root.mainloop()
 
