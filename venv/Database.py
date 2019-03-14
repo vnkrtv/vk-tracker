@@ -31,6 +31,53 @@ class GraphDatabase(object):
         added_user = Node('Person', **user_info)
         self._graph.create(added_user)
 
+        LIKED  = Relationship.type('LIKED')
+
+        for post in self._graph.nodes.match('Post'):
+            for person in self._graph.nodes.match('Person'):
+                if person['id'] in post['likes']:
+                    self._graph.merge(LIKED(person, post))
+
+        for photo in self._graph.nodes.match('Photo'):
+            for person in self._graph.nodes.match('Person'):
+                if person['id'] in photo['likes']:
+                    self._graph.merge(LIKED(person, photo))
+
+        POSTED = Relationship.type('POSTED')
+
+        for post in user['wall']['items']:
+            post_info = {
+                'likes_count': post['likes']['count'],
+                'post_id':     post['post_id'],
+                'text':        post['text'],
+                'likes': [item['id'] for item in post['likes']['items']]
+            }
+            node = Node('Post', **post_info)
+
+            self._graph.create(node)
+            self._graph.merge(POSTED(added_user, node))
+
+            for person in self._graph.nodes.match('Person'):
+                id = person['id']
+                if user_info['id'] in post_info['likes']:
+                    self._graph.merge(LIKED(person, node))
+
+        for photo in user['photos']['items']:
+            photo_info = {
+                'likes_count': photo['likes']['count'],
+                'photo_id':    photo['photo_id'],
+                'likes': [item['id'] for item in photo['likes']['items']]
+            }
+            node = Node('Photo', **photo_info)
+
+            self._graph.create(node)
+            self._graph.merge(POSTED(added_user, node))
+
+            for person in self._graph.nodes.match('Person'):
+                id = person['id']
+                if user_info['id'] in photo_info['likes']:
+                    self._graph.merge(LIKED(person, node))
+
 
         SUBSCRIBE_ON = Relationship.type('SUBSCRIBE_ON')
 
@@ -56,3 +103,5 @@ class GraphDatabase(object):
             id = person['id']
             if user_info['id'] in person['friends']:
                 self._graph.merge(FRIEND_OF(person, added_user) | FRIEND_OF(added_user, person))
+
+        

@@ -69,15 +69,15 @@ class VK_UserInfo:
                 }
 
                 try:
-                    photo['likes'] = self._user.likes.getList(type=photo, owner_id=self._id, item_id=photo_id,
-                                                              filter=likes, extended=1, v='5.65')
+                    photo['likes'] = self._user.likes.getList(type='photo', owner_id=self._id, item_id=photo['photo_id'],
+                                                              filter='likes', extended=1, v='5.65')
                 except:
                     photo['likes'] = None
 
                 sleep(self._timeout)
 
                 try:
-                    photo['comments'] = self._user.photos.getComments(owner_id=self._id, photo_id=photo_id, extended=1,
+                    photo['comments'] = self._user.photos.getComments(owner_id=self._id, photo_id=photo['photo_id'], extended=1,
                                                                       fields='first_name,last_name', v='5.65')
                 except:
                     photo['comments'] = None
@@ -85,9 +85,14 @@ class VK_UserInfo:
                 photos['photos']['items'].append(photo)
                 sleep(self._timeout)
         except:
-            photos = None
+            photos = {
+                'photos': {
+                    'count': 0,
+                    'items': []
+                }
+            }
 
-        return photos
+        return photos['photos']
 
     def userWall(self):
         try:
@@ -109,8 +114,8 @@ class VK_UserInfo:
                 }
 
                 try:
-                    post['likes'] = self._user.likes.getList(type=post, owner_id=self._id, item_id=post_id,
-                                                             filter=likes, extended=1, v='5.65')
+                    post['likes'] = self._user.likes.getList(type='post', owner_id=self._id, item_id=post['post_id'],
+                                                             filter='likes', extended=1, v='5.65')
                 except:
                     post['likes'] = None
 
@@ -122,7 +127,7 @@ class VK_UserInfo:
                     pass
 
                 try:
-                    post['comments'] = self._user.photos.getComments(owner_id=self._id, post_id=post_id, extended=1,
+                    post['comments'] = self._user.photos.getComments(owner_id=self._id, post_id=post['post_id'], extended=1,
                                                                      fields='first_name,last_name', v='5.65')
                 except:
                     post['comments'] = None
@@ -130,9 +135,14 @@ class VK_UserInfo:
                 wall['wall']['items'].append(post)
                 sleep(self._timeout)
         except:
-            wall = None
+            wall = {
+                'wall': {
+                    'count': 0,
+                    'items': []
+                }
+            }
 
-        return wall
+        return wall['wall']
 
     def userGroups(self):
         try:
@@ -147,7 +157,9 @@ class VK_UserInfo:
                 item.pop('photo_100')
                 item.pop('photo_50')
         except:
-            groups = None
+            groups = {
+                'items': []
+            }
 
         sleep(self._timeout)
         return groups
@@ -228,7 +240,17 @@ class UserInterface(Frame):
 
         self.status_txt.delete(0.0, END)
 
-        try:
+        token = open('../token/token.txt').read()
+        domain = self.dom_ent.get()
+
+        stream = self.status_txt
+        stream.write = lambda message: self.status_txt.insert(0.0, message)
+
+        s = VK_UserInfo(token=token, domain=domain)
+        self.status_txt.delete(0.0, END)
+        s.userAllInfo(stream)
+        """
+                try:
             token = open('../token/token.txt').read()
             domain = self.dom_ent.get()
 
@@ -245,6 +267,9 @@ class UserInterface(Frame):
         except:
             self.status_txt.delete(0.0, END)
             self.status_txt.insert(0.0, 'Error!')
+        """
+
+
 
 
 if __name__ == '__main__':
@@ -257,3 +282,4 @@ if __name__ == '__main__':
 
     root.mainloop()
 
+#python ./VKInfoSite/manage.py runserver
