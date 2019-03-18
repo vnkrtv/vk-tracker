@@ -1,0 +1,33 @@
+.style {
+	color: blue;
+	font-size: 12;
+	font-family: Times New Roman;
+	background: #1E90FF;
+}
+
+.test {
+	font-size: 14;
+	font-family: Arial;
+	color: #8B4513;
+}
+
+form.contact_form {
+	font-size: 16;
+	font-family: Arial;
+	color: #8B4513;
+}
+
+.button {
+    background-color: #F4A460;
+    border: none;
+    font-family: Arial;
+    color: #8B4513;
+    padding: 0px 15px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #CD853F;
+}
