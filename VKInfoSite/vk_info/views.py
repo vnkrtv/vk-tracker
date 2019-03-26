@@ -6,5 +6,5 @@ from django.http import HttpResponse
 from VK_UserInfo import VK_UserInfo
 
 def index(request):
-    responce = open('VK_Site/index.html').read()
+    responce = open('templates/index.html').read()
     return HttpResponse(responce)
