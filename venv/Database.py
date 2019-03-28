@@ -11,10 +11,13 @@ class GraphDatabase(object):
 
     def addUser(self, user):
 
-        friends, groups = [], []
+        friends, followers, groups = [], [], []
 
         for friend in user['friends']['items']:
             friends.append(friend['id'])
+
+        for follower in user['followers']['items']:
+            followers.append(follower['id'])
 
         for group in user['groups']['items']:
             groups.append(group['id'])
@@ -44,6 +47,7 @@ class GraphDatabase(object):
             'country':    country,
             'city':       city,
             'friends':    friends,
+            'followers':  followers,
             'groups':     groups
         }
 
@@ -119,7 +123,7 @@ class GraphDatabase(object):
                 'comments': [item['id'] for item in photo['comments']['items']],
                 'likes':    [item['id'] for item in photo['likes']['items']]
             }
-            node = Node('Photo', **photo_info)
+            node = j('Photo', **photo_info)
 
             self._graph.create(node)
             self._graph.merge(POSTED(added_user, node))
@@ -159,3 +163,11 @@ class GraphDatabase(object):
             id = person['id']
             if user_info['id'] in person['friends']:
                 self._graph.merge(FRIEND_OF(person, added_user) | FRIEND_OF(added_user, person))
+
+
+        FOLLOWS = Relationship.type('FOLLOWS')
+
+        for person in self._graph.nodes.match('Person'):
+            id = person['id']
+            if user_info['id'] in person['followers']:
+                self._graph.merge(FOLLOWS(added_user, person))

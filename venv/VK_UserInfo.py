@@ -1,7 +1,9 @@
 import vk
+import os
 
+from datetime import datetime as time
 from tkinter import *
-from time import sleep, clock, ctime
+from time import clock, sleep
 from Database import GraphDatabase
 
 class VK_UserInfo:
@@ -16,6 +18,18 @@ class VK_UserInfo:
         self._user_name = self._user.users.get(user_ids=domain, v='5.65')[0]['first_name']
         self._user_surname = self._user.users.get(user_ids=domain, v='5.65')[0]['last_name']
 
+    def userFirstName(self):
+        return self._user_name
+
+    def userLastName(self):
+        return self._user_surname
+
+    def userID(self):
+        return self._id
+
+    def userFolder(self):
+        self._folder = self._user.userFirstName() + ' ' + self._user.userLastName() + ' [id' + self._user.userID() + ']'
+        return self._folder
 
     def userMainInfo(self):
         fields  = 'counters,photo_id,verified,sex,bdate,city,country,home_town,domain,contacts,site,education,universities,schools,'
@@ -212,6 +226,29 @@ class VK_UserInfo:
 
         return info
 
+    def saveAllInfo(self, stream):
+        info = self.userAllInfo(stream)
+        path = 'userdata/' + folder
+
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        date = time.now().timepuple()
+        filename = date[3] + '.' + date[4] + ' ' + date[2] + '.' + date[1] + '.' + date[0]
+
+        info['date'] = {
+            'year':    date[0],
+            'month':   date[1],
+            'day':     date[2],
+            'hour':    date[3],
+            'minutes': date[4]
+        }
+
+        file = open(filename, 'w')
+        file.write(info)
+        file.close()
+
+
 
 
 class UserInterface(Frame):
@@ -248,7 +285,7 @@ class UserInterface(Frame):
 
         s = VK_UserInfo(token=token, domain=domain)
         self.status_txt.delete(0.0, END)
-        s.userAllInfo(stream)
+        s.saveAllInfo(stream)
         """
                 try:
             token = open('../token/token.txt').read()

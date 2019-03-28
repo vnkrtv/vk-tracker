@@ -1,6 +1,5 @@
 import VK_UserInfo
 
-
 class VK_UserAnalizer:
     def __init__(self, domain):
         self._user = VK_UserInfo(domain)
@@ -11,15 +10,15 @@ class VK_UserAnalizer:
 
 
     def cmpMainInfo(self):
-        oldMain = self.oldInf['main_info']
-        newMain = self.newInf['main_info']
+        oldMain = self._oldInf['main_info']
+        newMain = self._newInf['main_info']
 
         pass
 
 
     def cmpFriends(self):
-        oldFriends = self.oldInf['friends']['items']
-        newFriends = self.newInf['friends']['items']
+        oldFriends = self._oldInf['friends']['items']
+        newFriends = self._newInf['friends']['items']
 
         cmpDict = {}
 
@@ -49,8 +48,8 @@ class VK_UserAnalizer:
 
 
     def cmpFollowers(self):
-        oldFollowers = self.oldInfo['followers']['items']
-        newFollowers = self.newInfo['followers']['items']
+        oldFollowers = self._oldInf['followers']['items']
+        newFollowers = self._newInfo['followers']['items']
 
         cmpDict = {}
 
@@ -80,8 +79,8 @@ class VK_UserAnalizer:
 
 
     def cmpGroups(self):
-        oldGroups = self.oldInf['groups']['items']
-        newGroups = self.newInf['groups']['items']
+        oldGroups = self._oldInf['groups']['items']
+        newGroups = self._newInf['groups']['items']
 
         cmpDict = {}
 
@@ -111,8 +110,8 @@ class VK_UserAnalizer:
 
 
     def cmpPhotos(self):
-        oldPhotos = self.oldInf['photos']['items']
-        newPhotos = self.newInf['photos']['items']
+        oldPhotos = self._oldInf['photos']['items']
+        newPhotos = self._newInf['photos']['items']
 
         oldPhDict, newPhDict = {}, {}
 
@@ -231,137 +230,162 @@ class VK_UserAnalizer:
 
         return changeList
 
+    def cmpWall(self):
+        oldWall = self._oldInf['wall']['items']
+        newWall = self._newInf['wall']['items']
 
-def cmpWall(self):
-    oldWall = self.oldInf['wall']['items']
-    newWall = self.newInf['wall']['items']
+        oldWallDict, newWallDict, textDict = {}, {}, {}
 
-    oldWallDict, newWallDict, textDict = {}, {}, {}
+        for post in oldWall:
+            id = post['post_id']
 
-    for post in oldWall:
-        id = post['post_id']
+            textDict[id] = [post['text'], None]
+            oldWallDict[id] = [post['comments'], post['likes']]
 
-        textDict[id] = [post['text'], None]
-        oldWallDict[id] = [post['comments'], post['likes']]
+        for post in newWall:
+            id = post['post_id']
 
-    for post in newWall:
-        id = post['post_id']
+            textDict[id] = [None, post['text']]
+            newWallDict[id] = [post['comments'], post['likes']]
 
-        textDict[id] = [None, post['text']]
-        newWallDict[id] = [post['comments'], post['likes']]
+        changeList, listID = [], []
 
-    changeList, listID = [], []
+        for id in oldWallDict:
+            if id in newWallDict:
+                oldPost = {
+                    'post_id': id,
+                    'text': textDict[id],
+                    'comments': oldWallDict[id][0],
+                    'likes': oldWallDict[id][1],
+                    'status': 'deleted photo'
+                }
 
-    for id in oldWallDict:
-        if id in newWallDict:
+                changeList.append(oldPh)
+                listID.append(id)
 
-            oldPost = {
-                'post_id':  id,
-                'text':     textDict[id],
-                'comments': oldWallDict[id][0],
-                'likes':    oldWallDict[id][1],
-                'status':   'deleted photo'
-            }
+        for id in listID:
+            oldWallDict.pop(id)
+            textDict.pop(id)
 
-            changeList.append(oldPh)
-            listID.append(id)
+        listID = []
 
-    for id in listID:
-        oldWallDict.pop(id)
-        textDict.pop(id)
+        for id in newWallDict:
+            if id in oldWallDict:
+                newPost = {
+                    'post_id': id,
+                    'text': textDict[id],
+                    'comments': newWallDict[id][0],
+                    'likes': newWallDict[id][1],
+                    'status': 'new photo'
+                }
 
-    listID = []
+                changeList.append(newPh)
+                listID.append(id)
 
-    for id in newWallDict:
-        if id in oldWallDict:
+        for id in listID:
+            newWallDict.pop(id)
+            textDict.pop(id)
 
-            newPost = {
-                'post_id':  id,
-                'text':     textDict[id],
-                'comments': newWallDict[id][0],
-                'likes':    newWallDict[id][1],
-                'status':   'new photo'
-            }
+        changeLikesList, changeCommList = [], []
 
-            changeList.append(newPh)
-            listID.append(id)
+        for (old, new) in (oldWallDict, newWallDict):
+            if oldWallDict[old][0] != newWallDict[new][0]:
+                oldComm = oldPhDict[old][0]
+                newComm = newPhDict[new][0]
 
-    for id in listID:
-        newWallDict.pop(id)
-        textDict.pop(id)
+                if oldComm != newComm:
+                    cmpDict = {}
 
-    changeLikesList, changeCommList = [], []
+                    for item in oldComm['items']:
+                        id = item['id']
+                        cmpDict[id] = [item, 0]
 
-    for (old, new) in (oldWallDict, newWallDict):
-        if oldWallDict[old][0] != newWallDict[new][0]:
-            oldComm = oldPhDict[old][0]
-            newComm = newPhDict[new][0]
+                    for item in newComm['items']:
+                        id = item['id']
 
-            if oldComm != newComm:
-                cmpDict = {}
+                        if id in cmpDict:
+                            cmpDict.pop(id)
+                        else:
+                            cmpDict[id] = [item, 1]
 
-                for item in oldComm['items']:
-                    id = item['id']
-                    cmpDict[id] = [item, 0]
+                    for key in cmpDict:
 
-                for item in newComm['items']:
-                    id = item['id']
+                        if cmpDict[key][1]:
+                            cmpDict[key][0]['status'] = 'new comment'
+                        else:
+                            cmpDict[key][0]['status'] = 'deleted comment'
 
-                    if id in cmpDict:
-                        cmpDict.pop(id)
-                    else:
-                        cmpDict[id] = [item, 1]
+                        changeCommList.append(cmpDict[key][0])
 
-                for key in cmpDict:
+                oldLikes = oldWallDict[old][1]
+                newLikes = newWallDict[new][1]
 
-                    if cmpDict[key][1]:
-                        cmpDict[key][0]['status'] = 'new comment'
-                    else:
-                        cmpDict[key][0]['status'] = 'deleted comment'
+                if oldLikes != newLikes:
+                    cmpDict = {}
 
-                    changeCommList.append(cmpDict[key][0])
+                    for item in oldLikes['items']:
+                        id = item['id']
+                        cmpDict[id] = [item, 0]
 
-            oldLikes = oldWallDict[old][1]
-            newLikes = newWallDict[new][1]
+                    for item in newLikes['items']:
+                        id = item['id']
 
-            if oldLikes != newLikes:
-                cmpDict = {}
+                        if id in cmpDict:
+                            cmpDict.pop(id)
+                        else:
+                            cmpDict[id] = [item, 1]
 
-                for item in oldLikes['items']:
-                    id = item['id']
-                    cmpDict[id] = [item, 0]
+                    for key in cmpDict:
 
-                for item in newLikes['items']:
-                    id = item['id']
+                        if cmpDict[key][1]:
+                            cmpDict[key][0]['status'] = 'new like'
+                        else:
+                            cmpDict[key][0]['status'] = 'deleted like'
 
-                    if id in cmpDict:
-                        cmpDict.pop(id)
-                    else:
-                        cmpDict[id] = [item, 1]
+                        changeLikesList.append(cmpDict[key][0])
 
-                for key in cmpDict:
+                photo = {}
+                if not changeCommList:
+                    photo['comments'] = changeCommList
+                if not changeLikesList:
+                    photo['likes'] = changeLikesList
+                if (not changeCommList) or (not changeLikesList):
+                    photo['photo_id'] = old
+                    changeList.append(photo)
 
-                    if cmpDict[key][1]:
-                        cmpDict[key][0]['status'] = 'new like'
-                    else:
-                        cmpDict[key][0]['status'] = 'deleted like'
+                changeCommList, changeLikesList = [], []
 
-                    changeLikesList.append(cmpDict[key][0])
+        return changeList
 
-            photo = {}
-            if not changeCommList:
-                photo['comments'] = changeCommList
-            if not changeLikesList:
-                photo['likes'] = changeLikesList
-            if (not changeCommList) or (not changeLikesList):
-                photo['photo_id'] = old
-                changeList.append(photo)
+    def getChanges(self):
+        if self._oldInfo is None or self._newInfo is None:
+            raise Exception('user information was not loaded')
 
-            changeCommList, changeLikesList = [], []
+        changeDict = {
+            'main_info': self.cmpMainInfo(),
+            'friends':   self.cmpFriends(),
+            'followers': self.cmpFollowers(),
+            'groups':    self.cmpGroups(),
+            'photos':    self.cmpPhotos(),
+            'wall':      self.cmpWall()
+        }
 
-    return changeList
+
+
+
+    """
+
+	wstring filename = convert.from_bytes(_user.getName()) + L'_' + convert.from_bytes(_user.getSurname());
+	filename = filename + L"[id" + to_wstring(_user.getUserID()) + L']' + L'[' + getDate() + L"].txt";
+
+	ofstream fin(wstring(L"../userdata/comparison/" + filename));
+
+	fin << jChanges.dump(4) << endl;
+	wcout << L"Changes were successfully loaded to " + filename << endl;
+
+	fin.close();
+}"""
 
 
 if __name__ == '__main__':
-    from neo4j import GraphDatabase
-    
+    pass
