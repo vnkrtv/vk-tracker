@@ -26,12 +26,15 @@ class GraphDatabase(object):
         country = country.get('title', '') if country != None else ''
 
         city = user['main_info'].get('city', None)
-        city = country.get('title', '') if city != None else ''
+        city = city.get('title', '') if city != None else ''
 
         bday       = user['main_info'].get('bdate', '')
-        bday_year  = user['main_info'].get('bdate', ' . . ').split('.')[2],
         bday_month = user['main_info'].get('bdate', ' . . ').split('.')[1],
         bday_day   = user['main_info'].get('bdate', ' . . ').split('.')[0],
+        try:
+            bday_year = user['main_info'].get('bdate', ' . . ').split('.')[2]
+        except:
+            bday_year = 0
 
         user_info = {
             'first_name': user['main_info']['first_name'],
@@ -123,7 +126,7 @@ class GraphDatabase(object):
                 'comments': [item['id'] for item in photo['comments']['items']],
                 'likes':    [item['id'] for item in photo['likes']['items']]
             }
-            node = j('Photo', **photo_info)
+            node = Node('Photo', **photo_info)
 
             self._graph.create(node)
             self._graph.merge(POSTED(added_user, node))

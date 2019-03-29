@@ -1,5 +1,6 @@
-import vk
 import os
+import json
+import vk
 
 from datetime import datetime as time
 from tkinter import *
@@ -28,8 +29,7 @@ class VK_UserInfo:
         return self._id
 
     def userFolder(self):
-        self._folder = self._user.userFirstName() + ' ' + self._user.userLastName() + ' [id' + self._user.userID() + ']'
-        return self._folder
+        return self.userFirstName() + ' ' + self.userLastName() + ' [id' + str(self.userID()) + ']'
 
     def userMainInfo(self):
         fields  = 'counters,photo_id,verified,sex,bdate,city,country,home_town,domain,contacts,site,education,universities,schools,'
@@ -86,7 +86,10 @@ class VK_UserInfo:
                     photo['likes'] = self._user.likes.getList(type='photo', owner_id=self._id, item_id=photo['photo_id'],
                                                               filter='likes', extended=1, v='5.65')
                 except:
-                    photo['likes'] = None
+                    photo['likes'] = {
+                        'count': 0,
+                        'items': []
+                    }
 
                 sleep(self._timeout)
 
@@ -94,7 +97,10 @@ class VK_UserInfo:
                     photo['comments'] = self._user.photos.getComments(owner_id=self._id, photo_id=photo['photo_id'], extended=1,
                                                                       fields='first_name,last_name', v='5.65')
                 except:
-                    photo['comments'] = None
+                    photo['comments'] = {
+                        'count': 0,
+                        'items': []
+                    }
 
                 photos['photos']['items'].append(photo)
                 sleep(self._timeout)
@@ -131,7 +137,10 @@ class VK_UserInfo:
                     post['likes'] = self._user.likes.getList(type='post', owner_id=self._id, item_id=post['post_id'],
                                                              filter='likes', extended=1, v='5.65')
                 except:
-                    post['likes'] = None
+                    post['likes'] = {
+                        'count': 0,
+                        'items': []
+                    }
 
                 sleep(self._timeout)
 
@@ -144,7 +153,10 @@ class VK_UserInfo:
                     post['comments'] = self._user.photos.getComments(owner_id=self._id, post_id=post['post_id'], extended=1,
                                                                      fields='first_name,last_name', v='5.65')
                 except:
-                    post['comments'] = None
+                    post['comments'] = {
+                        'count': 0,
+                        'items': []
+                    }
 
                 wall['wall']['items'].append(post)
                 sleep(self._timeout)
@@ -218,23 +230,21 @@ class VK_UserInfo:
         mes += ('[%d s]Photos were loaded...\n' % (clock() - start))
         print(mes)
 
-        GraphDatabase().addUser(info)
-
         stream.delete(0.0, END)
-        mes += ('Information about %s was successfully loaded to Graph Database\n' % (self._user_name + ' ' + self._user_surname))
+        mes += ('Information about %s was successfully loaded\n' % (self._user_name + ' ' + self._user_surname))
         print(mes)
 
         return info
 
     def saveAllInfo(self, stream):
         info = self.userAllInfo(stream)
-        path = 'userdata/' + folder
+        path = '../userdata/' + self.userFolder()
 
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
 
-        date = time.now().timepuple()
-        filename = date[3] + '.' + date[4] + ' ' + date[2] + '.' + date[1] + '.' + date[0]
+        date = time.now().timetuple()
+        file = str(date[3]) + '.' + str(date[4]) + ' ' + str(date[2]) + '.' + str(date[1]) + '.' + str(date[0]) + '.json'
 
         info['date'] = {
             'year':    date[0],
@@ -244,9 +254,13 @@ class VK_UserInfo:
             'minutes': date[4]
         }
 
-        file = open(filename, 'w')
-        file.write(info)
-        file.close()
+        json.dump(info, open(path + '/' + file, 'w'))
+        self.addUserToDatabase(info)
+
+        return info
+
+    def addUserToDatabase(self, info):
+        GraphDatabase().addUser(info)
 
 
 

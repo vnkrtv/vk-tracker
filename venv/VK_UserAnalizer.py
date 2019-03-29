@@ -1,19 +1,34 @@
-import VK_UserInfo
+from VK_UserInfo import *
 
 class VK_UserAnalizer:
-    def __init__(self, domain):
+    def __init__(self, domain, date):
         self._user = VK_UserInfo(domain)
-
+        self.getInfo(date)
 
     def getInfo(self, date):
-        pass
+        path = '../userdata/' + self._user.userFolder()
+        if not os.path.exists(path):
+            raise Exception('user not found in database')
+        #TODO: convert data->filename: {hour}.{minutes} {day}.{month}.{year}.json
+
+        self._oldInf = open(path + '/' + filename, 'r').read()
+        self._newInf = self._user.saveAllInfo()
 
 
     def cmpMainInfo(self):
         oldMain = self._oldInf['main_info']
         newMain = self._newInf['main_info']
 
-        pass
+        cmpDict = {}
+
+        for (old, new) in (oldMain, newMain):
+            if oldMain[old] != newMain[new]:
+                cmpDict[old] = {
+                    'old': oldMain[old],
+                    'new': newMain[new]
+                }
+
+        return cmpDict
 
 
     def cmpFriends(self):
@@ -49,7 +64,7 @@ class VK_UserAnalizer:
 
     def cmpFollowers(self):
         oldFollowers = self._oldInf['followers']['items']
-        newFollowers = self._newInfo['followers']['items']
+        newFollowers = self._newInf['followers']['items']
 
         cmpDict = {}
 
@@ -358,7 +373,7 @@ class VK_UserAnalizer:
         return changeList
 
     def getChanges(self):
-        if self._oldInfo is None or self._newInfo is None:
+        if self._oldInf is None or self._newInf is None:
             raise Exception('user information was not loaded')
 
         changeDict = {
