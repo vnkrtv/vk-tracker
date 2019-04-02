@@ -1,0 +1,16 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <form>
+        <table>
+            <tr><td>Enter first user domain:</td>
+                <td><input>
+            </td></tr>
+            <tr><td>Enter second user domain:</td>
+                <td><input>
+            </td></tr>
+        </table>
+        <a href="/users_relation/show_relation/" class="btn btn-dark btn-sm">Get mutual activity</a>
+    </form>
+    <br/>
+{% endblock %}
