@@ -190,54 +190,37 @@ class VK_UserInfo:
         sleep(self._timeout)
         return groups
 
-    def userAllInfo(self, stream = sys.stdout):
-
-        sys.stdout = stream
+    def userAllInfo(self):
 
         info = {}
         start = clock()
 
-        mes = ('Start loading information about %s\n' % (self._user_name + ' ' + self._user_surname))
-        print(mes)
+        print('Start loading information about %s\n' % (self._user_name + ' ' + self._user_surname))
 
         info['main_info'] = self.userMainInfo()
-        stream.delete(0.0, END)
-        mes += ('[%d s]Main information was loaded...\n' % (clock() - start))
-        print(mes)
+        print('[%d s]Main information was loaded...\n' % (clock() - start))
 
         info['friends'] = self.userFriends()
-        stream.delete(0.0, END)
-        mes += ('[%d s]Friends were loaded...\n' % (clock() - start))
-        print(mes)
+        print('[%d s]Friends were loaded...\n' % (clock() - start))
 
         info['followers'] = self.userFollowers()
-        stream.delete(0.0, END)
-        mes += ('[%d s]Followers were loaded...\n' % (clock() - start))
-        print(mes)
+        print('[%d s]Followers were loaded...\n' % (clock() - start))
 
         info['groups'] = self.userGroups()
-        stream.delete(0.0, END)
-        mes += ('[%d s]Groups were loaded...\n' % (clock() - start))
-        print(mes)
+        print('[%d s]Groups were loaded...\n' % (clock() - start))
 
         info['wall'] = self.userWall()
-        stream.delete(0.0, END)
-        mes += ('[%d s]Wallposts were loaded...\n' % (clock() - start))
-        print(mes)
+        print('[%d s]Wallposts were loaded...\n' % (clock() - start))
 
         info['photos'] = self.userPhotos()
-        stream.delete(0.0, END)
-        mes += ('[%d s]Photos were loaded...\n' % (clock() - start))
-        print(mes)
+        print('[%d s]Photos were loaded...\n' % (clock() - start))
 
-        stream.delete(0.0, END)
-        mes += ('Information about %s was successfully loaded\n' % (self._user_name + ' ' + self._user_surname))
-        print(mes)
+        print('Information about %s was successfully loaded\n' % (self._user_name + ' ' + self._user_surname))
 
         return info
 
-    def saveAllInfo(self, stream):
-        info = self.userAllInfo(stream)
+    def saveAllInfo(self):
+        info = self.userAllInfo()
         path = '../userdata/' + self.userFolder()
 
         if not os.path.exists(path):
@@ -255,12 +238,12 @@ class VK_UserInfo:
         }
 
         json.dump(info, open(path + '/' + file, 'w'))
-        self.addUserToDatabase(info)
 
         return info
 
-    def addUserToDatabase(self, info):
-        GraphDatabase().addUser(info)
+    def addUserToDatabase(self):
+        info = self.saveAllInfo()
+        return GraphDatabase().addUser(info)
 
 
 
@@ -324,13 +307,8 @@ class UserInterface(Frame):
 
 
 if __name__ == '__main__':
-
-    root = Tk()
-    root.title('VkUserInfo')
-    root.geometry('400x500')
-
-    app = UserInterface(root)
-
-    root.mainloop()
+    token = open('../token/token.txt').read()
+    s = VK_UserInfo(token=token, domain='n_oriharov')
+    s.addUserToDatabase()
 
 #python ./VKInfoSite/manage.py runserver

@@ -385,21 +385,7 @@ class VK_UserAnalizer:
             'wall':      self.cmpWall()
         }
 
-
-
-
-    """
-
-	wstring filename = convert.from_bytes(_user.getName()) + L'_' + convert.from_bytes(_user.getSurname());
-	filename = filename + L"[id" + to_wstring(_user.getUserID()) + L']' + L'[' + getDate() + L"].txt";
-
-	ofstream fin(wstring(L"../userdata/comparison/" + filename));
-
-	fin << jChanges.dump(4) << endl;
-	wcout << L"Changes were successfully loaded to " + filename << endl;
-
-	fin.close();
-}"""
+        return changeDict
 
 
 if __name__ == '__main__':

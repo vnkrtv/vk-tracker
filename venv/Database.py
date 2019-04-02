@@ -1,6 +1,5 @@
 from py2neo import Graph, Node, Relationship
 
-
 class GraphDatabase(object):
 
     def __init__(self, url="bolt://localhost:11001", user='neo4j', password='admin'):
@@ -11,16 +10,9 @@ class GraphDatabase(object):
 
     def addUser(self, user):
 
-        friends, followers, groups = [], [], []
-
-        for friend in user['friends']['items']:
-            friends.append(friend['id'])
-
-        for follower in user['followers']['items']:
-            followers.append(follower['id'])
-
-        for group in user['groups']['items']:
-            groups.append(group['id'])
+        friends   = [friend['id']   for friend   in user['friends']['items']  ]
+        followers = [follower['id'] for follower in user['followers']['items']]
+        groups    = [group['id']    for group    in user['groups']['items']   ]
 
         country = user['main_info'].get('country', None)
         country = country.get('title', '') if country != None else ''
@@ -29,8 +21,9 @@ class GraphDatabase(object):
         city = city.get('title', '') if city != None else ''
 
         bday       = user['main_info'].get('bdate', '')
-        bday_month = user['main_info'].get('bdate', ' . . ').split('.')[1],
-        bday_day   = user['main_info'].get('bdate', ' . . ').split('.')[0],
+        bday_month = user['main_info'].get('bdate', ' . . ').split('.')[1]
+        bday_day   = user['main_info'].get('bdate', ' . . ').split('.')[0]
+
         try:
             bday_year = user['main_info'].get('bdate', ' . . ').split('.')[2]
         except:
@@ -56,15 +49,26 @@ class GraphDatabase(object):
 
 
         added_user = Node('Person', **user_info)
-        userExist = False
         for person in self._graph.nodes.match('Person'):
             if person['domain'] == user_info['domain']:
-                userExist = True
+                self._graph.evaluate("""
 
-        if not userExist:
-            self._graph.create(added_user)
+                            MATCH (n:Person) WHERE n.domain="%s"
+                            OPTIONAL MATCH (n)-[l_rel:LIKED]-()
+                            OPTIONAL MATCH (n)-[c_rel:COMMENTED]-()
+                            OPTIONAL MATCH (n)-[sub_rel:SUBSCRIBE_ON]-()
+                            OPTIONAL MATCH (n)-[post_rel:POSTED]-(posts)
+                            OPTIONAL MATCH ()-[l_posts_rel:LIKED]-(posts)
+                            OPTIONAL MATCH ()-[c_posts_rel:COMMENTED]-(posts)
+                            OPTIONAL MATCH (n)-[fr_rel_1:FRIEND_OF]-(fr)
+                            OPTIONAL MATCH (fr)-[fr_rel_2:FRIEND_OF]-(n)
+                            OPTIONAL MATCH (n)-[foll_rel:FOLLOWS]-()
+                            DELETE l_rel, c_rel, l_posts_rel, c_posts_rel, sub_rel, post_rel, fr_rel_1, fr_rel_2, foll_rel, posts, n"""
 
-        #TODO: проверить, существуют ли связи или нет
+                                     % user_info['domain'])
+
+        self._graph.create(added_user)
+
         LIKED  = Relationship.type('LIKED')
 
         for post in self._graph.nodes.match('Post'):
@@ -164,7 +168,7 @@ class GraphDatabase(object):
 
         for person in self._graph.nodes.match('Person'):
             id = person['id']
-            if user_info['id'] in person['friends']:
+            if (user_info['id'] in person['friends']) or (person['id'] in user_info['friends']):
                 self._graph.merge(FRIEND_OF(person, added_user) | FRIEND_OF(added_user, person))
 
 
@@ -174,3 +178,10 @@ class GraphDatabase(object):
             id = person['id']
             if user_info['id'] in person['followers']:
                 self._graph.merge(FOLLOWS(added_user, person))
+            elif person['id'] in user_info['followers']:
+                self._graph.merge(FOLLOWS(person, added_user))
+
+        return user_info
+
+if __name__ == '__main__':
+    pass

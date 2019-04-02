@@ -1,0 +1,9 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+   {% for d in value %}
+      {% for k, v in d.items %}
+        <p>{{ k }} - {{ v }}</p>
+      {% endfor %}
+   {% endfor %}
+{% endblock %}
