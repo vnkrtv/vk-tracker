@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from VK_UserInfo import VK_UserInfo
 
@@ -18,7 +20,8 @@ def getUserDomains(request):
     return render(request, 'main/getUsersDomainsPage.html')
 
 def getUserInfo(request):
-    vk_user = VK_UserInfo('b224a255a3de4e95ece62460ff0e8bfa11e67e965daa7eec3b4394c0726540412befb451396083a646007', 'n_oriharov')
+    token = open('token/token.txt', 'r').read()
+    vk_user = VK_UserInfo(token=token, domain=request.POST['domain'])
     user = vk_user.addUserToDatabase()
 
     info = {'value': [
@@ -34,8 +37,27 @@ def getUserInfo(request):
     }
     return render(request, 'main/userInfo.html', info)
 
+def getUserOldInfo(request):
+    token = open('token/token.txt', 'r').read()
+
+    domain = request.POST['domain']
+    user = VK_UserInfo(token=token, domain=domain)
+    info = {}
+
+    if os.path.exists('userdata/' + user.userFolder()):
+        info['files'] = [file[0:-5] for file in os.listdir('userdata/' + user.userFolder())]
+    else:
+        info['files'] = 'user not found'
+
+    return render(request, 'main/getUserOldInfo.html', info)
+
 def getUserChanges(request):
+    file = request.POST['file']
+
     return render(request, 'main/getUserChanges.html')
 
 def getUsersRelations(request):
+    first_domain  = request.POST['first_domain']
+    second_domain = request.POST['second_domain']
+
     return render(request, 'main/getUsersRelations.html')
