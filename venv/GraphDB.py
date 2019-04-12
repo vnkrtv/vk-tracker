@@ -1,6 +1,6 @@
 from py2neo import Graph, Node, Relationship
 
-class GraphDatabase(object):
+class GraphDB(object):
 
     def __init__(self, url="bolt://localhost:11001", user='neo4j', password='admin'):
         self._graph = Graph(url, user=user, password=password)

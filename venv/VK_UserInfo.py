@@ -5,7 +5,8 @@ import vk
 from datetime import datetime as time
 from tkinter import *
 from time import clock, sleep
-from Database import GraphDatabase
+from GraphDB import GraphDB
+from MongoDB import MongoDB
 
 class VK_UserInfo:
     _timeout = 0.35
@@ -217,8 +218,18 @@ class VK_UserInfo:
 
         print('Information about %s was successfully loaded\n' % (self._user_name + ' ' + self._user_surname))
 
+        date = time.now().timetuple()
+        info['date'] = {
+            'year': date[0],
+            'month': date[1],
+            'day': date[2],
+            'hour': date[3],
+            'minutes': date[4]
+        }
+
         return info
 
+    """
     def saveAllInfo(self):
         info = self.userAllInfo()
         path = '../userdata/' + self.userFolder()
@@ -240,10 +251,15 @@ class VK_UserInfo:
         json.dump(info, open(path + '/' + file, 'w'))
 
         return info
+    """
 
-    def addUserToDatabase(self):
+    def addUserToDB(self):
         info = self.saveAllInfo()
-        return GraphDatabase().addUser(info)
+
+        MongoDB().addUser(info)
+        GraphDatabase().addUser(info)
+
+        return info
 
 
 
