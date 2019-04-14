@@ -1,0 +1,13 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <p>User was successfully added to DBs!</p>
+    <table>
+        {% for d in value %}
+            {% for k, v in d.items %}
+                <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+            {% endfor %}
+        {% endfor %}
+    </table>
+    <br/>
+{% endblock %}

@@ -254,10 +254,10 @@ class VK_UserInfo:
     """
 
     def addUserToDB(self):
-        info = self.saveAllInfo()
+        info = self.userAllInfo()
 
         MongoDB().addUser(info)
-        GraphDatabase().addUser(info)
+        GraphDB().addUser(info)
 
         return info
 
@@ -325,6 +325,6 @@ class UserInterface(Frame):
 if __name__ == '__main__':
     token = open('../token/token.txt').read()
     s = VK_UserInfo(token=token, domain='n_oriharov')
-    s.addUserToDatabase()
+    s.addUserToDB()
 
 #python ./VKInfoSite/manage.py runserver

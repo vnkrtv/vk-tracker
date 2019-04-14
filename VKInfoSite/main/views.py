@@ -5,10 +5,27 @@ from VK_UserInfo import VK_UserInfo
 
 # Create your views here.
 
-from VK_UserInfo import VK_UserInfo
 
 def index(request):
     return render(request, 'main/homePage.html')
+
+
+def addUser(request):
+    return render(request, 'main/addUser.html')
+
+def addUserResult(request):
+    token = open('token/token.txt', 'r').read()
+    vk_user = VK_UserInfo(token=token, domain=request.POST['domain'])
+    user = vk_user.addUserToDB()
+
+    info = {'value': [
+        {'Имя': user['main_info']['first_name']},
+        {'Фамилия': user['main_info']['last_name']},
+        {'domain': user['main_info']['domain']},
+        {'id': user['main_info']['id']}]
+    }
+    return render(request, 'main/addUserResult.html', info)
+
 
 def getUserDomainShowData(request):
     return render(request, 'main/getUserDomainDataPage.html')
@@ -19,10 +36,11 @@ def getUserDomainChanges(request):
 def getUserDomains(request):
     return render(request, 'main/getUsersDomainsPage.html')
 
+
 def getUserInfo(request):
     token = open('token/token.txt', 'r').read()
     vk_user = VK_UserInfo(token=token, domain=request.POST['domain'])
-    user = vk_user.addUserToDatabase()
+    user = vk_user.addUserToDB()
 
     info = {'value': [
         {'Имя': user['first_name']},
