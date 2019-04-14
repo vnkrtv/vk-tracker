@@ -1,12 +1,12 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="{% url 'main:getUserOldInfo' %}" method="post">
+    <form action="{% url 'main:getInfo' %}" method="post">
         {% csrf_token %}
 
         <label for="domain">Enter user domain: </label>
         <input type="text" name="domain" id="domain"/><br/>
-        <input type="submit" class="btn btn-dark btn-sm" value="Get info" onclick="location.href='/user_changes/show_changes/'">
+        <input type="submit" class="btn btn-dark btn-sm" value="Get info" onclick="location.href='/user_info/show_info/'">
     </form>
     <br/>
 {% endblock %}
