@@ -4,14 +4,14 @@
     <p>Main info changes:</p>
     <li>
         New:
-        {% for key, change in info.value.main_info %}
-
+        {% for key, change in info.value.main_info.new %}
+            <p>{{ key }} - {{ change }}</p>
         {% endfor %}
     </li>
     <li>
         Old:
-        {% for key, change in info.value.main_info %}
-
+        {% for key, change in info.value.main_info.old %}
+            <p>{{ key }} - {{ change }}</p>
         {% endfor %}
     </li>
 
@@ -115,18 +115,28 @@
                 <tr><td>Likes</td><td>
                     {% for like in photo.likes %}
                         {% if like.status %}
-
+                             <p>New - {{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
                         {% else %}
-
+                             <p>Deleted - {{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
                         {% endif %}
                     {% endfor %}
                 </td></tr>
                 <tr><td>Comments</td><td>
                     {% for comment in photo.comments %}
                         {% if comment.status %}
-
+                            <p>New comment:</p>
+                            <table>
+                                {% for k, v in comment %}
+                                    <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                                {% endfor %}
+                            </table>
                         {% else %}
-
+                             <p>Deleted comment:</p>
+                             <table>
+                                {% for k, v in comment %}
+                                    <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                                {% endfor %}
+                            </table>
                         {% endif %}
                     {% endfor %}
                 </td></tr>
@@ -140,20 +150,30 @@
         <li>Wallpost {{ post.post_id }}:
             <table>
                 <tr><td>Likes</td><td>
-                    {% for like in post.likes %}
+                    {% for like in photo.likes %}
                         {% if like.status %}
-
+                             <p>New - {{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
                         {% else %}
-
+                             <p>Deleted - {{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
                         {% endif %}
                     {% endfor %}
                 </td></tr>
                 <tr><td>Comments</td><td>
-                    {% for comment in post.comments %}
+                    {% for comment in photo.comments %}
                         {% if comment.status %}
-
+                            <p>New comment:</p>
+                            <table>
+                                {% for k, v in comment %}
+                                    <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                                {% endfor %}
+                            </table>
                         {% else %}
-
+                             <p>Deleted comment:</p>
+                             <table>
+                                {% for k, v in comment %}
+                                    <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                                {% endfor %}
+                            </table>
                         {% endif %}
                     {% endfor %}
                 </td></tr>

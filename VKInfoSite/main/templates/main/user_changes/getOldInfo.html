@@ -1,8 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-<h1>HEY!</h1>
-    {% if 'error' not on info %}
+    {% if 'error' not in info %}
         <form action="{% url 'main:getChanges' %}" method="post">
             {% csrf_token %}
             {% for date in info.dates %}
