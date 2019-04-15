@@ -1,16 +1,79 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if 'error' not in value %}
-        <table>
-            {% for d in value %}
-                {% for k, v in d.items %}
-                    <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                {% endfor %}
+    {% if 'error' not in info %}
+        <p>Main info:</p>
+            {% for key, value in info.main_info.items %}
+                <li>{{ key }} - {{ value }}</li>
             {% endfor %}
-        </table>
-        <p></br></p>
+
+        <p><br>Friends list:</p>
+            {% for friend in info.friends.items %}
+                <li>
+                    <p>{{ friend.first_name}} {{ friend.last_name }} </p>
+                    <p>id - {{ friend.id }}</p>
+                    <p>domain - {{ friend.domain }}</p>
+                    <p>Bday: {{ friend.bdate }}</p>
+                </li>
+            {% endfor %}
+
+        <p><br>Followers list:</p>
+            {% for follower in info.followers.items %}
+                <li>
+                    <p>{{ follower.first_name }} {{ follower.last_name }} </p>
+                    <p>id - {{ follower.id }}</p>
+                    <p>domain - {{ follower.domain }}</p>
+                    <p>Bday: {{ follower.bdate }}</p>
+                </li>
+            {% endfor %}
+
+        <p><br>Groups:</p>
+            {% for group in info.groups.items %}
+                <li>
+                    <p>{{ group.name }}</p>
+                    <p>id - {{ group.id }}</p>
+                    <p>domain - {{ group.screen_name }}</p>
+                </li>
+            {% endfor %}
+
+        <p><br>Photos:</p>
+            {% for photo in info.photos.items %}
+                <li>Photo {{ photo.photo_id }}:
+                <table>
+                    <tr><td>Likes</td><td>
+                        {% for like in photo.likes.items %}
+                             <p>{{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
+                        {% endfor %}
+                    </td></tr>
+                    <tr><td>Comments</td><td>
+                        {% for comment in photo.comments.items %}
+                            {% for k in comment %}
+                                <tr><td>{{ k }}</td><td>{{ comment.k }}</td></tr>
+                            {% endfor %}
+                        {% endfor %}
+                </table>
+            {% endfor %}
+
+
+        <p><br>Wall:</p>
+            {% for post in info.wall.items %}
+                <li>Wallpost {{ post.post_id }}:
+                    <table>
+                        <tr><td>Likes</td><td>
+                            {% for like in photo.likes.items %}
+                                 <p>{{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
+                            {% endfor %}
+                        </td></tr>
+                        <tr><td>Comments</td><td>
+                            {% for comment in photo.comments.items %}
+                                {% for k in comment %}
+                                    <tr><td>{{ k }}</td><td>{{ comment.k }}</td></tr>
+                                {% endfor %}
+                            {% endfor %}
+                    </table>
+                </li>
+            {% endfor %}
     {% else %}
-        <p>Error: {{ value.error }}</p>
+        <p>Error: {{ error }}</p>
     {% endif %}
 {% endblock %}

@@ -13,6 +13,6 @@
             <input type="submit" class="btn btn-dark btn-sm" value="Get info" onclick="location.href='/user_changes/show_changes/'">
         </form>
     {% else %}
-        <p>Error: {{ value.error }}</p>
+        <p>Error: {{ error }}</p>
     {% endif %}
 {% endblock %}

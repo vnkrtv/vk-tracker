@@ -80,12 +80,12 @@ def getDomainInfo(request):
 
 def getInfo(request):
     try:
-        user = MongoDB().loadUserInfo(domain=request.POST['domain'])
-        info = {'value': [
-            {'Имя': user['main_info']['first_name']},
-            {'Фамилия': user['main_info']['last_name']},
-            {'domain': user['main_info']['domain']},
-            {'id': user['main_info']['id']}]
+        info = {'info': MongoDB().loadUserInfo(domain=request.POST['domain'])}
+        info['info']['main_info'] = {
+            'Имя': info['info']['main_info']['first_name'],
+            'Фамилия': info['info']['main_info']['last_name'],
+            'domain': info['info']['main_info']['domain'],
+            'id': info['info']['main_info']['id']
         }
     except Exception as e:
         info = {'error': traceback.format_exc()}

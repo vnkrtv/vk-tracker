@@ -9,6 +9,11 @@ class GraphDB(object):
         return self._graph
 
     def addUser(self, user):
+        """
+        Test
+        :param user:
+        :return:
+        """
 
         friends   = [friend['id']   for friend   in user['friends']['items']  ]
         followers = [follower['id'] for follower in user['followers']['items']]
