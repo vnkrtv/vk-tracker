@@ -1,0 +1,17 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    {% if 'error' not in value %}
+        <p>User was successfully added to DBs!<p>
+            <table>
+                {% for d in value %}
+                    {% for k, v in d.items %}
+                        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+            <p><br/><p>
+    {% else %}
+        <p>Error: {{ value.error }}</p>
+    {% endif %}
+{% endblock %}

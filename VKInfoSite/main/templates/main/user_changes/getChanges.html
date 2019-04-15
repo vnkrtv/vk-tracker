@@ -1,0 +1,164 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <p>Main info changes:</p>
+    <li>
+        New:
+        {% for key, change in info.value.main_info %}
+
+        {% endfor %}
+    </li>
+    <li>
+        Old:
+        {% for key, change in info.value.main_info %}
+
+        {% endfor %}
+    </li>
+
+
+    <p>Friend list changes:</p>
+    <li>
+        New friends:
+        {% for friend in info.value.friends %}
+            {% if friend.status %}
+                <li>
+                    <table>
+                        {% for k, v in friend %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </li>
+    <li>
+        Deleted friends:
+        {% for friend in info.value.friends %}
+            {% if not friend.status %}
+                <li>
+                    <table>
+                        {% for k, v in friend %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </li>
+
+
+    <p>Followers list changes:</p>
+    <li>
+        New followers:
+        {% for follower in info.value.followers %}
+            {% if follower.status %}
+                <li>
+                    <table>
+                        {% for k, v in follower %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </li>
+    <li>
+        Deleted followers:
+        {% for friend in info.value.follower %}
+            {% if not follower.status %}
+                <li>
+                    <table>
+                        {% for k, v in follower %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </li>
+
+    <p>Groups changes:</p>
+    <li>
+        New groups:
+        {% for group in info.value.groups %}
+            {% if group.status %}
+                <li>
+                    <table>
+                        {% for k, v in group %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </li>
+    <li>
+        Deleted groups:
+        {% for group in info.value.groups %}
+            {% if not group.status %}
+                <li>
+                    <table>
+                        {% for k, v in group %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </li>
+
+
+    <p>Photos changes:</p>
+    {% for photo in info.value.photos %}
+        <li>Photo {{ photo.photo_id }}:
+            <table>
+                <tr><td>Likes</td><td>
+                    {% for like in photo.likes %}
+                        {% if like.status %}
+
+                        {% else %}
+
+                        {% endif %}
+                    {% endfor %}
+                </td></tr>
+                <tr><td>Comments</td><td>
+                    {% for comment in photo.comments %}
+                        {% if comment.status %}
+
+                        {% else %}
+
+                        {% endif %}
+                    {% endfor %}
+                </td></tr>
+            </table>
+        </li>
+    {% endfor %}
+
+
+    <p>Wall changes:</p>
+    {% for post in info.value.wall %}
+        <li>Wallpost {{ post.post_id }}:
+            <table>
+                <tr><td>Likes</td><td>
+                    {% for like in post.likes %}
+                        {% if like.status %}
+
+                        {% else %}
+
+                        {% endif %}
+                    {% endfor %}
+                </td></tr>
+                <tr><td>Comments</td><td>
+                    {% for comment in post.comments %}
+                        {% if comment.status %}
+
+                        {% else %}
+
+                        {% endif %}
+                    {% endfor %}
+                </td></tr>
+            </table>
+        </li>
+    {% endfor %}
+
+{% endblock %}

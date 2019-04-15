@@ -1,0 +1,19 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+<h1>HEY!</h1>
+    {% if 'error' not on info %}
+        <form action="{% url 'main:getChanges' %}" method="post">
+            {% csrf_token %}
+            {% for date in info.dates %}
+                <input type="radio" id="date" name="date" value="date" >
+                <label for="date">
+                    <p>{{ date }}</p>
+                </label>
+            {% endfor %}
+            <input type="submit" class="btn btn-dark btn-sm" value="Get info" onclick="location.href='/user_changes/show_changes/'">
+        </form>
+    {% else %}
+        <p>Error: {{ value.error }}</p>
+    {% endif %}
+{% endblock %}
