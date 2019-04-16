@@ -23,16 +23,16 @@ def addResult(request):
         vk_user = VK_UserInfo(token=token, domain=request.POST['domain'])
         user = vk_user.addUserToDB()
 
-        info = {'value': [
-            {'Имя': user['main_info']['first_name']},
-            {'Фамилия': user['main_info']['last_name']},
-            {'domain': user['main_info']['domain']},
-            {'id': user['main_info']['id']}]
-        }
+        value = {'info': {
+            'first_name': user['main_info']['first_name'],
+            'last_name': user['main_info']['last_name'],
+            'domain': user['main_info']['domain'],
+            'id': user['main_info']['id']
+        }}
     except Exception as e:
-        info = {'error': traceback.format_exc()}
+        value = {'error': traceback.format_exc()}
 
-    return render(request, 'main/add_user/addResult.html', info)
+    return render(request, 'main/add_user/addResult.html', value)
 
 
 
@@ -46,11 +46,12 @@ def getOldInfo(request):
     try:
         VK_UserInfo(token=token, domain=domain)
         info = {
-            'value': {
+            'info': {
                 'dates':  MongoDB().getUserDates(domain=domain),
                 'domain': domain
             }
         }
+        print(info['info']['dates'])
 
     except Exception as e:
         info = {'error': traceback.format_exc()}

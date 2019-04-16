@@ -1,16 +1,11 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if 'error' not in value %}
-        <p>User was successfully added to DBs!<p>
-            <table>
-                {% for d in value %}
-                    {% for k, v in d.items %}
-                        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                    {% endfor %}
-                {% endfor %}
-            </table>
-            <p><br/><p>
+    {% if 'error' not in info %}
+    <p class="font-weight-normal">
+        <a style="color: black" href="https://vk.com/{{ info.domain }}">{{ info.first_name }} {{ info.last_name }}</a>
+        was successfully added to DBs!
+    </p>
     {% else %}
         <p>Error: {{ error }}</p>
     {% endif %}

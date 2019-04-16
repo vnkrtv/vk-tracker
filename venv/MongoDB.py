@@ -48,10 +48,10 @@ class MongoDB(object):
     def getUserDates(self, id=0, domain=''):
         try:
             if id != 0:
-                dates = [date for d, inf in self._db.find_one({'user_id': id})['dates']]
-                return dates
+                dates = [date for date in list(self._db.find_one({'user_id': id})['dates'])]
+                return [list(date.keys())[0] for date in dates]
             elif domain != '':
-                dates = [date for d, inf in self._db.find_one({'domain': domain})['dates']]
-                return dates
+                dates = [date for date in list(self._db.find_one({'domain': domain})['dates'])]
+                return [list(date.keys())[0] for date in dates]
         except:
             return []
