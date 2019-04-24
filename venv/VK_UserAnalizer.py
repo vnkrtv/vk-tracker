@@ -1,12 +1,41 @@
 from VK_UserInfo import *
 
 class VK_UserAnalizer:
-    def __init__(self, token, domain, date):
-        self._user = VK_UserInfo(token=token, domain=domain)
-        id = self._user.userID()
 
-        self._oldInf = MongoDB().loadUserInfo(id=id, date=date)
-        self._newInf = self._user.addUserToDB()
+    def __init__(self, domain, date1, date2):
+
+        if not MongoDB().checkDomain(domain):
+            raise Exception('No user with input domain in base')
+
+        self._newInf = MongoDB().loadUserInfo(domain=domain, date=date2)
+        self._oldInf = MongoDB().loadUserInfo(domain=domain, date=date1)
+        print('HEAR!\n\n\n', self._oldInf['friends'], end='\n\n\n')
+
+
+        self.checkDates(date1, date2);
+
+
+    def checkDates(self, date1, date2):
+        #"{hour:02}-{minutes:02} {day}-{month:02}-{year}".format(**user['date'])
+        date1 = tuple(map(int, date1.replace(' ', '-').split('-')))
+        date2 = tuple(map(int, date2.replace(' ', '-').split('-')))
+
+        for i in range(4, 1, -1):
+            if date1[i] != date2[i]:
+                if date2[i] > date1[i]:
+                    buff_dict    = self._newInf
+                    self._newInf = self._oldInf
+                    self._oldInf = buff_dict
+                    return
+
+        for i in range(0, 2):
+            if date1[i] != date2[i]:
+                if date2[i] > date1[i]:
+                    buff_dict    = self._newInf
+                    self._newInf = self._oldInf
+                    self._oldInf = buff_dict
+                    return
+
 
     def cmpMainInfo(self):
         oldMain = self._oldInf['main_info']
@@ -14,7 +43,7 @@ class VK_UserAnalizer:
 
         cmpDict = {}
 
-        for (old, new) in (oldMain, newMain):
+        for (old, new) in zip(oldMain, newMain):
             if oldMain[old] != newMain[new]:
                 cmpDict[old] = {
                     'old': oldMain[old],
@@ -25,6 +54,8 @@ class VK_UserAnalizer:
 
 
     def cmpFriends(self):
+        print('HEAR!\n\n\n', self._oldInf, end='\n\n\n')
+
         oldFriends = self._oldInf['friends']['items']
         newFriends = self._newInf['friends']['items']
 
@@ -45,12 +76,12 @@ class VK_UserAnalizer:
         changeList = []
 
         for item in cmpDict:
-            if cmpDict['item'][1]:
-                cmpDict['item'][0]['status'] = 1 #'new friend'
+            if cmpDict[item][1]:
+                cmpDict[item][0]['status'] = 1  # 'new friend'
             else:
-                cmpDict['item'][0]['status'] = 0 #'deleted from friends'
+                cmpDict[item][0]['status'] = 0  # 'deleted from friends'
 
-            changeList.append(cmpDict['item'][0])
+            changeList.append(cmpDict[item][0])
 
         return changeList
 
@@ -76,12 +107,12 @@ class VK_UserAnalizer:
         changeList = []
 
         for item in cmpDict:
-            if cmpDict['item'][1]:
-                cmpDict['item'][0]['status'] = 1 #'new friend'
+            if cmpDict[item][1]:
+                cmpDict[item][0]['status'] = 1  # 'new friend'
             else:
-                cmpDict['item'][0]['status'] = 0 #'deleted from friends'
+                cmpDict[item][0]['status'] = 0  # 'deleted from friends'
 
-            changeList.append(cmpDict['item'][0])
+            changeList.append(cmpDict[item][0])
 
         return changeList
 
@@ -107,12 +138,12 @@ class VK_UserAnalizer:
         changeList = []
 
         for item in cmpDict:
-            if cmpDict['item'][1]:
-                cmpDict['item'][0]['status'] = 1 #'new friend'
+            if cmpDict[item][1]:
+                cmpDict[item][0]['status'] = 1 #'new friend'
             else:
-                cmpDict['item'][0]['status'] = 0 #'deleted from friends'
+                cmpDict[item][0]['status'] = 0 #'deleted from friends'
 
-            changeList.append(cmpDict['item'][0])
+            changeList.append(cmpDict[item][0])
 
         return changeList
 
@@ -169,7 +200,7 @@ class VK_UserAnalizer:
 
         changeLikesList, changeCommList = [], []
 
-        for (old, new) in (oldPhDict, newPhDict):
+        for (old, new) in zip(oldPhDict, newPhDict):
             if oldPhDict[old][0] != newPhDict[new][0]:
                 oldComm = oldPhDict[old][0]
                 newComm = newPhDict[new][0]
@@ -268,7 +299,7 @@ class VK_UserAnalizer:
                     'status': 0 #'deleted photo'
                 }
 
-                changeList.append(oldPh)
+                changeList.append(oldPost)
                 listID.append(id)
 
         for id in listID:
@@ -287,7 +318,7 @@ class VK_UserAnalizer:
                     'status': 1 #'new photo'
                 }
 
-                changeList.append(newPh)
+                changeList.append(newPost)
                 listID.append(id)
 
         for id in listID:
@@ -296,7 +327,7 @@ class VK_UserAnalizer:
 
         changeLikesList, changeCommList = [], []
 
-        for (old, new) in (oldWallDict, newWallDict):
+        for (old, new) in zip(oldWallDict, newWallDict):
             if oldWallDict[old][0] != newWallDict[new][0]:
                 oldComm = oldPhDict[old][0]
                 newComm = newPhDict[new][0]

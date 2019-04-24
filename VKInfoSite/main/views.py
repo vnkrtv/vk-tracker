@@ -51,7 +51,6 @@ def getOldInfo(request):
                 'domain': domain
             }
         }
-        print(info['info']['dates'])
 
     except Exception as e:
         info = {'error': traceback.format_exc()}
@@ -59,19 +58,19 @@ def getOldInfo(request):
     return render(request, 'main/user_changes/getOldInfo.html', info)
 
 def getChanges(request):
-    token = open('token/token.txt', 'r').read()
-
-    date = request.POST['date']
+    date1 = request.POST['date1']
+    date2 = request.POST['date2']
     domain = request.POST['domain']
 
     try:
         info = {
-            'value': VK_UserAnalizer(token=token, domain=domain).getChanges()
+            'info': VK_UserAnalizer(domain=domain, date1=date1, date2=date2).getChanges()
         }
 
     except Exception as e:
         info = {'error': traceback.format_exc()}
 
+    print(info)
     return render(request, 'main/user_changes/getChanges.html', info)
 
 

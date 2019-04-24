@@ -4,16 +4,21 @@
     {% if 'error' not in info %}
         <form action="{% url 'main:getChanges' %}" method="post">
             {% csrf_token %}
-            <input type="hidden" id="domain" name="domain" value="{{ info.domain }}">
-            <p>Dates of collecting information about user with domain <label for="domain">{{ info.domain }}</label></p>
+            <label for="domain">
+                <input type="hidden" id="domain" name="domain" value="{{ info.domain }}">
+            </label>
+            <select size="5" required="required" name="date1">
             {% for date in info.dates %}
-                <input type="radio" id="date" name="date" value="date">
-                <label for="date">
-                    <p>{{ date }}</p>
-                </label>
-                <br>
+                    <option value="{{ date }}">{{ date }}</option>
             {% endfor %}
-            <input type="submit" class="btn btn-dark btn-sm" value="Choose date" onclick="location.href='/user_changes/show_changes/'">
+            </select>
+            <select size="5" required="required" name="date2">
+            {% for date in info.dates %}
+                    <option value="{{ date }}">{{ date }}</option>
+            {% endfor %}
+            </select>
+            <br>
+            <input type="submit" class="btn btn-dark btn-sm" value="Choose date">
             <p></p>
         </form>
     {% else %}

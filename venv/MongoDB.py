@@ -16,17 +16,22 @@ class MongoDB(object):
         else:
             self._db.insert_one({'user_id': id, 'domain': domain, 'dates': [{date: user}]})
 
-    def getDomain(self):
-        return
+
+    def checkDomain(self, domain):
+        if self._db.find_one({'domain': domain}):
+            return True
+        return False
+
 
     def loadUserInfo(self, id=0, domain='', date=''):
         try:
             if id != 0:
                 if date:
                     info = {}
-                    for d, inf in self._db.find_one({'user_id': id})['dates']:
-                        if d == date:
-                            info = inf
+                    for inf in self._db.find_one({'user_id': id})['dates']:
+                        for d in inf:
+                            if d == date:
+                                info = inf[date]
                     return info
                 else:
                     info = self._db.find_one({'user_id': id})
@@ -35,15 +40,17 @@ class MongoDB(object):
             elif domain != '':
                 if date:
                     info = {}
-                    for d, inf in self._db.find_one({'domain': domain})['dates']:
-                        if d == date:
-                            info = inf
+                    for inf in self._db.find_one({'domain': domain})['dates']:
+                        for d in inf:
+                            if d == date:
+                                info = inf[date]
                     return info
                 else:
                     info = self._db.find_one({'domain': domain})
                     return list(info['dates'][-1].values())[0]
         except:
             return {}
+
 
     def getUserDates(self, id=0, domain=''):
         try:
