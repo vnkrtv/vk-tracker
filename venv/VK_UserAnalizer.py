@@ -9,8 +9,6 @@ class VK_UserAnalizer:
 
         self._newInf = MongoDB().loadUserInfo(domain=domain, date=date2)
         self._oldInf = MongoDB().loadUserInfo(domain=domain, date=date1)
-        print('HEAR!\n\n\n', self._oldInf['friends'], end='\n\n\n')
-
 
         self.checkDates(date1, date2);
 
@@ -22,7 +20,7 @@ class VK_UserAnalizer:
 
         for i in range(4, 1, -1):
             if date1[i] != date2[i]:
-                if date2[i] > date1[i]:
+                if date2[i] < date1[i]:
                     buff_dict    = self._newInf
                     self._newInf = self._oldInf
                     self._oldInf = buff_dict
@@ -30,7 +28,7 @@ class VK_UserAnalizer:
 
         for i in range(0, 2):
             if date1[i] != date2[i]:
-                if date2[i] > date1[i]:
+                if date2[i] < date1[i]:
                     buff_dict    = self._newInf
                     self._newInf = self._oldInf
                     self._oldInf = buff_dict
@@ -45,17 +43,17 @@ class VK_UserAnalizer:
 
         for (old, new) in zip(oldMain, newMain):
             if oldMain[old] != newMain[new]:
-                cmpDict[old] = {
-                    'old': oldMain[old],
-                    'new': newMain[new]
-                }
+                if type(oldMain[old]) is not dict:
+                    cmpDict[old] = {
+                        'old': oldMain[old],
+                        'new': newMain[new]
+                    }
 
+        print(cmpDict)
         return cmpDict
 
 
     def cmpFriends(self):
-        print('HEAR!\n\n\n', self._oldInf, end='\n\n\n')
-
         oldFriends = self._oldInf['friends']['items']
         newFriends = self._newInf['friends']['items']
 
@@ -73,17 +71,18 @@ class VK_UserAnalizer:
             else:
                 cmpDict[id] = [friend, 1]
 
-        changeList = []
+        changeDict = {
+            'new': [],
+            'deleted': []
+        }
 
         for item in cmpDict:
             if cmpDict[item][1]:
-                cmpDict[item][0]['status'] = 1  # 'new friend'
+                changeDict['new'].append(cmpDict[item][0])
             else:
-                cmpDict[item][0]['status'] = 0  # 'deleted from friends'
+                changeDict['deleted'].append(cmpDict[item][0])
 
-            changeList.append(cmpDict[item][0])
-
-        return changeList
+        return changeDict
 
 
     def cmpFollowers(self):
@@ -104,17 +103,18 @@ class VK_UserAnalizer:
             else:
                 cmpDict[id] = [follower, 1]
 
-        changeList = []
+        changeDict = {
+            'new': [],
+            'deleted': []
+        }
 
         for item in cmpDict:
             if cmpDict[item][1]:
-                cmpDict[item][0]['status'] = 1  # 'new friend'
+                changeDict['new'].append(cmpDict[item][0])
             else:
-                cmpDict[item][0]['status'] = 0  # 'deleted from friends'
+                changeDict['deleted'].append(cmpDict[item][0])
 
-            changeList.append(cmpDict[item][0])
-
-        return changeList
+        return changeDict
 
 
     def cmpGroups(self):
@@ -135,17 +135,18 @@ class VK_UserAnalizer:
             else:
                 cmpDict[id] = [group, 1]
 
-        changeList = []
+        changeDict = {
+            'new': [],
+            'deleted': []
+        }
 
         for item in cmpDict:
             if cmpDict[item][1]:
-                cmpDict[item][0]['status'] = 1 #'new friend'
+                changeDict['new'].append(cmpDict[item][0])
             else:
-                cmpDict[item][0]['status'] = 0 #'deleted from friends'
+                changeDict['deleted'].append(cmpDict[item][0])
 
-            changeList.append(cmpDict[item][0])
-
-        return changeList
+        return changeDict
 
 
     def cmpPhotos(self):

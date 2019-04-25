@@ -1,90 +1,184 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
+
+    {% if info.main_info %}
+        <span class="d-block p-2 bg-primary text-white">Main info changes</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+           		    <th scope="col">Field</th>
+           		    <th scope="col">Old</th>
+           		    <th scope="col">New</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for name, field in info.main_info.items %}
+                   <tr>
+                        <td>{{ name }}</td>
+                        <td>{{ field.old }}</td>
+                        <td>{{ field.new }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+    {% if info.friends.new %}
+        <span class="d-block p-2 bg-primary text-white">New friends</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Fullname</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">domain</th>
+           		    <th scope="col">bday</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for friend in info.friends.new %}
+                   <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                        <td>{{ friend.id }}</td>
+                        <td>{{ friend.domain }}</td>
+                        <td>{{ friend.bdate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if info.friends.deleted %}
+        <span class="d-block p-2 bg-primary text-white">Deleted friends</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Fullname</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">domain</th>
+           		    <th scope="col">bday</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for friend in info.friends.deleted %}
+                   <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                        <td>{{ friend.id }}</td>
+                        <td>{{ friend.domain }}</td>
+                        <td>{{ friend.bdate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+    {% if info.followers.new %}
+        <span class="d-block p-2 bg-primary text-white">New followers</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Fullname</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">domain</th>
+           		    <th scope="col">bday</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for friend in info.followers.new %}
+                   <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                        <td>{{ friend.id }}</td>
+                        <td>{{ friend.domain }}</td>
+                        <td>{{ friend.bdate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if info.followers.deleted %}
+        <span class="d-block p-2 bg-primary text-white">Deleted followers</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Fullname</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">domain</th>
+           		    <th scope="col">bday</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for friend in info.followers.deleted %}
+                   <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                        <td>{{ friend.id }}</td>
+                        <td>{{ friend.domain }}</td>
+                        <td>{{ friend.bdate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if info.groups.new %}
+        <span class="d-block p-2 bg-primary text-white">New groups</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Name</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">Screen name</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for group in info.groups.new %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a style="color: white" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                    <td>{{ group.id }}</td>
+                    <td>{{ group.screen_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if info.groups.deleted %}
+        <span class="d-block p-2 bg-primary text-white">Deleted groups</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Name</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">Screen name</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for group in info.groups.deleted %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a style="color: white" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                    <td>{{ group.id }}</td>
+                    <td>{{ group.screen_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
 {% comment %}
-    <p>Main info changes:</p>
-    <li>
-        New:
-        {% for key, change in info.main_info.new %}
-            <p>{{ key }} - {{ change }}</p>
-        {% endfor %}
-    </li>
-    <li>
-        Old:
-        {% for key, change in info.main_info.old %}
-            <p>{{ key }} - {{ change }}</p>
-        {% endfor %}
-    </li>
-{% endcomment %}
-
-    <p>Friend list changes:</p>
-    <p>New friends:</p>
-        {% for friend in info.friends %}
-            {% if friend.status %}
-                    <p>New!</p>
-            {% endif %}
-        {% endfor %}
-    <p>Deleted friends:</p>
-        {% for friend in info.friends %}
-            {% if not friend.status %}
-                <p>Deleted!</p>
-            {% endif %}
-        {% endfor %}
-
-{% comment %}
-
-    <p>Followers list changes:</p>
-    <li>
-        New followers:
-        {% for follower in info.followers %}
-            {% if follower.status %}
-                    <table>
-                        {% for k, v in follower %}
-                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                        {% endfor %}
-                    </table>
-            {% endif %}
-        {% endfor %}
-    </li>
-    <li>
-        Deleted followers:
-        {% for friend in info.follower %}
-            {% if not follower.status %}
-                    <table>
-                        {% for k, v in follower %}
-                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                        {% endfor %}
-                    </table>
-            {% endif %}
-        {% endfor %}
-    </li>
-
-    <p>Groups changes:</p>
-    <li>
-        New groups:
-        {% for group in info.groups %}
-            {% if group.status %}
-                    <table>
-                        {% for k, v in group %}
-                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                        {% endfor %}
-                    </table>
-            {% endif %}
-        {% endfor %}
-    </li>
-    <li>
-        Deleted groups:
-        {% for group in info.groups %}
-            {% if not group.status %}
-                    <table>
-                        {% for k, v in group %}
-                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                        {% endfor %}
-                    </table>
-            {% endif %}
-        {% endfor %}
-    </li>
-
 
     <p>Photos changes:</p>
     {% for photo in info.photos %}

@@ -7,7 +7,6 @@ from VK_UserAnalizer import *
 # Create your views here.
 
 
-
 def index(request):
     return render(request, 'main/index.html')
 
@@ -70,7 +69,6 @@ def getChanges(request):
     except Exception as e:
         info = {'error': traceback.format_exc()}
 
-    print(info)
     return render(request, 'main/user_changes/getChanges.html', info)
 
 
@@ -80,13 +78,12 @@ def getDomainInfo(request):
 
 def getInfo(request):
     try:
-        info = {'info': MongoDB().loadUserInfo(domain=request.POST['domain'])}
-        info['info']['main_info'] = {
-            'Имя': info['info']['main_info']['first_name'],
-            'Фамилия': info['info']['main_info']['last_name'],
-            'domain': info['info']['main_info']['domain'],
-            'id': info['info']['main_info']['id']
+        info = {
+            'info': MongoDB().loadUserInfo(domain=request.POST['domain'])
         }
+        info['domain']   = info['info']['main_info']['domain']
+        info['id']       = info['info']['main_info']['id']
+        info['fullname'] = info['info']['main_info']['first_name'] + ' ' + info['info']['main_info']['last_name']
     except Exception as e:
         info = {'error': traceback.format_exc()}
 

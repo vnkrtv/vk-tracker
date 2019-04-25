@@ -2,10 +2,27 @@
 
 {% block content %}
     {% if 'error' not in info %}
-        <p>Main info:</p>
-            {% for key, value in info.main_info.items %}
-                <li>{{ key }} - {{ value }}</li>
-            {% endfor %}
+
+        <p>Information about <a style="color: black" href="https://vk.com/{{ domain }}">{{ fullname }}</a></p>
+        <span class="d-block p-2 bg-primary text-white">Main info</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+           		    <th scope="col">Field</th>
+           		    <th scope="col">Value</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for name, value in info.main_info.items %}
+                    {% if value %}
+                        <tr>
+                            <td>{{ name }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
 
         <span class="d-block p-2 bg-primary text-white">Friends list</span>
         <table class="table table-striped table-dark">
@@ -77,43 +94,81 @@
             </tbody>
         </table>
 
-        <p><br>Photos:</p>
-            {% for photo in info.photos.items %}
-                <li>Photo {{ photo.photo_id }}:
-                <table>
-                    <tr><td>Likes</td><td>
+        <span class="d-block p-2 bg-primary text-white">Photos</span>
+        <table class="table table-striped table-dark">
+            <thead>
+           	     <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Photo id</th>
+           		    <th scope="col">Likes</th>
+           		    <th scope="col">Comments</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for photo in info.photos.items %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                    <td><p>Count: {{ photo.likes.count }}</p>
                         {% for like in photo.likes.items %}
-                             <p>{{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
+                             <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                         {% endfor %}
-                    </td></tr>
-                    <tr><td>Comments</td><td>
+                    </td>
+                    <td>
                         {% for comment in photo.comments.items %}
-                            {% for k in comment %}
-                                <tr><td>{{ k }}</td><td>{{ comment.k }}</td></tr>
-                            {% endfor %}
+                            <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                            {% if 'attachments' in comment and not comment.text %}
+                                 <p>Attachment: {{ comment.attachments.0.type }}</p>
+                            {% else %}
+                                <p>Text: {{ comment.text }}</p>
+                            {% endif %}
+                            <br>
                         {% endfor %}
-                </table>
-            {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-
-        <p><br>Wall:</p>
-            {% for post in info.wall.items %}
-                <li>Wallpost {{ post.post_id }}:
-                    <table>
-                        <tr><td>Likes</td><td>
-                            {% for like in photo.likes.items %}
-                                 <p>{{ like.first_name }} {{ like.last_name }} [id: {{ like.id }}]</p>
+        {% if info.wall.items %}
+            <span class="d-block p-2 bg-primary text-white">Wall</span>
+            <table class="table table-striped table-dark">
+                <thead>
+           	         <tr>
+                        <th scope="col">#</th>
+           		        <th scope="col">Post id</th>
+                        <th scope="col">Text</th>
+           		        <th scope="col">Likes</th>
+           		        <th scope="col">Comments</th>
+                     </tr>
+                </thead>
+                <tbody>
+                    {% for post in info.wall.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                        <td>{{ post.text }}</td>
+                        <td><p>Count: {{ post.likes.count }}</p>
+                            {% for like in post.likes.items %}
+                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                             {% endfor %}
-                        </td></tr>
-                        <tr><td>Comments</td><td>
-                            {% for comment in photo.comments.items %}
-                                {% for k in comment %}
-                                    <tr><td>{{ k }}</td><td>{{ comment.k }}</td></tr>
-                                {% endfor %}
+                        </td>
+                        <td>
+                            {% for comment in post.comments.items %}
+                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                {% if 'attachments' in comment and not comment.text %}
+                                     <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                {% else %}
+                                    <p>Text: {{ comment.text }}</p>
+                                {% endif %}
+                                <br>
                             {% endfor %}
-                    </table>
-                </li>
-            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     {% else %}
         <p>Error: {{ error }}</p>
     {% endif %}
