@@ -94,41 +94,43 @@
             </tbody>
         </table>
 
-        <span class="d-block p-2 bg-primary text-white">Photos</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Photo id</th>
-           		    <th scope="col">Likes</th>
-           		    <th scope="col">Comments</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for photo in info.photos.items %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
-                    <td><p>Count: {{ photo.likes.count }}</p>
-                        {% for like in photo.likes.items %}
-                             <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for comment in photo.comments.items %}
-                            <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                            {% if 'attachments' in comment and not comment.text %}
-                                 <p>Attachment: {{ comment.attachments.0.type }}</p>
-                            {% else %}
-                                <p>Text: {{ comment.text }}</p>
-                            {% endif %}
-                            <br>
-                        {% endfor %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% if info.photos.items %}
+            <span class="d-block p-2 bg-primary text-white">Photos</span>
+            <table class="table table-striped table-dark">
+                <thead>
+           	         <tr>
+                        <th scope="col">#</th>
+               		    <th scope="col">Photo id</th>
+               		    <th scope="col">Likes</th>
+               		    <th scope="col">Comments</th>
+                     </tr>
+                </thead>
+                <tbody>
+                    {% for photo in info.photos.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                        <td><p>Count: {{ photo.likes.count }}</p>
+                            {% for like in photo.likes.items %}
+                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for comment in photo.comments.items %}
+                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                {% if 'attachments' in comment and not comment.text %}
+                                     <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                {% else %}
+                                     <p>Text: {{ comment.text }}</p>
+                                {% endif %}
+                                <br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
 
         {% if info.wall.items %}
             <span class="d-block p-2 bg-primary text-white">Wall</span>

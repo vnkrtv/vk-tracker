@@ -20,14 +20,16 @@ def addResult(request):
 
     try:
         vk_user = VK_UserInfo(token=token, domain=request.POST['domain'])
-        user = vk_user.addUserToDB()
+        user    = vk_user.addUserToDB()
 
-        value = {'info': {
-            'first_name': user['main_info']['first_name'],
-            'last_name': user['main_info']['last_name'],
-            'domain': user['main_info']['domain'],
-            'id': user['main_info']['id']
-        }}
+        value = {
+            'info': {
+                'first_name': user['main_info']['first_name'],
+                'last_name':  user['main_info']['last_name'],
+                'domain':     user['main_info']['domain'],
+                'id':         user['main_info']['id']
+            }
+        }
     except Exception as e:
         value = {'error': traceback.format_exc()}
 
@@ -57,15 +59,16 @@ def getOldInfo(request):
     return render(request, 'main/user_changes/getOldInfo.html', info)
 
 def getChanges(request):
-    date1 = request.POST['date1']
-    date2 = request.POST['date2']
+    date1  = request.POST['date1']
+    date2  = request.POST['date2']
     domain = request.POST['domain']
 
     try:
         info = {
             'info': VK_UserAnalizer(domain=domain, date1=date1, date2=date2).getChanges()
         }
-
+        info['domain'] = info['info']['domain']
+        info['id']     = info['info']['id']
     except Exception as e:
         info = {'error': traceback.format_exc()}
 
@@ -105,4 +108,4 @@ def getRelations(request):
     except Exception as e:
         info = {'error': traceback.format_exc()}
 
-    return render(request, 'main/users_relations/getRelations.html')
+    return render(request, 'main/users_relations/getRelations.html', info)

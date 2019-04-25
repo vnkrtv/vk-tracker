@@ -10,7 +10,8 @@ class VK_UserAnalizer:
         self._newInf = MongoDB().loadUserInfo(domain=domain, date=date2)
         self._oldInf = MongoDB().loadUserInfo(domain=domain, date=date1)
 
-        self.checkDates(date1, date2);
+        print(self._newInf['wall'])
+        #self.checkDates(date1, date2);
 
 
     def checkDates(self, date1, date2):
@@ -20,7 +21,7 @@ class VK_UserAnalizer:
 
         for i in range(4, 1, -1):
             if date1[i] != date2[i]:
-                if date2[i] < date1[i]:
+                if date2[i] > date1[i]:
                     buff_dict    = self._newInf
                     self._newInf = self._oldInf
                     self._oldInf = buff_dict
@@ -28,7 +29,7 @@ class VK_UserAnalizer:
 
         for i in range(0, 2):
             if date1[i] != date2[i]:
-                if date2[i] < date1[i]:
+                if date2[i] > date1[i]:
                     buff_dict    = self._newInf
                     self._newInf = self._oldInf
                     self._oldInf = buff_dict
@@ -49,7 +50,6 @@ class VK_UserAnalizer:
                         'new': newMain[new]
                     }
 
-        print(cmpDict)
         return cmpDict
 
 
@@ -163,19 +163,23 @@ class VK_UserAnalizer:
             id = photo['photo_id']
             newPhDict[id] = [photo['comments'], photo['likes']]
 
-        changeList, listID = [], []
+        listID = []
+        changeDict = {
+            'new': [],
+            'deleted': [],
+            'items': []
+        }
 
         for id in oldPhDict:
-            if id in newPhDict:
+            if id not in newPhDict:
 
                 oldPh = {
                     'photo_id': id,
                     'comments': oldPhDict[id][0],
                     'likes':    oldPhDict[id][1],
-                    'status':   0 #'deleted photo'
                 }
 
-                changeList.append(oldPh)
+                changeDict['deleted'].append(oldPh)
                 listID.append(id)
 
         for id in listID:
@@ -184,16 +188,15 @@ class VK_UserAnalizer:
         listID = []
 
         for id in newPhDict:
-            if id in oldPhDict:
+            if id not in oldPhDict:
 
                 newPh = {
                     'photo_id': id,
                     'comments': newPhDict[id][0],
                     'likes':    newPhDict[id][1],
-                    'status':   1 #'new photo'
                 }
 
-                changeList.append(newPh)
+                changeDict['new'].append(newPh)
                 listID.append(id)
 
         for id in listID:
@@ -264,11 +267,11 @@ class VK_UserAnalizer:
                     photo['likes'] = changeLikesList
                 if (not changeCommList) or (not changeLikesList):
                     photo['photo_id'] = old
-                    changeList.append(photo)
+                    changeDict['items'].append(photo)
 
                 changeCommList, changeLikesList = [], []
 
-        return changeList
+        return changeDict
 
     def cmpWall(self):
         oldWall = self._oldInf['wall']['items']
@@ -288,19 +291,23 @@ class VK_UserAnalizer:
             textDict[id] = [None, post['text']]
             newWallDict[id] = [post['comments'], post['likes']]
 
-        changeList, listID = [], []
+        listID = []
+        changeDict = {
+            'new': [],
+            'deleted': [],
+            'items': []
+        }
 
         for id in oldWallDict:
-            if id in newWallDict:
+            if id not in newWallDict:
                 oldPost = {
                     'post_id': id,
-                    'text': textDict[id],
+                    'text': textDict[id][0],
                     'comments': oldWallDict[id][0],
                     'likes': oldWallDict[id][1],
-                    'status': 0 #'deleted photo'
                 }
 
-                changeList.append(oldPost)
+                changeDict['deleted'].append(oldPost)
                 listID.append(id)
 
         for id in listID:
@@ -310,16 +317,15 @@ class VK_UserAnalizer:
         listID = []
 
         for id in newWallDict:
-            if id in oldWallDict:
+            if id not in oldWallDict:
                 newPost = {
                     'post_id': id,
-                    'text': textDict[id],
+                    'text': textDict[id][1],
                     'comments': newWallDict[id][0],
                     'likes': newWallDict[id][1],
-                    'status': 1 #'new photo'
                 }
 
-                changeList.append(newPost)
+                changeDict['new'].append(newPost)
                 listID.append(id)
 
         for id in listID:
@@ -391,11 +397,12 @@ class VK_UserAnalizer:
                     photo['likes'] = changeLikesList
                 if (not changeCommList) or (not changeLikesList):
                     photo['photo_id'] = old
-                    changeList.append(photo)
+                    changeDict['items'].append(photo)
 
                 changeCommList, changeLikesList = [], []
 
-        return changeList
+        print(changeDict)
+        return changeDict
 
     def getChanges(self):
         if self._oldInf is None or self._newInf is None:
@@ -407,7 +414,9 @@ class VK_UserAnalizer:
             'followers': self.cmpFollowers(),
             'groups':    self.cmpGroups(),
             'photos':    self.cmpPhotos(),
-            'wall':      self.cmpWall()
+            'wall':      self.cmpWall(),
+            'domain':    self._newInf['main_info']['domain'],
+            'id':        self._newInf['main_info']['id'],
         }
 
         return changeDict
