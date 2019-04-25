@@ -10,7 +10,6 @@ class VK_UserAnalizer:
         self._newInf = MongoDB().loadUserInfo(domain=domain, date=date2)
         self._oldInf = MongoDB().loadUserInfo(domain=domain, date=date1)
 
-        print(self._newInf['wall'])
         #self.checkDates(date1, date2);
 
 
@@ -202,74 +201,75 @@ class VK_UserAnalizer:
         for id in listID:
             newPhDict.pop(id)
 
-        changeLikesList, changeCommList = [], []
-
         for (old, new) in zip(oldPhDict, newPhDict):
-            if oldPhDict[old][0] != newPhDict[new][0]:
-                oldComm = oldPhDict[old][0]
-                newComm = newPhDict[new][0]
+            changeCommList, changeLikesList = [], []
 
-                if oldComm != newComm:
-                    cmpDict = {}
+            oldComm = oldPhDict[old][0]
+            newComm = newPhDict[new][0]
 
-                    for item in oldComm['items']:
-                        id = item['id']
-                        cmpDict[id] = [item, 0]
+            if oldComm != newComm:
+                cmpDict = {}
 
-                    for item in newComm['items']:
-                        id = item['id']
+                for item in oldComm['items']:
+                    id = item['id']
+                    cmpDict[id] = [item, 0]
 
-                        if id in cmpDict:
-                            cmpDict.pop(id)
-                        else:
-                            cmpDict[id] = [item, 1]
+                for item in newComm['items']:
+                    id = item['id']
 
-                    for key in cmpDict:
+                    if id in cmpDict:
+                        cmpDict.pop(id)
+                    else:
+                        cmpDict[id] = [item, 1]
 
-                        if cmpDict[key][1]:
-                            cmpDict[key][0]['status'] = 1 #'new comment'
-                        else:
-                            cmpDict[key][0]['status'] = 0 #'deleted comment'
+                for key in cmpDict:
 
-                        changeCommList.append(cmpDict[key][0])
+                    if cmpDict[key][1]:
+                        cmpDict[key][0]['status'] = 1  # 'new comment'
+                    else:
+                        cmpDict[key][0]['status'] = 0  # 'deleted comment'
 
-                oldLikes = oldPhDict[old][1]
-                newLikes = newPhDict[new][1]
+                    changeCommList.append(cmpDict[key][0])
 
-                if oldLikes != newLikes:
-                    cmpDict = {}
+            oldLikes = oldPhDict[old][1]
+            newLikes = newPhDict[new][1]
 
-                    for item in oldLikes['items']:
-                        id = item['id']
-                        cmpDict[id] = [item, 0]
+            if oldLikes != newLikes:
+                cmpDict = {}
 
-                    for item in newLikes['items']:
-                        id = item['id']
+                for item in oldLikes['items']:
+                    id = item['id']
+                    cmpDict[id] = [item, 0]
 
-                        if id in cmpDict:
-                            cmpDict.pop(id)
-                        else:
-                            cmpDict[id] = [item, 1]
+                for item in newLikes['items']:
+                    id = item['id']
 
-                    for key in cmpDict:
+                    if id in cmpDict:
+                        cmpDict.pop(id)
+                    else:
+                        cmpDict[id] = [item, 1]
 
-                        if cmpDict[key][1]:
-                            cmpDict[key][0]['status'] = 1 #'new like'
-                        else:
-                            cmpDict[key][0]['status'] = 0 #'deleted like'
+                for key in cmpDict:
 
-                        changeLikesList.append(cmpDict[key][0])
+                    if cmpDict[key][1]:
+                        cmpDict[key][0]['status'] = 1  # 'new like'
+                    else:
+                        cmpDict[key][0]['status'] = 0  # 'deleted like'
 
-                photo = {}
-                if not changeCommList:
-                    photo['comments'] = changeCommList
-                if not changeLikesList:
-                    photo['likes'] = changeLikesList
-                if (not changeCommList) or (not changeLikesList):
-                    photo['photo_id'] = old
-                    changeDict['items'].append(photo)
+                    changeLikesList.append(cmpDict[key][0])
 
-                changeCommList, changeLikesList = [], []
+            photo = {
+                'comments': [],
+                'likes': [],
+            }
+            if changeCommList:
+                photo['comments'] = changeCommList
+            if changeLikesList:
+                photo['likes'] = changeLikesList
+            if changeCommList or changeLikesList:
+                photo['photo_id'] = old
+                changeDict['items'].append(photo)
+
 
         return changeDict
 
@@ -332,74 +332,78 @@ class VK_UserAnalizer:
             newWallDict.pop(id)
             textDict.pop(id)
 
-        changeLikesList, changeCommList = [], []
-
         for (old, new) in zip(oldWallDict, newWallDict):
-            if oldWallDict[old][0] != newWallDict[new][0]:
-                oldComm = oldPhDict[old][0]
-                newComm = newPhDict[new][0]
+            changeLikesList, changeCommList = [], []
+            print('HEAR!\n', changeLikesList, '\nHEAR!')
 
-                if oldComm != newComm:
-                    cmpDict = {}
+            oldComm = oldPhDict[old][0]
+            newComm = newPhDict[new][0]
 
-                    for item in oldComm['items']:
-                        id = item['id']
-                        cmpDict[id] = [item, 0]
+            cmpDict = {}
+            print('HEAR!\n', changeLikesList, '\nHEAR!')
 
-                    for item in newComm['items']:
-                        id = item['id']
+            for item in oldComm['items']:
+                id = item['id']
+                cmpDict[id] = [item, 0]
 
-                        if id in cmpDict:
-                            cmpDict.pop(id)
-                        else:
-                            cmpDict[id] = [item, 1]
+            for item in newComm['items']:
+                id = item['id']
 
-                    for key in cmpDict:
+                if id in cmpDict:
+                    cmpDict.pop(id)
+                else:
+                    cmpDict[id] = [item, 1]
 
-                        if cmpDict[key][1]:
-                            cmpDict[key][0]['status'] = 1 #'new comment'
-                        else:
-                            cmpDict[key][0]['status'] = 0 #'deleted comment'
+            for key in cmpDict:
 
-                        changeCommList.append(cmpDict[key][0])
+                if cmpDict[key][1]:
+                    cmpDict[key][0]['status'] = 1  # 'new comment'
+                else:
+                    cmpDict[key][0]['status'] = 0  # 'deleted comment'
 
-                oldLikes = oldWallDict[old][1]
-                newLikes = newWallDict[new][1]
+                changeCommList.append(cmpDict[key][0])
 
-                if oldLikes != newLikes:
-                    cmpDict = {}
 
-                    for item in oldLikes['items']:
-                        id = item['id']
-                        cmpDict[id] = [item, 0]
+            oldLikes = oldWallDict[old][1]
+            newLikes = newWallDict[new][1]
 
-                    for item in newLikes['items']:
-                        id = item['id']
+            print('HEAR!\n', changeLikesList, '\nHEAR!')
 
-                        if id in cmpDict:
-                            cmpDict.pop(id)
-                        else:
-                            cmpDict[id] = [item, 1]
+            cmpDict = {}
 
-                    for key in cmpDict:
+            for item in oldLikes['items']:
+                id = item['id']
+                cmpDict[id] = [item, 0]
 
-                        if cmpDict[key][1]:
-                            cmpDict[key][0]['status'] = 1 #'new like'
-                        else:
-                            cmpDict[key][0]['status'] = 0 #'deleted like'
+            for item in newLikes['items']:
+                id = item['id']
 
-                        changeLikesList.append(cmpDict[key][0])
+                if id in cmpDict:
+                    cmpDict.pop(id)
+                else:
+                    cmpDict[id] = [item, 1]
 
-                photo = {}
-                if not changeCommList:
-                    photo['comments'] = changeCommList
-                if not changeLikesList:
-                    photo['likes'] = changeLikesList
-                if (not changeCommList) or (not changeLikesList):
-                    photo['photo_id'] = old
-                    changeDict['items'].append(photo)
+            for key in cmpDict:
 
-                changeCommList, changeLikesList = [], []
+                if cmpDict[key][1]:
+                    cmpDict[key][0]['status'] = 1  # 'new like'
+                else:
+                    cmpDict[key][0]['status'] = 0  # 'deleted like'
+
+                changeLikesList.append(cmpDict[key][0])
+
+            print('HEAR!\n', changeLikesList, '\nHEAR!')
+            post = {
+                'comments': [],
+                'likes': [],
+            }
+            if changeCommList:
+                post['comments'] = changeCommList
+            if changeLikesList:
+                post['likes'] = changeLikesList
+            if changeCommList or changeLikesList:
+                post['photo_id'] = old
+                changeDict['items'].append(post)
 
         print(changeDict)
         return changeDict

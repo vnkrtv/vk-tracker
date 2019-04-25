@@ -273,18 +273,33 @@
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
                         <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
-                        <td><p>Count: {{ photo.likes.count }}</p>
+                        <td>
                             {% for like in photo.likes.items %}
-                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                                {% if like.status %}
+                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
+                                {% else %}
+                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
+                                {% endif %}
                             {% endfor %}
                         </td>
                         <td>
                             {% for comment in photo.comments.items %}
-                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                                {% if 'attachments' in comment and not comment.text %}
-                                     <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                {% if comment.status %}
+                                    <p>[NEW]</p>
+                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                    {% if 'attachments' in comment and not comment.text %}
+                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                    {% else %}
+                                         <p>Text: {{ comment.text }}</p>
+                                    {% endif %}
                                 {% else %}
-                                     <p>Text: {{ comment.text }}</p>
+                                    <p>[DELETED]</p>
+                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                    {% if 'attachments' in comment and not comment.text %}
+                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                    {% else %}
+                                         <p>Text: {{ comment.text }}</p>
+                                    {% endif %}
                                 {% endif %}
                                 <br>
                             {% endfor %}
@@ -394,18 +409,33 @@
                         <th scope="row">{{ forloop.counter }}</th>
                         <td><a style="color: white" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
                         <td>{{ post.text }}</td>
-                        <td><p>Count: {{ post.likes.count }}</p>
+                        <td>
                             {% for like in post.likes.items %}
-                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                                {% if like.status %}
+                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
+                                {% else %}
+                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
+                                {% endif %}
                             {% endfor %}
                         </td>
                         <td>
                             {% for comment in post.comments.items %}
-                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                                {% if 'attachments' in comment and not comment.text %}
-                                     <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                {% if comment.status %}
+                                    <p>[NEW]</p>
+                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                    {% if 'attachments' in comment and not comment.text %}
+                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                    {% else %}
+                                         <p>Text: {{ comment.text }}</p>
+                                    {% endif %}
                                 {% else %}
-                                    <p>Text: {{ comment.text }}</p>
+                                    <p>[DELETED]</p>
+                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                    {% if 'attachments' in comment and not comment.text %}
+                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
+                                    {% else %}
+                                         <p>Text: {{ comment.text }}</p>
+                                    {% endif %}
                                 {% endif %}
                                 <br>
                             {% endfor %}
