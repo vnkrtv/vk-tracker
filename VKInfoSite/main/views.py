@@ -2,7 +2,7 @@ import os
 import traceback
 
 from django.shortcuts import render
-from VK_UserAnalizer import *
+from VK_UserRelation import *
 
 # Create your views here.
 
@@ -40,12 +40,12 @@ def addResult(request):
 def getDomainChanges(request):
     return render(request, 'main/user_changes/getDomain.html')
 
-def getOldInfo(request):
-    token = open('token/token.txt', 'r').read()
+def getDates(request):
     domain = request.POST['domain']
 
     try:
-        VK_UserInfo(token=token, domain=domain)
+        if not MongoDB().checkDomain(domain):
+            raise Exception('user with input domain not found in database')
         info = {
             'info': {
                 'dates':  MongoDB().getUserDates(domain=domain),
@@ -56,7 +56,7 @@ def getOldInfo(request):
     except Exception as e:
         info = {'error': traceback.format_exc()}
 
-    return render(request, 'main/user_changes/getOldInfo.html', info)
+    return render(request, 'main/user_changes/getDates.html', info)
 
 def getChanges(request):
     date1  = request.POST['date1']
@@ -97,15 +97,42 @@ def getInfo(request):
 def getDomains(request):
     return render(request, 'main/users_relations/getDomains.html')
 
-def getRelations(request):
+def getUsersDates(request):
     first_domain  = request.POST['first_domain']
     second_domain = request.POST['second_domain']
 
     try:
+        if not MongoDB().checkDomain(first_domain):
+            raise Exception('user with first domain not found in database')
+        if not MongoDB().checkDomain(second_domain):
+            raise Exception('user with second domain not found in database')
 
-        info = {}
+        info = {
+            'first_domain': first_domain,
+            'second_domain': second_domain,
+            'first_user': MongoDB().getFullname(domain=first_domain),
+            'second_user': MongoDB().getFullname(domain=second_domain),
+            'first_dates': MongoDB().getUserDates(domain=first_domain),
+            'second_dates': MongoDB().getUserDates(domain=second_domain)
+        }
 
     except Exception as e:
         info = {'error': traceback.format_exc()}
+
+    return render(request, 'main/users_relations/getUsersDates.html', info)
+
+
+def getRelations(request):
+    first_domain  = request.POST['first_domain']
+    second_domain = request.POST['second_domain']
+    date1 = request.POST['date1']
+    date2 = request.POST['date2']
+
+    try:
+        info = VK_UserRelation(first_domain, date1, second_domain, date2).getActivity()
+    except Exception as e:
+        info = {'error': traceback.format_exc()}
+
+    print(info)
 
     return render(request, 'main/users_relations/getRelations.html', info)

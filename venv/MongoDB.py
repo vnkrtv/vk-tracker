@@ -23,6 +23,14 @@ class MongoDB(object):
         return False
 
 
+    def getFullname(self, domain):
+        if self.checkDomain(domain):
+            info = list(self._db.find_one({'domain': domain})['dates'][-1].values())[0]['main_info']
+            return info['first_name'] + ' ' + info['last_name']
+        else:
+            return ''
+
+
     def loadUserInfo(self, id=0, domain='', date=''):
         try:
             if id != 0:

@@ -13,9 +13,10 @@ urlpatterns = [
     url(r'^user_info/show_info/$',          views.getInfo,          name='getInfo'),
 
     url(r'^user_changes/$',                 views.getDomainChanges, name='getDomainChanges'),
-    url(r'^user_changes/get_date/$',        views.getOldInfo,       name='getOldInfo'),
+    url(r'^user_changes/get_date/$',        views.getDates,         name='getDates'),
     url(r'^user_changes/show_changes/$',    views.getChanges,       name='getChanges'),
 
     url(r'^users_relation/$',               views.getDomains,       name='getDomains'),
+    url(r'^users_relation/get_dates$',      views.getUsersDates,    name='getUsersDates'),
     url(r'^users_relation/show_relation/$', views.getRelations,     name='getRelations')
 ]
