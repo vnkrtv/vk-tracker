@@ -270,7 +270,6 @@ class VK_UserAnalizer:
                 photo['photo_id'] = old
                 changeDict['items'].append(photo)
 
-
         return changeDict
 
     def cmpWall(self):
@@ -334,13 +333,11 @@ class VK_UserAnalizer:
 
         for (old, new) in zip(oldWallDict, newWallDict):
             changeLikesList, changeCommList = [], []
-            print('HEAR!\n', changeLikesList, '\nHEAR!')
 
-            oldComm = oldPhDict[old][0]
-            newComm = newPhDict[new][0]
+            oldComm = oldWallDict[old][0]
+            newComm = newWallDict[new][0]
 
             cmpDict = {}
-            print('HEAR!\n', changeLikesList, '\nHEAR!')
 
             for item in oldComm['items']:
                 id = item['id']
@@ -367,8 +364,6 @@ class VK_UserAnalizer:
             oldLikes = oldWallDict[old][1]
             newLikes = newWallDict[new][1]
 
-            print('HEAR!\n', changeLikesList, '\nHEAR!')
-
             cmpDict = {}
 
             for item in oldLikes['items']:
@@ -392,7 +387,6 @@ class VK_UserAnalizer:
 
                 changeLikesList.append(cmpDict[key][0])
 
-            print('HEAR!\n', changeLikesList, '\nHEAR!')
             post = {
                 'comments': [],
                 'likes': [],
@@ -402,10 +396,9 @@ class VK_UserAnalizer:
             if changeLikesList:
                 post['likes'] = changeLikesList
             if changeCommList or changeLikesList:
-                post['photo_id'] = old
+                post['post_id'] = old
                 changeDict['items'].append(post)
 
-        print(changeDict)
         return changeDict
 
     def getChanges(self):

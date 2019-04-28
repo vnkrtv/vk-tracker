@@ -1,7 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if 'error' not in info %}
+    {% if not error %}
 
         <p>Information about <a style="color: black" href="https://vk.com/{{ domain }}">{{ fullname }}</a></p>
         <span class="d-block p-2 bg-primary text-white">Main info</span>

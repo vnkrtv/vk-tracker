@@ -1,7 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if 'error' not in info %}
+    {% if not error %}
         <form action="{% url 'main:getChanges' %}" method="post">
             {% csrf_token %}
             <label for="domain">

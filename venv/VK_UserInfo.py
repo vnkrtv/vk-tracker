@@ -12,6 +12,11 @@ class VK_UserInfo:
     _timeout = 0.35
 
     def __init__(self, token, domain):
+        """
+
+        :param token: vk token (must have all rights)
+        :param domain: vk user domain
+        """
 
         self._token = token
         self._user = vk.API(vk.Session(access_token=token))
@@ -29,10 +34,11 @@ class VK_UserInfo:
     def userID(self):
         return self._id
 
-    def userFolder(self):
-        return self.userFirstName() + ' ' + self.userLastName() + ' [id' + str(self.userID()) + ']'
-
     def userMainInfo(self):
+        """
+
+        :return: dict of vk user main info
+        """
         fields  = 'counters,photo_id,verified,sex,bdate,city,country,home_town,domain,contacts,site,education,universities,schools,'
         fields += 'status,followers_count,occupation,relatives,relation,personal,connections,activities,interests,about,career'
 
@@ -46,6 +52,23 @@ class VK_UserInfo:
         return main_info
 
     def userFriends(self):
+        """
+
+        :return: dict of vk user's friends
+        {
+            'count': quantity of user's friends,
+            'items': {
+                {
+                    'first_name': ...,
+                    'last_name': ...,
+                    'bdate': ...,
+
+
+                }
+            ]
+        }
+
+        """
         try:
             friends = self._user.friends.get(user_id=self._id, fields='domain,sex,bdate,country', v='5.65')
             for friend in friends['items']:
@@ -57,6 +80,10 @@ class VK_UserInfo:
         return friends
 
     def userFollowers(self):
+        """
+
+        :return: dict of vk user's followers
+        """
         try:
             followers = self._user.users.getFollowers(user_id=self._id, fields='domain,sex,bdate,country', v='5.65')
         except:
@@ -66,6 +93,10 @@ class VK_UserInfo:
         return followers
 
     def userPhotos(self):
+        """
+
+        :return: dict of
+        """
         try:
             resp = self._user.photos.getAll(owner_id=self._id, count=200, photo_sizes=0, extended=0, v='5.65')
             sleep(self._timeout)

@@ -1,7 +1,9 @@
-import os
 import traceback
 
 from django.shortcuts import render
+from requests.exceptions import ConnectionError
+from neobolt.exceptions import ServiceUnavailable
+from pymongo.errors import ServerSelectionTimeoutError
 from VK_UserRelation import *
 
 # Create your views here.
@@ -22,7 +24,7 @@ def addResult(request):
         vk_user = VK_UserInfo(token=token, domain=request.POST['domain'])
         user    = vk_user.addUserToDB()
 
-        value = {
+        info = {
             'info': {
                 'first_name': user['main_info']['first_name'],
                 'last_name':  user['main_info']['last_name'],
@@ -30,10 +32,18 @@ def addResult(request):
                 'id':         user['main_info']['id']
             }
         }
-    except Exception as e:
-        value = {'error': traceback.format_exc()}
+    except ConnectionError:
+        info = {'error': 'no connection to the internet'}
+    except vk.exceptions.VkAPIError:
+        info = {'error': 'user with input domain not found'}
+    except ServerSelectionTimeoutError:
+        info = {'error': 'MongoDB is not connected'}
+    except ServiceUnavailable:
+        info = {'error': 'Neo4j is not connected'}
+    except Exception:
+        info = {'error': traceback.format_exc()}
 
-    return render(request, 'main/add_user/addResult.html', value)
+    return render(request, 'main/add_user/addResult.html', info)
 
 
 
@@ -45,15 +55,18 @@ def getDates(request):
 
     try:
         if not MongoDB().checkDomain(domain):
-            raise Exception('user with input domain not found in database')
+            raise NameError('user with input domain not found in database')
         info = {
             'info': {
                 'dates':  MongoDB().getUserDates(domain=domain),
                 'domain': domain
             }
         }
-
-    except Exception as e:
+    except ServerSelectionTimeoutError:
+        info = {'error': 'MongoDB is not connected'}
+    except NameError as e:
+        info = {'error': e}
+    except Exception:
         info = {'error': traceback.format_exc()}
 
     return render(request, 'main/user_changes/getDates.html', info)
@@ -63,14 +76,11 @@ def getChanges(request):
     date2  = request.POST['date2']
     domain = request.POST['domain']
 
-    try:
-        info = {
-            'info': VK_UserAnalizer(domain=domain, date1=date1, date2=date2).getChanges()
-        }
-        info['domain'] = info['info']['domain']
-        info['id']     = info['info']['id']
-    except Exception as e:
-        info = {'error': traceback.format_exc()}
+    info = {
+        'info': VK_UserAnalizer(domain=domain, date1=date1, date2=date2).getChanges()
+    }
+    info['domain'] = info['info']['domain']
+    info['id'] = info['info']['id']
 
     return render(request, 'main/user_changes/getChanges.html', info)
 
@@ -87,7 +97,9 @@ def getInfo(request):
         info['domain']   = info['info']['main_info']['domain']
         info['id']       = info['info']['main_info']['id']
         info['fullname'] = info['info']['main_info']['first_name'] + ' ' + info['info']['main_info']['last_name']
-    except Exception as e:
+    except ServerSelectionTimeoutError:
+        info = {'error': 'MongoDB is not connected'}
+    except Exception:
         info = {'error': traceback.format_exc()}
 
     return render(request, 'main/user_info/userInfo.html', info)
@@ -103,9 +115,9 @@ def getUsersDates(request):
 
     try:
         if not MongoDB().checkDomain(first_domain):
-            raise Exception('user with first domain not found in database')
+            raise NameError('user with first domain not found in database')
         if not MongoDB().checkDomain(second_domain):
-            raise Exception('user with second domain not found in database')
+            raise NameError('user with second domain not found in database')
 
         info = {
             'first_domain': first_domain,
@@ -115,8 +127,11 @@ def getUsersDates(request):
             'first_dates': MongoDB().getUserDates(domain=first_domain),
             'second_dates': MongoDB().getUserDates(domain=second_domain)
         }
-
-    except Exception as e:
+    except ServerSelectionTimeoutError:
+        info = {'error': 'MongoDB is not connected'}
+    except NameError as e:
+        info = {'error': e}
+    except Exception:
         info = {'error': traceback.format_exc()}
 
     return render(request, 'main/users_relations/getUsersDates.html', info)
@@ -130,9 +145,7 @@ def getRelations(request):
 
     try:
         info = VK_UserRelation(first_domain, date1, second_domain, date2).getActivity()
-    except Exception as e:
+    except Exception:
         info = {'error': traceback.format_exc()}
-
-    print(info)
 
     return render(request, 'main/users_relations/getRelations.html', info)

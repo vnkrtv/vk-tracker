@@ -3,6 +3,12 @@ from py2neo import Graph, Node, Relationship
 class GraphDB(object):
 
     def __init__(self, url="bolt://localhost:11001", user='neo4j', password='admin'):
+        """
+
+        :param url: Neo4j server url
+        :param user: username
+        :param password: password
+        """
         self._graph = Graph(url, user=user, password=password)
 
     def getGraph(self):
@@ -10,9 +16,8 @@ class GraphDB(object):
 
     def addUser(self, user):
         """
-        Test
-        :param user:
-        :return:
+        :param user: json with vk user information
+        :return: information loaded to graph db
         """
 
         friends   = [friend['id']   for friend   in user['friends']['items']  ]

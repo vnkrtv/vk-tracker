@@ -1,7 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if 'error' not in info %}
+    {% if not error %}
     <p class="font-weight-normal">
         <a style="color: black" href="https://vk.com/{{ info.domain }}">{{ info.first_name }} {{ info.last_name }}</a>
         was successfully added to DBs!
