@@ -25,16 +25,16 @@ class VK_UserInfo:
         self._user_name = self._user.users.get(user_ids=domain, v='5.65')[0]['first_name']
         self._user_surname = self._user.users.get(user_ids=domain, v='5.65')[0]['last_name']
 
-    def userFirstName(self):
+    def get_first_name(self):
         return self._user_name
 
-    def userLastName(self):
+    def get_last_name(self):
         return self._user_surname
 
-    def userID(self):
+    def get_id(self):
         return self._id
 
-    def userMainInfo(self):
+    def get_main_info(self):
         """
 
         :return: dict of vk user main info
@@ -51,7 +51,7 @@ class VK_UserInfo:
         sleep(self._timeout)
         return main_info
 
-    def userFriends(self):
+    def get_friends(self):
         """
 
         :return: dict of vk user's friends
@@ -79,7 +79,7 @@ class VK_UserInfo:
         sleep(self._timeout)
         return friends
 
-    def userFollowers(self):
+    def get_followers(self):
         """
 
         :return: dict of vk user's followers
@@ -92,7 +92,7 @@ class VK_UserInfo:
         sleep(self._timeout)
         return followers
 
-    def userPhotos(self):
+    def get_photos(self):
         """
 
         :return: dict of
@@ -146,7 +146,7 @@ class VK_UserInfo:
 
         return photos['photos']
 
-    def userWall(self):
+    def get_wall(self):
         try:
             resp = self._user.wall.get(owner_id=self._id, count=100, photo_sizes=0, extended=0, v='5.65')
             sleep(self._timeout)
@@ -202,7 +202,7 @@ class VK_UserInfo:
 
         return wall['wall']
 
-    def userGroups(self):
+    def get_groups(self):
         try:
             groups = {}
             groups = self._user.groups.get(user_id=self._id, count=200, extended=1,
@@ -222,29 +222,29 @@ class VK_UserInfo:
         sleep(self._timeout)
         return groups
 
-    def userAllInfo(self):
+    def get_all_info(self):
 
         info = {}
         start = clock()
 
         print('Start loading information about %s\n' % (self._user_name + ' ' + self._user_surname))
 
-        info['main_info'] = self.userMainInfo()
+        info['main_info'] = self.get_main_info()
         print('[%d s]Main information was loaded...\n' % (clock() - start))
 
-        info['friends'] = self.userFriends()
+        info['friends'] = self.get_friends()
         print('[%d s]Friends were loaded...\n' % (clock() - start))
 
-        info['followers'] = self.userFollowers()
+        info['followers'] = self.get_followers()
         print('[%d s]Followers were loaded...\n' % (clock() - start))
 
-        info['groups'] = self.userGroups()
+        info['groups'] = self.get_groups()
         print('[%d s]Groups were loaded...\n' % (clock() - start))
 
-        info['wall'] = self.userWall()
+        info['wall'] = self.get_wall()
         print('[%d s]Wallposts were loaded...\n' % (clock() - start))
 
-        info['photos'] = self.userPhotos()
+        info['photos'] = self.get_photos()
         print('[%d s]Photos were loaded...\n' % (clock() - start))
 
         print('Information about %s was successfully loaded\n' % (self._user_name + ' ' + self._user_surname))
@@ -260,35 +260,12 @@ class VK_UserInfo:
 
         return info
 
-    """
-    def saveAllInfo(self):
-        info = self.userAllInfo()
-        path = '../userdata/' + self.userFolder()
 
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        date = time.now().timetuple()
-        file = str(date[3]) + '.' + str(date[4]) + ' ' + str(date[2]) + '.' + str(date[1]) + '.' + str(date[0]) + '.json'
-
-        info['date'] = {
-            'year':    date[0],
-            'month':   date[1],
-            'day':     date[2],
-            'hour':    date[3],
-            'minutes': date[4]
-        }
-
-        json.dump(info, open(path + '/' + file, 'w'))
-
-        return info
-    """
-
-    def addUserToDB(self):
+    def add_user_to_DBs(self):
         info = self.userAllInfo()
 
-        MongoDB().addUser(info)
-        GraphDB().addUser(info)
+        MongoDB().add_user(info)
+        GraphDB().add_user(info)
 
         return info
 

@@ -2,7 +2,7 @@
 
 {% block content %}
     {% if not error %}
-        <form action="{% url 'main:getChanges' %}" method="post">
+        <form action="{% url 'main:get_changes' %}" method="post">
             {% csrf_token %}
             <label for="domain">
                 <input type="hidden" id="domain" name="domain" value="{{ info.domain }}">

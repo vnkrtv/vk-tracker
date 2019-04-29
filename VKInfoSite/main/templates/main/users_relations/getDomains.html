@@ -1,7 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="{% url 'main:getUsersDates' %}" method="post">
+    <form action="{% url 'main:get_users_dates' %}" method="post">
         {% csrf_token %}
 
         <table>

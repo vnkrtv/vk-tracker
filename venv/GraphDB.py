@@ -11,10 +11,10 @@ class GraphDB(object):
         """
         self._graph = Graph(url, user=user, password=password)
 
-    def getGraph(self):
+    def get_graph(self):
         return self._graph
 
-    def addUser(self, user):
+    def add_user(self, user):
         """
         :param user: json with vk user information
         :return: information loaded to graph db

@@ -20,7 +20,7 @@ class VK_UserRelation:
         self._user2_domain = user2_domain
 
 
-    def checkWall(self):
+    def check_wall(self):
 
         user1Wall = self._user1['wall']
         user2Wall = self._user2['wall']
@@ -89,7 +89,7 @@ class VK_UserRelation:
         return result
 
 
-    def checkPhotos(self):
+    def check_photos(self):
 
         user1Photos = self._user1['photos']
         user2Photos = self._user2['photos']
@@ -158,7 +158,7 @@ class VK_UserRelation:
         return result
 
 
-    def checkFriends(self):
+    def check_friends(self):
 
         user1Friends = self._user1['friends']
         user2Friends = self._user2['friends']
@@ -182,7 +182,7 @@ class VK_UserRelation:
         return result
 
 
-    def checkGroups(self):
+    def check_groups(self):
 
         user1Groups = self._user1['groups']
         user2Groups = self._user2['groups']
@@ -205,7 +205,7 @@ class VK_UserRelation:
         return result
 
 
-    def getActivity(self):
+    def get_mutual_activity(self):
 
         result = {
             'user1_info': {
@@ -220,12 +220,12 @@ class VK_UserRelation:
                 'domain':     self._user2_domain,
                 'id':         self._user2_id
             },
-            'mutual_friends': self.checkFriends(),
-            'mutual_groups':  self.checkGroups()
+            'mutual_friends': self.check_friends(),
+            'mutual_groups':  self.check_groups()
         }
 
-        wall    = self.checkWall()
-        photos  = self.checkPhotos()
+        wall    = self.check_wall()
+        photos  = self.check_photos()
 
         result['first_user2second_user'] = {
             'wall':   wall[0],

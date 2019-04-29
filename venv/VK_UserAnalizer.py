@@ -4,16 +4,16 @@ class VK_UserAnalizer:
 
     def __init__(self, domain, date1, date2):
 
-        if not MongoDB().checkDomain(domain):
+        if not MongoDB().check_domain(domain):
             raise Exception('No user with input domain in base')
 
-        self._newInf = MongoDB().loadUserInfo(domain=domain, date=date2)
-        self._oldInf = MongoDB().loadUserInfo(domain=domain, date=date1)
+        self._new_info = MongoDB().load_user_info(domain=domain, date=date2)
+        self._old_info = MongoDB().load_user_info(domain=domain, date=date1)
 
-        #self.checkDates(date1, date2);
+        #self.check_dates(date1, date2);
 
 
-    def checkDates(self, date1, date2):
+    def check_dates(self, date1, date2):
         #"{hour:02}-{minutes:02} {day}-{month:02}-{year}".format(**user['date'])
         date1 = tuple(map(int, date1.replace(' ', '-').split('-')))
         date2 = tuple(map(int, date2.replace(' ', '-').split('-')))
@@ -31,392 +31,392 @@ class VK_UserAnalizer:
                 if date2[i] > date1[i]:
                     buff_dict    = self._newInf
                     self._newInf = self._oldInf
-                    self._oldInf = buff_dict
+                    self._old_info = buff_dict
                     return
 
 
-    def cmpMainInfo(self):
-        oldMain = self._oldInf['main_info']
-        newMain = self._newInf['main_info']
+    def cmp_main_info(self):
+        old_main = self._old_info['main_info']
+        new_main = self._new_info['main_info']
 
-        cmpDict = {}
+        cmp_dict = {}
 
-        for (old, new) in zip(oldMain, newMain):
-            if oldMain[old] != newMain[new]:
-                if type(oldMain[old]) is not dict:
-                    cmpDict[old] = {
-                        'old': oldMain[old],
-                        'new': newMain[new]
+        for (old, new) in zip(old_main, new_main):
+            if old_main[old] != new_main[new]:
+                if type(old_main[old]) is not dict:
+                    cmp_dict[old] = {
+                        'old': old_main[old],
+                        'new': new_main[new]
                     }
 
-        return cmpDict
+        return cmp_dict
 
 
-    def cmpFriends(self):
-        oldFriends = self._oldInf['friends']['items']
-        newFriends = self._newInf['friends']['items']
+    def cmp_friends(self):
+        old_friends = self._old_info['friends']['items']
+        new_friends = self._new_info['friends']['items']
 
-        cmpDict = {}
+        cmp_dict = {}
 
-        for friend in oldFriends:
+        for friend in old_friends:
             id = friend['id']
-            cmpDict[id] = [friend, 0]
+            cmp_dict[id] = [friend, 0]
 
-        for friend in newFriends:
+        for friend in new_friends:
             id = friend['id']
 
-            if id in cmpDict:
-                cmpDict.pop(id)
+            if id in cmp_dict:
+                cmp_dict.pop(id)
             else:
-                cmpDict[id] = [friend, 1]
+                cmp_dict[id] = [friend, 1]
 
-        changeDict = {
+        changes_dict = {
             'new': [],
             'deleted': []
         }
 
-        for item in cmpDict:
-            if cmpDict[item][1]:
-                changeDict['new'].append(cmpDict[item][0])
+        for item in cmp_dict:
+            if cmp_dict[item][1]:
+                changes_dict['new'].append(cmp_dict[item][0])
             else:
-                changeDict['deleted'].append(cmpDict[item][0])
+                changes_dict['deleted'].append(cmp_dict[item][0])
 
-        return changeDict
+        return changes_dict
 
 
-    def cmpFollowers(self):
-        oldFollowers = self._oldInf['followers']['items']
-        newFollowers = self._newInf['followers']['items']
+    def cmp_followers(self):
+        old_followers = self._old_info['followers']['items']
+        new_followers = self._new_info['followers']['items']
 
-        cmpDict = {}
+        cmp_dict = {}
 
-        for follower in oldFollowers:
+        for follower in old_followers:
             id = follower['id']
-            cmpDict[id] = [follower, 0]
+            cmp_dict[id] = [follower, 0]
 
-        for follower in newFollowers:
+        for follower in new_followers:
             id = follower['id']
 
-            if id in cmpDict:
-                cmpDict.pop(id)
+            if id in cmp_dict:
+                cmp_dict.pop(id)
             else:
-                cmpDict[id] = [follower, 1]
+                cmp_dict[id] = [follower, 1]
 
-        changeDict = {
+        changes_dict = {
             'new': [],
             'deleted': []
         }
 
-        for item in cmpDict:
+        for item in cmp_dict:
             if cmpDict[item][1]:
-                changeDict['new'].append(cmpDict[item][0])
+                changes_dict['new'].append(cmp_dict[item][0])
             else:
-                changeDict['deleted'].append(cmpDict[item][0])
+                changes_dict['deleted'].append(cmp_dict[item][0])
 
-        return changeDict
+        return changes_dict
 
 
-    def cmpGroups(self):
-        oldGroups = self._oldInf['groups']['items']
-        newGroups = self._newInf['groups']['items']
+    def cmp_groups(self):
+        old_groups = self._old_info['groups']['items']
+        new_groups = self._new_info['groups']['items']
 
-        cmpDict = {}
+        cmp_dict = {}
 
-        for group in oldGroups:
+        for group in old_groups:
             id = group['id']
-            cmpDict[id] = [group, 0]
+            cmp_dict[id] = [group, 0]
 
-        for group in newGroups:
+        for group in new_groups:
             id = group['id']
 
-            if id in cmpDict:
-                cmpDict.pop(id)
+            if id in cmp_dict:
+                cmp_dict.pop(id)
             else:
-                cmpDict[id] = [group, 1]
+                cmp_dict[id] = [group, 1]
 
-        changeDict = {
+        changes_dict = {
             'new': [],
             'deleted': []
         }
 
-        for item in cmpDict:
-            if cmpDict[item][1]:
-                changeDict['new'].append(cmpDict[item][0])
+        for item in cmp_dict:
+            if cmp_dict[item][1]:
+                changes_dict['new'].append(cmp_dict[item][0])
             else:
-                changeDict['deleted'].append(cmpDict[item][0])
+                changes_dict['deleted'].append(cmp_dict[item][0])
 
-        return changeDict
+        return changes_dict
 
 
-    def cmpPhotos(self):
-        oldPhotos = self._oldInf['photos']['items']
-        newPhotos = self._newInf['photos']['items']
+    def cmp_photos(self):
+        old_photos = self._old_info['photos']['items']
+        new_photos = self._new_info['photos']['items']
 
-        oldPhDict, newPhDict = {}, {}
+        old_ph_dict, new_ph_dict = {}, {}
 
-        for photo in oldPhotos:
+        for photo in old_photos:
             id = photo['photo_id']
-            oldPhDict[id] = [photo['comments'], photo['likes']]
+            old_ph_dict[id] = [photo['comments'], photo['likes']]
 
-        for photo in newPhotos:
+        for photo in new_photos:
             id = photo['photo_id']
-            newPhDict[id] = [photo['comments'], photo['likes']]
+            new_ph_dict[id] = [photo['comments'], photo['likes']]
 
-        listID = []
-        changeDict = {
+        list_ids = []
+        changes_dict = {
             'new': [],
             'deleted': [],
             'items': []
         }
 
-        for id in oldPhDict:
-            if id not in newPhDict:
+        for id in old_ph_dict:
+            if id not in new_ph_dict:
 
-                oldPh = {
+                old_ph = {
                     'photo_id': id,
-                    'comments': oldPhDict[id][0],
-                    'likes':    oldPhDict[id][1],
+                    'comments': old_ph_dict[id][0],
+                    'likes':    old_ph_dict[id][1],
                 }
 
-                changeDict['deleted'].append(oldPh)
-                listID.append(id)
+                changes_dict['deleted'].append(old_ph)
+                list_ids.append(id)
 
-        for id in listID:
-            oldPhDict.pop(id)
+        for id in list_ids:
+            old_ph_dict.pop(id)
 
-        listID = []
+        list_ids = []
 
-        for id in newPhDict:
-            if id not in oldPhDict:
+        for id in new_ph_dict:
+            if id not in old_ph_dict:
 
-                newPh = {
+                new_ph = {
                     'photo_id': id,
-                    'comments': newPhDict[id][0],
-                    'likes':    newPhDict[id][1],
+                    'comments': new_ph_dict[id][0],
+                    'likes':    new_ph_dict[id][1],
                 }
 
-                changeDict['new'].append(newPh)
-                listID.append(id)
+                changes_dict['new'].append(new_ph)
+                list_ids.append(id)
 
-        for id in listID:
-            newPhDict.pop(id)
+        for id in list_ids:
+            new_ph_dict.pop(id)
 
-        for (old, new) in zip(oldPhDict, newPhDict):
-            changeCommList, changeLikesList = [], []
+        for (old, new) in zip(old_ph_dict, new_ph_dict):
+            changes_comm_list, changes_likes_list = [], []
 
-            oldComm = oldPhDict[old][0]
-            newComm = newPhDict[new][0]
+            old_comm = old_ph_dict[old][0]
+            new_comm = new_ph_dict[new][0]
 
-            if oldComm != newComm:
-                cmpDict = {}
+            if old_comm != new_comm:
+                cmp_dict = {}
 
-                for item in oldComm['items']:
+                for item in old_comm['items']:
                     id = item['id']
-                    cmpDict[id] = [item, 0]
+                    cmp_dict[id] = [item, 0]
 
-                for item in newComm['items']:
+                for item in new_comm['items']:
+                    id = item['id']
+
+                    if id in cmp_dict:
+                        cmp_dict.pop(id)
+                    else:
+                        cmp_dict[id] = [item, 1]
+
+                for key in cmp_dict:
+
+                    if cmp_dict[key][1]:
+                        cmp_dict[key][0]['status'] = 1  # 'new comment'
+                    else:
+                        cmp_dict[key][0]['status'] = 0  # 'deleted comment'
+
+                    changes_comm_list.append(cmp_dict[key][0])
+
+            old_likes = old_ph_dict[old][1]
+            new_likes = new_ph_dict[new][1]
+
+            if old_likes != new_likes:
+                cmp_dict = {}
+
+                for item in old_likes['items']:
+                    id = item['id']
+                    cmp_dict[id] = [item, 0]
+
+                for item in new_likes['items']:
                     id = item['id']
 
                     if id in cmpDict:
-                        cmpDict.pop(id)
+                        cmp_dict.pop(id)
                     else:
-                        cmpDict[id] = [item, 1]
+                        cmp_dict[id] = [item, 1]
 
-                for key in cmpDict:
+                for key in cmp_dict:
 
-                    if cmpDict[key][1]:
-                        cmpDict[key][0]['status'] = 1  # 'new comment'
+                    if cmp_dict[key][1]:
+                        cmp_dict[key][0]['status'] = 1  # 'new like'
                     else:
-                        cmpDict[key][0]['status'] = 0  # 'deleted comment'
+                        cmp_dict[key][0]['status'] = 0  # 'deleted like'
 
-                    changeCommList.append(cmpDict[key][0])
-
-            oldLikes = oldPhDict[old][1]
-            newLikes = newPhDict[new][1]
-
-            if oldLikes != newLikes:
-                cmpDict = {}
-
-                for item in oldLikes['items']:
-                    id = item['id']
-                    cmpDict[id] = [item, 0]
-
-                for item in newLikes['items']:
-                    id = item['id']
-
-                    if id in cmpDict:
-                        cmpDict.pop(id)
-                    else:
-                        cmpDict[id] = [item, 1]
-
-                for key in cmpDict:
-
-                    if cmpDict[key][1]:
-                        cmpDict[key][0]['status'] = 1  # 'new like'
-                    else:
-                        cmpDict[key][0]['status'] = 0  # 'deleted like'
-
-                    changeLikesList.append(cmpDict[key][0])
+                    changes_likes_list.append(cmp_dict[key][0])
 
             photo = {
                 'comments': [],
                 'likes': [],
             }
-            if changeCommList:
-                photo['comments'] = changeCommList
-            if changeLikesList:
-                photo['likes'] = changeLikesList
-            if changeCommList or changeLikesList:
+            if changes_comm_list:
+                photo['comments'] = changes_comm_list
+            if changes_likes_list:
+                photo['likes'] = changes_likes_list
+            if changes_comm_list or changes_likes_list:
                 photo['photo_id'] = old
-                changeDict['items'].append(photo)
+                changes_dict['items'].append(photo)
 
-        return changeDict
+        return changes_dict
 
-    def cmpWall(self):
-        oldWall = self._oldInf['wall']['items']
-        newWall = self._newInf['wall']['items']
+    def cmp_wall(self):
+        old_wall = self._old_info['wall']['items']
+        new_wall = self._new_info['wall']['items']
 
-        oldWallDict, newWallDict, textDict = {}, {}, {}
+        old_wall_dict, new_wall_dict, text_dict = {}, {}, {}
 
-        for post in oldWall:
+        for post in old_wall:
             id = post['post_id']
 
-            textDict[id] = [post['text'], None]
-            oldWallDict[id] = [post['comments'], post['likes']]
+            text_dict[id] = [post['text'], None]
+            old_wall_dict[id] = [post['comments'], post['likes']]
 
-        for post in newWall:
+        for post in new_wall:
             id = post['post_id']
 
-            textDict[id] = [None, post['text']]
-            newWallDict[id] = [post['comments'], post['likes']]
+            text_dict[id] = [None, post['text']]
+            new_wall_dict[id] = [post['comments'], post['likes']]
 
-        listID = []
-        changeDict = {
+        list_ids = []
+        changes_dict = {
             'new': [],
             'deleted': [],
             'items': []
         }
 
-        for id in oldWallDict:
-            if id not in newWallDict:
-                oldPost = {
+        for id in old_wall_dict:
+            if id not in new_wall_dict:
+                old_post = {
                     'post_id': id,
-                    'text': textDict[id][0],
-                    'comments': oldWallDict[id][0],
-                    'likes': oldWallDict[id][1],
+                    'text': text_dict[id][0],
+                    'comments': old_wall_dict[id][0],
+                    'likes': old_wall_dict[id][1],
                 }
 
-                changeDict['deleted'].append(oldPost)
-                listID.append(id)
+                changes_dict['deleted'].append(old_post)
+                list_ids.append(id)
 
-        for id in listID:
-            oldWallDict.pop(id)
-            textDict.pop(id)
+        for id in list_ids:
+            old_wall_dict.pop(id)
+            text_dict.pop(id)
 
-        listID = []
+        list_ids = []
 
-        for id in newWallDict:
-            if id not in oldWallDict:
-                newPost = {
+        for id in new_wall_dict:
+            if id not in old_wall_dict:
+                new_post = {
                     'post_id': id,
-                    'text': textDict[id][1],
-                    'comments': newWallDict[id][0],
-                    'likes': newWallDict[id][1],
+                    'text': text_dict[id][1],
+                    'comments': new_wall_dict[id][0],
+                    'likes': new_wall_dict[id][1],
                 }
 
-                changeDict['new'].append(newPost)
-                listID.append(id)
+                changes_dict['new'].append(new_post)
+                list_ids.append(id)
 
-        for id in listID:
-            newWallDict.pop(id)
-            textDict.pop(id)
+        for id in list_ids:
+            new_wall_dict.pop(id)
+            text_dict.pop(id)
 
-        for (old, new) in zip(oldWallDict, newWallDict):
-            changeLikesList, changeCommList = [], []
+        for (old, new) in zip(old_wall_dict, new_wall_dict):
+            changes_likes_list, change_comm_list = [], []
 
-            oldComm = oldWallDict[old][0]
-            newComm = newWallDict[new][0]
+            old_comm = old_wall_dict[old][0]
+            new_comm = new_wall_dict[new][0]
 
-            cmpDict = {}
+            cmp_dict = {}
 
-            for item in oldComm['items']:
+            for item in old_comm['items']:
                 id = item['id']
-                cmpDict[id] = [item, 0]
+                cmp_dict[id] = [item, 0]
 
-            for item in newComm['items']:
-                id = item['id']
-
-                if id in cmpDict:
-                    cmpDict.pop(id)
-                else:
-                    cmpDict[id] = [item, 1]
-
-            for key in cmpDict:
-
-                if cmpDict[key][1]:
-                    cmpDict[key][0]['status'] = 1  # 'new comment'
-                else:
-                    cmpDict[key][0]['status'] = 0  # 'deleted comment'
-
-                changeCommList.append(cmpDict[key][0])
-
-
-            oldLikes = oldWallDict[old][1]
-            newLikes = newWallDict[new][1]
-
-            cmpDict = {}
-
-            for item in oldLikes['items']:
-                id = item['id']
-                cmpDict[id] = [item, 0]
-
-            for item in newLikes['items']:
+            for item in new_comm['items']:
                 id = item['id']
 
-                if id in cmpDict:
-                    cmpDict.pop(id)
+                if id in cmp_dict:
+                    cmp_dict.pop(id)
                 else:
-                    cmpDict[id] = [item, 1]
+                    cmp_dict[id] = [item, 1]
 
-            for key in cmpDict:
+            for key in cmp_dict:
 
-                if cmpDict[key][1]:
-                    cmpDict[key][0]['status'] = 1  # 'new like'
+                if cmp_dict[key][1]:
+                    cmp_dict[key][0]['status'] = 1  # 'new comment'
                 else:
-                    cmpDict[key][0]['status'] = 0  # 'deleted like'
+                    cmp_dict[key][0]['status'] = 0  # 'deleted comment'
 
-                changeLikesList.append(cmpDict[key][0])
+                change_comm_list.append(cmp_dict[key][0])
+
+
+            old_likes = old_wall_dict[old][1]
+            new_likes = new_wall_dict[new][1]
+
+            cmp_dict = {}
+
+            for item in old_likes['items']:
+                id = item['id']
+                cmp_dict[id] = [item, 0]
+
+            for item in new_likes['items']:
+                id = item['id']
+
+                if id in cmp_dict:
+                    cmp_dict.pop(id)
+                else:
+                    cmp_dict[id] = [item, 1]
+
+            for key in cmp_dict:
+
+                if cmp_dict[key][1]:
+                    cmp_dict[key][0]['status'] = 1  # 'new like'
+                else:
+                    cmp_dict[key][0]['status'] = 0  # 'deleted like'
+
+                changes_likes_list.append(cmp_dict[key][0])
 
             post = {
                 'comments': [],
                 'likes': [],
             }
-            if changeCommList:
-                post['comments'] = changeCommList
-            if changeLikesList:
-                post['likes'] = changeLikesList
-            if changeCommList or changeLikesList:
+            if change_comm_list:
+                post['comments'] = change_comm_list
+            if changes_likes_list:
+                post['likes'] = changes_likes_list
+            if change_comm_list or changes_likes_list:
                 post['post_id'] = old
-                changeDict['items'].append(post)
+                changes_dict['items'].append(post)
 
-        return changeDict
+        return changes_dict
 
-    def getChanges(self):
-        if self._oldInf is None or self._newInf is None:
-            raise Exception('user information was not loaded')
+    def get_changes(self):
+        if not self._old_info or not self._new_info:
+            raise ValueError('user information was not loaded')
 
-        changeDict = {
-            'main_info': self.cmpMainInfo(),
-            'friends':   self.cmpFriends(),
-            'followers': self.cmpFollowers(),
-            'groups':    self.cmpGroups(),
-            'photos':    self.cmpPhotos(),
-            'wall':      self.cmpWall(),
-            'domain':    self._newInf['main_info']['domain'],
-            'id':        self._newInf['main_info']['id'],
+        changes_dict = {
+            'main_info': self.cmp_main_info(),
+            'friends':   self.cmp_friends(),
+            'followers': self.cmp_followers(),
+            'groups':    self.cmp_groups(),
+            'photos':    self.cmp_photos(),
+            'wall':      self.cmp_wall(),
+            'domain':    self._new_info['main_info']['domain'],
+            'id':        self._new_info['main_info']['id'],
         }
 
-        return changeDict
+        return changes_dict
 
 
 if __name__ == '__main__':

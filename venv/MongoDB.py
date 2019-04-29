@@ -6,7 +6,7 @@ class MongoDB(object):
         self._client = MongoClient(host, port)
         self._db = self._client.vk.vk_data
 
-    def addUser(self, user):
+    def add_user(self, user):
         """
 
         :param user: json with vk user information
@@ -21,7 +21,7 @@ class MongoDB(object):
             self._db.insert_one({'user_id': id, 'domain': domain, 'dates': [{date: user}]})
 
 
-    def checkDomain(self, domain):
+    def check_domain(self, domain):
         """
 
         :param domain: vk user domain
@@ -32,7 +32,7 @@ class MongoDB(object):
         return False
 
 
-    def getFullname(self, domain):
+    def get_fullname(self, domain):
         """
 
         :param domain: vk user domain
@@ -45,7 +45,7 @@ class MongoDB(object):
             return ''
 
 
-    def loadUserInfo(self, id=0, domain='', date=''):
+    def load_user_info(self, id=0, domain='', date=''):
         """
 
         :param id: vk user id (if input)
@@ -78,7 +78,7 @@ class MongoDB(object):
                 return list(info['dates'][-1].values())[0]
 
 
-    def getUserDates(self, id=0, domain=''):
+    def get_user_info_dates(self, id=0, domain=''):
         """
 
         :param id: vk user id

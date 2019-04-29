@@ -2,7 +2,7 @@
 
 {% block content %}
     {% if not error %}
-        <form action="{% url 'main:getRelations' %}" method="post">
+        <form action="{% url 'main:get_relations' %}" method="post">
             {% csrf_token %}
             <table>
                 <tr>

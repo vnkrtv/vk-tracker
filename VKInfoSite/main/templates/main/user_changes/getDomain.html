@@ -1,7 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="{% url 'main:getDates' %}" method="post">
+    <form action="{% url 'main:get_dates' %}" method="post">
         {% csrf_token %}
 
         <label for="domain">Enter user domain: </label>
