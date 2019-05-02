@@ -21,16 +21,16 @@ class VK_UserAnalizer:
         for i in range(4, 1, -1):
             if date1[i] != date2[i]:
                 if date2[i] > date1[i]:
-                    buff_dict    = self._newInf
-                    self._newInf = self._oldInf
-                    self._oldInf = buff_dict
+                    buff_dict    = self._new_info
+                    self._new_info = self._old_info
+                    self._old_info = buff_dict
                     return
 
         for i in range(0, 2):
             if date1[i] != date2[i]:
                 if date2[i] > date1[i]:
-                    buff_dict    = self._newInf
-                    self._newInf = self._oldInf
+                    buff_dict    = self._new_info
+                    self._new_info = self._old_info
                     self._old_info = buff_dict
                     return
 
