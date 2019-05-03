@@ -261,78 +261,19 @@ class VK_UserInfo:
         return info
 
 
-    def add_user_to_DBs(self):
+    def add_user_to_DBs(self, mongo_host, mongo_port, neo4j_url, neo4j_user, neo4j_password):
+        """
+        Add user to Mongo db and Neo5j db
+        :param mongo_host:
+        :param mongo_port:
+        :param url:
+        :param user:
+        :param password:
+        :return: json with vk user info
+        """
         info = self.userAllInfo()
 
-        MongoDB().add_user(info)
-        GraphDB().add_user(info)
+        MongoDB(host=mongo_host, port=mongo_port).add_user(info)
+        GraphDB(url=neo4j_url, user=neo4j_user, password=neo4j_password).add_user(info)
 
         return info
-
-
-
-
-class UserInterface(Frame):
-
-    def __init__(self, master):
-
-        super(UserInterface, self).__init__(master)
-        self.grid()
-        self.create_widgets()
-
-    def create_widgets(self):
-
-        self.info_lbl = Label(self, text = "Enter user domain:")
-        self.info_lbl.grid(row = 0, column = 0, sticky = 'W')
-
-        self.dom_ent = Entry(self)
-        self.dom_ent.grid(row = 1, columnspan = 3, sticky = 'W')
-
-        self.submit_bttn = Button(self, text = "Download information", command = self.download)
-        self.submit_bttn.grid(row = 2, column = 0, columnspan = 3, sticky = 'W')
-
-        self.status_txt = Text(self, width = 70, height = 70, wrap = WORD)
-        self.status_txt.grid(row = 3, column = 0)
-
-    def download(self):
-
-        self.status_txt.delete(0.0, END)
-
-        token = open('../token/token.txt').read()
-        domain = self.dom_ent.get()
-
-        stream = self.status_txt
-        stream.write = lambda message: self.status_txt.insert(0.0, message)
-
-        s = VK_UserInfo(token=token, domain=domain)
-        self.status_txt.delete(0.0, END)
-        s.saveAllInfo(stream)
-        """
-                try:
-            token = open('../token/token.txt').read()
-            domain = self.dom_ent.get()
-
-            stream = self.status_txt
-            stream.write = lambda message: self.status_txt.insert(0.0, message)
-
-            s = VK_UserInfo(token=token, domain=domain)
-            self.status_txt.delete(0.0, END)
-            s.userAllInfo(stream)
-
-        except vk.exceptions.VkAPIError:
-            self.status_txt.delete(0.0, END)
-            self.status_txt.insert(0.0, 'Error: invalid domain')
-        except:
-            self.status_txt.delete(0.0, END)
-            self.status_txt.insert(0.0, 'Error!')
-        """
-
-
-
-
-if __name__ == '__main__':
-    token = open('../token/token.txt').read()
-    s = VK_UserInfo(token=token, domain='n_oriharov')
-    s.addUserToDB()
-
-#python ./VKInfoSite/manage.py runserver

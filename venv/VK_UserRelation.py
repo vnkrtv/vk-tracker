@@ -2,10 +2,12 @@ from VK_UserAnalizer import *
 
 
 class VK_UserRelation:
-    def __init__(self, user1_domain, date1, user2_domain, date2):
+    def __init__(self, user1_domain, date1, user2_domain, date2, mongo_host, mongo_port):
 
-        self._user1 = MongoDB().loadUserInfo(domain=user1_domain, date=date1)
-        self._user2 = MongoDB().loadUserInfo(domain=user2_domain, date=date2)
+        mdb = MongoDB(host=mongo_host, port=mongo_port)
+
+        self._user1 = mdb.loadUserInfo(domain=user1_domain, date=date1)
+        self._user2 = mdb.loadUserInfo(domain=user2_domain, date=date2)
 
         self._user1_first_name = self._user1['main_info']['first_name']
         self._user2_first_name = self._user2['main_info']['first_name']

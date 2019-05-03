@@ -1,0 +1,70 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+  <form action="{% url 'main:change_settings_result' %}" method="post">
+    {% csrf_token %}
+    <P>Settings</P>
+
+    Mongo DB:
+    <table>
+      <tr>
+        <td>
+          Host:
+        </td>
+        <td>
+          <input type="text" id="MDB_HOST" name="MDB_HOST" value="{{ MDB_HOST }}" required="required">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Port:
+        </td>
+        <td>
+          <input type="number" id="MDB_PORT" name="MDB_PORT" value="{{ MDB_PORT }}" required="required">
+        </td>
+      </tr>
+    </table>
+
+    <br>Neo4j DB:
+    <table>
+      <tr>
+        <td>
+          Url:
+        </td>
+        <td>
+          <input type="text" id="NEO_URL" name="NEO_URL" value="{{ NEO_URL }}" required="required">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          User:
+        </td>
+        <td>
+          <input type="text" id="NEO_USER" name="NEO_USER" value="{{ NEO_USER }}" required="required">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Password:
+        </td>
+        <td>
+          <input type="text" id="NEO_PASS" name="NEO_PASS" value="{{ NEO_PASS }}" required="required">
+        </td>
+      </tr>
+    </table>
+
+    <br>
+    <table>
+      <tr>
+        <td>
+          VK token:
+        </td>
+        <td>
+          <input type="text" id="vk_token" name="vk_token" value="{{ vk_token }}" size="95" maxlength="85" minlength="85" required="required">
+        </td>
+    </table>
+    <br>Use default settings <input type="checkbox" id="default" name="default"><br>
+    <input type="submit" class="btn btn-dark btn-sm" value="Change settings">
+  </form>
+  <br>
+{% endblock %}

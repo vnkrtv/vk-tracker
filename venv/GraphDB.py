@@ -2,7 +2,7 @@ from py2neo import Graph, Node, Relationship
 
 class GraphDB(object):
 
-    def __init__(self, url="bolt://localhost:11001", user='neo4j', password='admin'):
+    def __init__(self, url='bolt://localhost:11001', user='neo4j', password='admin'):
         """
 
         :param url: Neo4j server url

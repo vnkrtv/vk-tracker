@@ -2,13 +2,14 @@ from VK_UserInfo import *
 
 class VK_UserAnalizer:
 
-    def __init__(self, domain, date1, date2):
+    def __init__(self, domain, date1, date2, mongo_host, mongo_port):
 
-        if not MongoDB().check_domain(domain):
+        mdb = MongoDB(host=mongo_host, port=mongo_port)
+        if not mdb.check_domain(domain):
             raise Exception('No user with input domain in base')
 
-        self._new_info = MongoDB().load_user_info(domain=domain, date=date2)
-        self._old_info = MongoDB().load_user_info(domain=domain, date=date1)
+        self._new_info = mdb.load_user_info(domain=domain, date=date2)
+        self._old_info = mdb.load_user_info(domain=domain, date=date1)
 
         #self.check_dates(date1, date2);
 

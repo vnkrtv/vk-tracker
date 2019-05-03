@@ -11,9 +11,7 @@
 	<body>
 	<div class="jumbotron">
 		<dir class="container">
-			<h1>
-				{% include "main/includes/header.html" %}
-			</h1>
+			{% include "main/includes/header.html" %}
 			{% block content %}
 			{% endblock %}
 			<p>
@@ -27,6 +25,7 @@
 		</dir>
 	</div>
 	<div class="container">
+		<a style="color: black" href="{% url 'main:change_settings' %}">Change setting<br></a>
 		<a style="color: black" href="https://github.com/LeadNess/VKUserInfo">&copy; Korotaev Ivan, 2019</a>
 	</div>
 	</body>

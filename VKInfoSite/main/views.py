@@ -1,4 +1,5 @@
 import traceback
+import json
 
 from django.shortcuts import render
 from requests.exceptions import ConnectionError
@@ -6,11 +7,22 @@ from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
 from VK_UserRelation import *
 
-# Create your views here.
-
 
 def index(request):
     return render(request, 'main/index.html')
+
+
+def change_settings(request):
+    info = json.load(open('config/config.json', 'r'))
+    return render(request, 'main/changeSettings.html', info)
+
+
+def change_settings_result(request):
+    default = request.POST.get('default', '')
+    new_config = json.load(open('config/default_config.json', 'r')) if default else request.POST
+    json.dump(new_config, open('config/config.json', 'w'))
+
+    return render(request, 'main/changeSettingsResult.html')
 
 
 def get_domain_add(request):
@@ -18,11 +30,13 @@ def get_domain_add(request):
 
 
 def add_result(request):
+    config = json.load(open('config/config.json', 'r'))
     info = {}
 
     try:
-        vk_user = VK_UserInfo(token=open('token/token.txt', 'r').read(), domain=request.POST['domain'])
-        user = vk_user.add_user_to_DBs()
+        vk_user = VK_UserInfo(token=config['vk_token'], domain=request.POST['domain'])
+        config.pop('vk_token')
+        user = vk_user.add_user_to_DBs(**config)
 
         info['info'] = {
             'first_name': user['main_info']['first_name'],
@@ -49,12 +63,16 @@ def get_domain_info(request):
 
 
 def get_info(request):
+    config = json.load(open('config/config.json', 'r'))
+
     domain = request.POST['domain']
     info = {}
 
     try:
-        info['info'] = MongoDB().load_user_info(domain=domain)
-        info['fullname'] = MongoDB().get_fullname(domain=domain)
+        mdb = MongoDB(host=config['MDB_HOST'], port=config['MDB_PORT'])
+
+        info['info'] = mdb.load_user_info(domain=domain)
+        info['fullname'] = mdb.get_fullname(domain=domain)
         info['id'] = info['info']['main_info']['id']
         info['domain'] = domain
 
@@ -71,14 +89,17 @@ def get_domain_changes(request):
 
 
 def get_dates(request):
+    config = json.load(open('config/config.json', 'r'))
     domain = request.POST['domain']
     info = {}
 
     try:
-        if not MongoDB().check_domain(domain):
+        mdb = MongoDB(host=config['MDB_HOST'], port=config['MDB_PORT'])
+
+        if not mdb.check_domain(domain):
             raise ValueError('user with input domain not found in database')
         info['info'] = {
-            'dates': MongoDB().get_user_info_dates(domain=domain),
+            'dates': mdb.get_user_info_dates(domain=domain),
             'domain': domain
         }
     except ServerSelectionTimeoutError:
@@ -92,14 +113,19 @@ def get_dates(request):
 
 
 def get_changes(request):
-    date1 = request.POST['date1']
-    date2 = request.POST['date2']
-    domain = request.POST['domain']
+    config = json.load(open('config/config.json', 'r'))
+    args = {
+        'date1':      request.POST['date1'],
+        'date2':      request.POST['date2'],
+        'domain':     request.POST['domain'],
+        'mongo_host': config['MDB_HOST'],
+        'mongo_port': config['MDB_PORT']
+    }
 
-    cmp_info = VK_UserAnalizer(domain=domain, date1=date1, date2=date2).get_changes()
+    cmp_info = VK_UserAnalizer(**args).get_changes()
     info = {
         'info':   cmp_info,
-        'domain': domain,
+        'domain': args['domain'],
         'id':     cmp_info['info']['id']
     }
 
@@ -111,28 +137,26 @@ def get_domains(request):
 
 
 def get_users_dates(request):
-    """
-
-    :param request:
-    :return:
-    """
+    config = json.load(open('config/config.json', 'r'))
     first_domain = request.POST['first_domain']
     second_domain = request.POST['second_domain']
     info = {}
 
     try:
-        if not MongoDB().check_domain(first_domain):
+        mdb = MongoDB(host=config['MDB_HOST'], port=config['MDB_PORT'])
+
+        if not mdb.check_domain(first_domain):
             raise ValueError('user with first domain not found in database')
-        if not MongoDB().check_domain(second_domain):
+        if not mdb.check_domain(second_domain):
             raise ValueError('user with second domain not found in database')
 
         info = {
             'first_domain':  first_domain,
             'second_domain': second_domain,
-            'first_user':    MongoDB().get_fullname(domain=first_domain),
-            'second_user':   MongoDB().get_fullname(domain=second_domain),
-            'first_dates':   MongoDB().get_user_info_dates(domain=first_domain),
-            'second_dates':  MongoDB().get_user_info_dates(domain=second_domain)
+            'first_user':    mdb.get_fullname(domain=first_domain),
+            'second_user':   mdb.get_fullname(domain=second_domain),
+            'first_dates':   mdb.get_user_info_dates(domain=first_domain),
+            'second_dates':  mdb.get_user_info_dates(domain=second_domain)
         }
     except ServerSelectionTimeoutError:
         info['error'] = 'MongoDB is not connected'
@@ -145,13 +169,18 @@ def get_users_dates(request):
 
 
 def get_relations(request):
-    first_domain = request.POST['first_domain']
-    second_domain = request.POST['second_domain']
-    date1 = request.POST['date1']
-    date2 = request.POST['date2']
+    config = json.load(open('config/config.json', 'r'))
+    args = {
+        'first_domain':  request.POST['first_domain'],
+        'second_domain': request.POST['second_domain'],
+        'date1':         request.POST['date1'],
+        'date2':         request.POST['date2'],
+        'mongo_host':    config['MDB_HOST'],
+        'mongo_port':    config['MDB_PORT']
+    }
 
     try:
-        info = VK_UserRelation(first_domain, date1, second_domain, date2).get_mutual_activity()
+        info = VK_UserRelation(**args).get_mutual_activity()
     except Exception:
         info = {'error': traceback.format_exc()}
 
