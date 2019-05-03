@@ -19,9 +19,20 @@ def change_settings(request):
 
 def change_settings_result(request):
     default = request.POST.get('default', '')
-    request.POST.pop('csrfmiddlewaretoken')
-    new_config = json.load(open('config/default_config.json', 'r')) if default else request.POST
-    json.dump(new_config, open('config/config.json', 'w'))
+
+    if default:
+        new_config = json.load(open('config/default_config.json', 'r'))
+        json.dump(new_config, open('config/config.json', 'w'))
+    else:
+        # {% костыль %}
+        json.dump(request.POST, open('config/config.json', 'w'))
+        new_config = json.load(open('config/config.json', 'r'))
+        try:
+            new_config.pop('csrfmiddlewaretoken')
+        except:
+            pass
+        json.dump(new_config, open('config/config.json', 'w'))
+        # {% endкостыль %}
 
     return render(request, 'main/changeSettingsResult.html')
 
