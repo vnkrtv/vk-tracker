@@ -138,7 +138,7 @@ def get_changes(request):
     info = {
         'info':   cmp_info,
         'domain': args['domain'],
-        'id':     cmp_info['info']['id']
+        'id':     cmp_info['id']
     }
 
     return render(request, 'main/user_changes/getChanges.html', info)

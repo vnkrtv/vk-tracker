@@ -245,7 +245,7 @@ class VK_UserAnalizer:
                 for item in new_likes['items']:
                     id = item['id']
 
-                    if id in cmpDict:
+                    if id in cmp_dict:
                         cmp_dict.pop(id)
                     else:
                         cmp_dict[id] = [item, 1]

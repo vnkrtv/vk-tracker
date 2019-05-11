@@ -2,12 +2,12 @@ from VK_UserAnalizer import *
 
 
 class VK_UserRelation:
-    def __init__(self, user1_domain, date1, user2_domain, date2, mongo_host, mongo_port):
+    def __init__(self, first_domain, date1, second_domain, date2, mongo_host, mongo_port):
 
         mdb = MongoDB(host=mongo_host, port=mongo_port)
 
-        self._user1 = mdb.loadUserInfo(domain=user1_domain, date=date1)
-        self._user2 = mdb.loadUserInfo(domain=user2_domain, date=date2)
+        self._user1 = mdb.load_user_info(domain=first_domain, date=date1)
+        self._user2 = mdb.load_user_info(domain=second_domain, date=date2)
 
         self._user1_first_name = self._user1['main_info']['first_name']
         self._user2_first_name = self._user2['main_info']['first_name']
@@ -18,8 +18,8 @@ class VK_UserRelation:
         self._user1_id = self._user1['main_info']['id']
         self._user2_id = self._user2['main_info']['id']
 
-        self._user1_domain = user1_domain
-        self._user2_domain = user2_domain
+        self._user1_domain = first_domain
+        self._user2_domain = second_domain
 
 
     def check_wall(self):

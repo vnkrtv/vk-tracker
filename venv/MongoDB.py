@@ -38,7 +38,7 @@ class MongoDB(object):
         :param domain: vk user domain
         :return: str '${first_name} ${last_name}'
         """
-        if self.checkDomain(domain):
+        if self.check_domain(domain):
             info = list(self._db.find_one({'domain': domain})['dates'][-1].values())[0]['main_info']
             return info['first_name'] + ' ' + info['last_name']
         else:

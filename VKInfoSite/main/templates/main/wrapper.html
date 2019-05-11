@@ -11,21 +11,22 @@
 	<body>
 	<div class="jumbotron">
 		<dir class="container">
-			{% include "main/includes/header.html" %}
+			<h1>
+				{% include "main/includes/header.html" %}
+			</h1>
 			{% block content %}
 			{% endblock %}
 			<p>
-				<a href="/" class="btn btn-primary btn-sm">Main page</a>
-				<a href="/add_user" class="btn btn-primary btn-sm">Add user</a>
-				<a href="/user_info" class="btn btn-primary btn-sm">Get user info</a>
-				<a href="/user_changes" class="btn btn-primary btn-sm">Get user account changes</a>
-				<a href="/users_relation" class="btn btn-primary btn-sm">Get users mutual activity</a>
+				<a href="/"                               class="btn btn-primary btn-sm">Main page</a>
+				<a href="/add_user"                       class="btn btn-primary btn-sm">Add user</a>
+				<a href="/user_info"                      class="btn btn-primary btn-sm">Get user info</a>
+				<a href="/user_changes"                   class="btn btn-primary btn-sm">Get user account changes</a>
+				<a href="/users_relation"                 class="btn btn-primary btn-sm">Get users mutual activity</a>
 				<a href="http://localhost:11002/browser/" class="btn btn-primary btn-sm">Go to Neo4j browser &raquo;</a>
 			</p>
 		</dir>
 	</div>
 	<div class="container">
-		<a style="color: black" href="{% url 'main:change_settings' %}">Change setting<br></a>
 		<a style="color: black" href="https://github.com/LeadNess/VKUserInfo">&copy; Korotaev Ivan, 2019</a>
 	</div>
 	</body>
