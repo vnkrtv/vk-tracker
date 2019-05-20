@@ -24,6 +24,8 @@
             </tbody>
         </table>
 
+        <iframe id="gender-graph" scrolling="no" style="border:none;" src="http://127.0.0.1:{{ GENDER_GRAPH_PORT }}/" height="525px" width="100%">
+	    </iframe>
         <span class="d-block p-2 bg-primary text-white">Friends list</span>
         <table class="table table-striped table-dark">
             <thead>
@@ -94,6 +96,8 @@
             </tbody>
         </table>
 
+        <iframe id="photos-likes" scrolling="no" style="border:none;" src="http://127.0.0.1:{{ PHOTOS_GRAPH_PORT }}/" height="525px" width="100%">
+	    </iframe>
         {% if info.photos.items %}
             <span class="d-block p-2 bg-primary text-white">Photos</span>
             <table class="table table-striped table-dark">
@@ -132,6 +136,8 @@
             </table>
         {% endif %}
 
+        <iframe id="posts-likes" scrolling="no" style="border:none;" src="http://127.0.0.1:{{ WALL_GRAPH_PORT }}/" height="525px" width="100%">
+	    </iframe>
         {% if info.wall.items %}
             <span class="d-block p-2 bg-primary text-white">Wall</span>
             <table class="table table-striped table-dark">

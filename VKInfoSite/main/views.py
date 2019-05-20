@@ -6,6 +6,7 @@ from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
 from VK_UserRelation import *
+from DashGraphs import *
 
 
 def index(request):
@@ -87,6 +88,9 @@ def get_info(request):
         info['fullname'] = mdb.get_fullname(domain=domain)
         info['id'] = info['info']['main_info']['id']
         info['domain'] = domain
+        info['PHOTOS_GRAPH_PORT'] = PhotoLikesGraph(photos_list=info['info']['photos']['items']).run()
+        info['POSTS_GRAPH_PORT'] = PostsLikesGraph(posts_list=info['info']['wall']['items']).run()
+        info['GENDER_GRAPH_PORT'] = GenderGraph(friends_list=info['info']['friends']['items']).run()
 
     except ServerSelectionTimeoutError:
         info['error'] = 'MongoDB is not connected'
