@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
 from . import views
+from django.urls import re_path
 
 app_name = 'main'
 
@@ -20,5 +21,7 @@ urlpatterns = [
 
     url(r'^users_relation/$',               views.get_domains,            name='get_domains'),
     url(r'^users_relation/get_dates/$',     views.get_users_dates,        name='get_users_dates'),
-    url(r'^users_relation/show_relation/$', views.get_relations,          name='get_relations')
+    url(r'^users_relation/show_relation/$', views.get_relations,          name='get_relations'),
 ]
+
+#leaflet/folium instagram_scrapper

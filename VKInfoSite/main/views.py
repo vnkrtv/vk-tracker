@@ -6,7 +6,6 @@ from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
 from VK_UserRelation import *
-from DashGraphs import *
 
 
 def index(request):
@@ -32,6 +31,7 @@ def change_settings_result(request):
             new_config.pop('csrfmiddlewaretoken')
         except:
             pass
+        new_config['mdb_port'] = int(new_config['mdb_port'])
         json.dump(new_config, open('config/config.json', 'w'))
         # {% endкостыль %}
 
@@ -63,9 +63,9 @@ def add_result(request):
         info['error'] = 'user with input domain not found'
     except ServerSelectionTimeoutError:
         info['error'] = 'MongoDB is not connected'
-    except ServiceUnavailable:
-        info['error'] = 'Neo4j is not connected'
-    except Exception:
+    #except ServiceUnavailable:
+    #    info['error'] = 'Neo4j is not connected'
+    except:
         info['error'] = traceback.format_exc()
 
     return render(request, 'main/add_user/addResult.html', info)
@@ -82,15 +82,12 @@ def get_info(request):
     info = {}
 
     try:
-        mdb = MongoDB(host=config['MDB_HOST'], port=config['MDB_PORT'])
+        mdb = VKMongoDB(host=config['mdb_host'], port=config['mdb_port'])
 
         info['info'] = mdb.load_user_info(domain=domain)
         info['fullname'] = mdb.get_fullname(domain=domain)
         info['id'] = info['info']['main_info']['id']
         info['domain'] = domain
-        info['PHOTOS_GRAPH_PORT'] = PhotoLikesGraph(photos_list=info['info']['photos']['items']).run()
-        info['POSTS_GRAPH_PORT'] = PostsLikesGraph(posts_list=info['info']['wall']['items']).run()
-        info['GENDER_GRAPH_PORT'] = GenderGraph(friends_list=info['info']['friends']['items']).run()
 
     except ServerSelectionTimeoutError:
         info['error'] = 'MongoDB is not connected'
@@ -110,7 +107,7 @@ def get_dates(request):
     info = {}
 
     try:
-        mdb = MongoDB(host=config['MDB_HOST'], port=config['MDB_PORT'])
+        mdb = VKMongoDB(host=config['mdb_host'], port=config['mdb_port'])
 
         if not mdb.check_domain(domain):
             raise ValueError('user with input domain not found in database')
@@ -134,8 +131,8 @@ def get_changes(request):
         'date1':      request.POST['date1'],
         'date2':      request.POST['date2'],
         'domain':     request.POST['domain'],
-        'mongo_host': config['MDB_HOST'],
-        'mongo_port': config['MDB_PORT']
+        'mongo_host': config['mdb_host'],
+        'mongo_port': config['mdb_port']
     }
 
     cmp_info = VK_UserAnalizer(**args).get_changes()
@@ -159,7 +156,7 @@ def get_users_dates(request):
     info = {}
 
     try:
-        mdb = MongoDB(host=config['MDB_HOST'], port=config['MDB_PORT'])
+        mdb = VKMongoDB(host=config['mdb_host'], port=config['mdb_port'])
 
         if not mdb.check_domain(first_domain):
             raise ValueError('user with first domain not found in database')
@@ -191,8 +188,8 @@ def get_relations(request):
         'second_domain': request.POST['second_domain'],
         'date1':         request.POST['date1'],
         'date2':         request.POST['date2'],
-        'mongo_host':    config['MDB_HOST'],
-        'mongo_port':    config['MDB_PORT']
+        'mongo_host':    config['mdb_host'],
+        'mongo_port':    config['mdb_port']
     }
 
     try:
@@ -201,3 +198,5 @@ def get_relations(request):
         info = {'error': traceback.format_exc()}
 
     return render(request, 'main/users_relations/getRelations.html', info)
+
+

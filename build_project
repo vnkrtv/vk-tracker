@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo /bin/bash ./project_update .
+sudo docker build -t vkuserinfo docker
+echo "Project was successfully build. Enter 'docker-compose up' to run it"

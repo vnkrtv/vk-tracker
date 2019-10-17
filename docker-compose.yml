@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  web-app:
+    image: vkuserinfo:latest
+    networks:
+      - main
+    ports:
+      - "8000:8000"
+  mongo:
+    image: mongo:latest
+    networks:
+      main:
+        aliases:
+          - mongodb
+    #depends_on:
+    #  - web-app
+  neo4j:
+    image: neo4j:latest
+    networks:
+      main:
+        aliases:
+          - graphdb
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    #depends_on:
+    #  - web-app
+
+networks:
+  main:
+

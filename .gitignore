@@ -1,4 +1,8 @@
-userdata/
+docker/VKInfoSite
+docker/requirements.txt
+venv/
 .idea/
-config/
-venv/Lib/
+VKInfoSite/__pycache__
+VKInfoSite/config/default_config.json
+VKInfoSite/main/__pycache__
+VKInfoSite/dashboard/__pycache__
