@@ -1,0 +1,8 @@
+mkdir tmp
+mv -r VKInfoSite tmp/VKInfoSite
+pip install --no-cache-dir -r requirements.txt
+django-admin.py startproject VKInfoSite
+python VKInfoSite/manage.py startapp main
+cp -r -f tmp/VKInfoSite VKInfoSite
+rm -r tmp
+ 
