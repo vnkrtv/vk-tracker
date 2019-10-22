@@ -7,7 +7,9 @@ echo "===========================================Start loading requirements=====
 pip install --no-cache-dir -r requirements.txt
 echo "=========================================Successfully loaded requeirments======================================="
 django-admin startproject VKInfoSite
-cd VKInfoSite || python manage.py startapp main || cd ..
+cd VKInfoSite
+python manage.py startapp main
+cd ..
 rm -r VKInfoSite
 cp -r tmp/VKInfoSite VKInfoSite
 rm -r tmp
