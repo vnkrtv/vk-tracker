@@ -1,29 +1,24 @@
 #!/bin/bash
-/bin/bash ./venv/bin/activate
+source ./venv/bin/activate
 mkdir tmp
-mv -r VKInfoSite tmp/VKInfoSite
-echo "Start loading requirements"
-echo "==========================================="
+cp -r VKInfoSite tmp/VKInfoSite
+rm -r VKInfoSite
+echo "===========================================Start loading requirements==========================================="
 pip install --no-cache-dir -r requirements.txt
-echo "Successfully loaded requeirments"
-echo "==========================================="
-echo "Initialize django app"
-echo "==========================================="
-django-admin.py startproject VKInfoSite
+echo "=========================================Successfully loaded requeirments======================================="
+django-admin startproject VKInfoSite
 python VKInfoSite/manage.py startapp main
 cp -r -f tmp/VKInfoSite VKInfoSite
 rm -r tmp
-echo "Initialized django app"
-echo "==========================================="
-echo "Enter configuration data:"
+echo "===========================================Initialized django app==============================================="
+echo "===========================================Enter configuration data:============================================"
 read -p "Vk token: " TOKEN
 read -p "Mongo host: " MDB_HOST
 read -p "Mongo port: " MDB_PORT
 read -p "Neo4j URL: " NEO4J_URL
 read -p "Neo4j user: " NEO4J_USER
 read -p "Neo4j pass: " NEO4J_PASS
-rm ./VKInfoSite/config/config.json 2> /dev/null
+rm ./VKInfoSite/config/config.json 2>/dev/null
 CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"neo_url\": \"${NEO4J_URL}\", \"neo_user\": \"${NEO4J_USER}\", \"neo_pass\": \"${NEO4J_PASS}\", \"vk_token\": \"${TOKEN}\"}"
-echo "${CONFIG}" >> ./VKInfoSite/config/config.json
-echo "Initialize configuration file config.json
-"
+echo "${CONFIG}" >> ./VKInfoSite/config/config.json 2>/dev/null
+echo "===================================Initialize configuration file config.json===================================="
