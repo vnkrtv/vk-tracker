@@ -1,10 +1,11 @@
 # VKUserInfo
-Requirements:
-- vk
-- py2neo
-- pymongo
-- django
-- bootstrap4
-- dash==0.42.0
-- dash-daq==0.1.0
-- pandas
+Application for monitoring VK and user search by specified filters
+
+Install:
+- git clone https://github.com/LeadNess/VKUserInfo.git
+- cd VKUserInfo
+- python -m venv venv
+- ./build_djangoapp   #create django app in current folder
+- ./build_project     #create docker containers for docker-compose
+
+  
