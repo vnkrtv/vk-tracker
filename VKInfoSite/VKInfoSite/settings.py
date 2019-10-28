@@ -26,7 +26,7 @@ SECRET_KEY = '&q-rdzsmfnc)&1n))2up!(4+_q-4l-gv(n^^pfz_1_0inst%)h'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
+    '127.0.0.1',
     '0.0.0.0'
 ]
 
@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'main',
     'dashboard',
+    'vksearch',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -1,0 +1,15 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <form action="{% url 'vksearch:get_new_philter_region' %}" method="post">
+        {% csrf_token %}
+        Select country:
+        <select required="required" name="country" id="country" >
+            {% for country in countries %}
+                <option value="{{ country.id }}">{{ country.title }}</option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" class="btn btn-dark btn-sm" value="Next" onclick="location.href='/add_philter/getRegion/'">
+    </form>
+    <br/>
+{% endblock %}

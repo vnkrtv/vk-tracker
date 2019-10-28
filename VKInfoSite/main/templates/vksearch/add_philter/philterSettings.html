@@ -1,0 +1,37 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <form action="{% url 'vksearch:get_new_philter_params' %}" method="post">
+        {% csrf_token %}
+        <p>Enter new philter settings:</p>
+        <table>
+            <tr>
+                <td>Allowed groups</td>
+                <td><input type="checkbox" name="allowed_groups"></td>
+                <td><input type="number" name="allowed_groups_num" id="allowed_groups_num" value="1" size="2" min="1" style="width:50px" required="required"></td>
+            </tr>
+            <tr>
+                <td>Friends list</td>
+                <td><input type="checkbox" name="friends_list"></td>
+                <td><input type="number" name="friends_list_num" id="friends_list_num" value="1" size="2" min="1" style="width:50px" required="required"></td>                
+            </tr>
+            <tr>
+                <td>Countries</td>
+                <td><input type="checkbox" name="countries"></td>
+                <td><input type="number" name="countries_num" id="countries_num" value="1" size="2" min="1" style="width:50px" required="required"></td>                
+            </tr>
+            <tr>
+                <td>Cities</td>
+                <td><input type="checkbox" name="cities"></td>
+                <td><input type="number" name="cities_num" id="cities_num" value="1" size="2" min="1" style="width:50px" required="required"></td>                
+            </tr>
+            <tr>
+                <td>Universities</td>
+                <td><input type="checkbox" name="universities"></td>
+                <td><input type="number" name="universities_num" id="universities_num" value="1" size="2" min="1" style="width:50px" required="required"></td>                
+            </tr>                                    
+        </table>
+        <input type="submit" class="btn btn-dark btn-sm" value="Get info" onclick="location.href='/add_philter/getPhilterParams/'">
+    </form>
+    <br/>
+{% endblock %}

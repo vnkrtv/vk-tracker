@@ -1,0 +1,19 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <form action="{% url 'vksearch:get_new_philter_cities' %}" method="post">
+        {% csrf_token %}
+        Select region:
+        <select required="required" name="region" id="region" >
+            {% for region in regions %}
+                <option value="{{ region.id }}">{{ region.title }}</option>
+            {% endfor %}
+        </select><br>
+        Cities <input type="number" name="cities_num" id="cities_num" value="1" size="2" min="1" style="width:50px" required="required"><br>
+        <label for="country_id">
+             <input type="hidden" id="country_id" name="country_id" value="{{ country_id }}">
+        </label>
+        <input type="submit" class="btn btn-dark btn-sm" value="Next" onclick="location.href='/add_philter/getCities/'">
+    </form>
+    <br/>
+{% endblock %}

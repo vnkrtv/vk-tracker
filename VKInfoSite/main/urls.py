@@ -1,6 +1,5 @@
 from django.conf.urls import url, include
 from . import views
-from django.urls import re_path
 
 app_name = 'main'
 

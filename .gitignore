@@ -1,8 +1,12 @@
-docker/VKInfoSite
-docker/requirements.txt
 venv/
 .idea/
-VKInfoSite/__pycache__
+docker/VKInfoSite
+docker/requirements.txt
 VKInfoSite/config/default_config.json
-VKInfoSite/main/__pycache__
-VKInfoSite/dashboard/__pycache__
+VKInfoSite/__pycache__
+VKInfoSite/main/__pycache__/
+VKInfoSite/main/migrations/
+VKInfoSite/dashboard/__pycache__/
+VKInfoSite/dashboard/migrations/
+VKInfoSite/vksearch/__pycache__/
+VKInfoSite/vksearch/migrations/
