@@ -9,6 +9,7 @@ echo "=========================================Successfully loaded requeirments=
 django-admin startproject VKInfoSite
 cd VKInfoSite
 python manage.py startapp main
+python manage.py startapp vksearch
 cd ..
 rm -r VKInfoSite
 cp -r tmp/VKInfoSite VKInfoSite
