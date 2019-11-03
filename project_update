@@ -46,7 +46,7 @@ echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/mai
 
 VIEWS=$(cat ./docker/VKInfoSite/main/views.py)
 rm "./docker/VKInfoSite/vksearch/views.py"
-echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/mavksearchin/views.py"
+echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/vksearch/views.py"
 
 VIEWS=$(cat ./docker/VKInfoSite/dashboard/dash_app.py)
 rm "./docker/VKInfoSite/dashboard/dash_app.py"
