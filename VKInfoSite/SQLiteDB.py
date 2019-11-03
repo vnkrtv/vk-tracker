@@ -181,4 +181,5 @@ class SQLiteDB(object):
                     self.load_schools(schools_info, city_id)
                     print_log(start, f'Loaded schools      (country_id: {country_id}, region_id: {city_id})', log_file)
 
+        print_log(start, 'Updating completed', log_file)
         log_file.close()
