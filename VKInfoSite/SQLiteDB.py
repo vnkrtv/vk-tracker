@@ -1,5 +1,6 @@
 import sqlite3 as sql
-from time import sleep
+import vk
+from time import sleep, time
 
 
 class SQLiteDB(object):
@@ -60,7 +61,7 @@ class SQLiteDB(object):
             self.cursor.execute(f'CREATE TABLE cities_{country_id}_{region_id} (id INT , title text)')
         except:
             pass
-        cities = set([tuple(item.values()) for item in cities_info['items']])
+        cities = set([tuple((item.get('id'), item.get('title'))) for item in cities_info['items']])
         cities -= set(self.get_cities(country_id, region_id))
         self.cursor.executemany(f'INSERT INTO cities_{country_id}_{region_id} VALUES (?,?)', cities)
         self.conn.commit()
@@ -126,10 +127,11 @@ class SQLiteDB(object):
         schools = [item for item in self.cursor.execute(f'SELECT * FROM schools_{city_id} ORDER BY id')]
         return schools
 
-    def update_base(self, vk_token):
+    def update_base(self, vk_token, logging_file='../db/db.logs'):
         """
 
         :param vk_token:
+        :param logging_file:
         :return:
         """
         session = vk.API(vk.Session(access_token=vk_token))
@@ -138,14 +140,25 @@ class SQLiteDB(object):
         # RU, UA, BR, KZ
         CIS_countries = [1, 2, 3, 4]
 
+        log_file = open(logging_file, 'w')
+        start = time()
+        print_log = lambda st, info, file: print(('[%d:%02d:%02d.%03d] ' + info) %
+                                                 (((time() - st) / 3600),
+                                                 ((time() - st) / 60),
+                                                 (time() - st),
+                                                 ((time() - st) * 1000)), file=file)
+
+        print_log(start, 'Start updating', log_file)
         countries = session.database.getCountries(need_all=1, count=1000, v=token_v)
         sleep(timeout)
         self.load_countries(countries)
+        print_log(start, 'Loaded countries', log_file)
 
         for country_id in CIS_countries:
             regions = session.database.getRegions(country_id=country_id, count=100, v=token_v)
             sleep(timeout)
             self.load_regions(regions, country_id)
+            print_log(start, f'Loaded regions (country_id: {country_id})', log_file)
 
             for region in regions['items']:
                 region_id = region['id']
@@ -153,14 +166,19 @@ class SQLiteDB(object):
                                                     v=token_v)
                 sleep(timeout)
                 self.load_cities(cities, country_id, region_id)
+                print_log(start, f'Loaded cities (country_id: {country_id}, region_id: {region_id})', log_file)
 
                 for city in cities['items']:
                     city_id = city['id']
 
-                    universities_info = session.database.getSchools(q='', city_id=city_id, count=10000, v=token_v)
+                    universities_info = session.database.getUniversities(q='', city_id=city_id, count=10000, v=token_v)
                     sleep(timeout)
                     self.load_universities(universities_info, country_id, city_id)
+                    print_log(start, f'Loaded universities (country_id: {country_id}, region_id: {city_id})', log_file)
 
                     schools_info = session.database.getSchools(q='', city_id=city_id, count=10000, v=token_v)
                     sleep(timeout)
                     self.load_schools(schools_info, city_id)
+                    print_log(start, f'Loaded schools      (country_id: {country_id}, region_id: {city_id})', log_file)
+
+        log_file.close()
