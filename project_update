@@ -9,17 +9,22 @@ fi
 if [ "$1" == "default" ]
 then
     PROJECT_DIR="/home/leadness/PycharmProjects/VKUserInfo"
+    echo "Project directory: ${PROJECT_DIR}"
 else
     if [ -d "$1" ]
     then
         PROJECT_DIR="$1"
+        if [ "$1" -eq "." ]
+        then
+            echo "Project directory: $(pwd)"
+        else
+            echo "Project directory: ${PROJECT_DIR}"
+        fi
     else
         echo "Error: ${1} is not dir"
         exit 1
     fi
 fi
-
-echo "Project directory: ${PROJECT_DIR}"
 
 rm "./docker/requirments.txt" 2> /dev/null
 rm -r "./docker/VKInfoSite" 2> /dev/null
@@ -36,22 +41,7 @@ CONFIG="${CONFIG/\"localhost\"/\"mongodb\"}"
 echo "${CONFIG}" >> "./docker/VKInfoSite/config/config.json"
 echo "${CONFIG}" >> "./docker/VKInfoSite/config/default_config.json"
 
-VIEWS=$(cat ./docker/VKInfoSite/dashboard/dash_app.py)
-rm "./docker/VKInfoSite/MongoDB.py"
-echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/MongoDB.py"
-
-VIEWS=$(cat ./docker/VKInfoSite/main/views.py)
-rm "./docker/VKInfoSite/main/views.py"
-echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/main/views.py"
-
-VIEWS=$(cat ./docker/VKInfoSite/main/views.py)
-rm "./docker/VKInfoSite/vksearch/views.py"
-echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/vksearch/views.py"
-
-VIEWS=$(cat ./docker/VKInfoSite/dashboard/dash_app.py)
-rm "./docker/VKInfoSite/dashboard/dash_app.py"
-echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/dashboard/dash_app.py"
-
-VIEWS=$(cat ./docker/VKInfoSite/dashboard/DashGraphs.py)
-rm "./docker/VKInfoSite/dashboard/DashGraphs.py"
-echo "${VIEWS//(\'config/(\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/dashboard/DashGraphs.py"
+CONFIG=$(cat ./VKInfoSite/config.py)
+rm "./VKInfoSite/config.py"
+CONFIG="${VIEWS//(\'config/(\'/app/VKInfoSite/config}"
+echo "${VIEWS//(\'../(\'/app}" >> "./VKInfoSite/config.py"

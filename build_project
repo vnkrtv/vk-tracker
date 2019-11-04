@@ -1,10 +1,7 @@
 #!/bin/bash
 
-echo "Start preparing Docker environment"
-echo "==========================================="
+echo "=======================================Start preparing Docker environment======================================="
 sudo /bin/bash ./project_update .
-echo "==========================================="
-echo "Start building VKUserInfo Docker"
+echo "====================================Start building VKUserInfo Docker conteiner=================================="
 sudo docker build -t vkuserinfo docker
-echo "==========================================="
-echo "Project was successfully build. Enter 'docker-compose up' to run it"
+echo "=======================Project was successfully build. Enter 'docker-compose up' to run it======================"

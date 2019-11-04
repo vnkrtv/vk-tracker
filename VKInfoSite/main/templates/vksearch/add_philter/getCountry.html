@@ -5,11 +5,13 @@
         {% csrf_token %}
         Select country:
         <select required="required" name="country" id="country" >
-            {% for country in countries %}
-                <option value="{{ country.id }}">{{ country.title }}</option>
+            {% for id, title in countries %}
+                <option value="{{ id }}">{{ title }}</option>
             {% endfor %}
         </select><br>
-        <input type="submit" class="btn btn-dark btn-sm" value="Next" onclick="location.href='/add_philter/getRegion/'">
+        Regions name philter <input type="text" name="regions" id="regions" style="width:90px" required="required">
+        <br>
+        <input type="submit" class="btn btn-dark btn-sm" value="Next">
     </form>
     <br/>
 {% endblock %}

@@ -10,3 +10,5 @@ VKInfoSite/dashboard/__pycache__/
 VKInfoSite/dashboard/migrations/
 VKInfoSite/vksearch/__pycache__/
 VKInfoSite/vksearch/migrations/
+db/db.logs
+db/VKDatabase.db

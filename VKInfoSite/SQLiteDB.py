@@ -5,7 +5,7 @@ from time import sleep, time
 
 class SQLiteDB(object):
 
-    def __init__(self, db_file="../db/VKDatabase.db"):
+    def __init__(self, db_file):
         self.conn = sql.connect(db_file)
         self.cursor = self.conn.cursor()
 
@@ -144,9 +144,9 @@ class SQLiteDB(object):
         start = time()
         print_log = lambda st, info, file: print(('[%d:%02d:%02d.%03d] ' + info) %
                                                  (((time() - st) / 3600),
-                                                 ((time() - st) / 60),
-                                                 (time() - st),
-                                                 ((time() - st) * 1000)), file=file)
+                                                 (((time() - st) / 60) % 60),
+                                                 ((time() - st) % 60),
+                                                 (((time() - st) % 1) * 1000)), file=file)
 
         print_log(start, 'Start updating', log_file)
         countries = session.database.getCountries(need_all=1, count=1000, v=token_v)
@@ -174,12 +174,12 @@ class SQLiteDB(object):
                     universities_info = session.database.getUniversities(q='', city_id=city_id, count=10000, v=token_v)
                     sleep(timeout)
                     self.load_universities(universities_info, country_id, city_id)
-                    print_log(start, f'Loaded universities (country_id: {country_id}, region_id: {city_id})', log_file)
+                    print_log(start, f'Loaded universities (country_id: {country_id}, city_id: {city_id})', log_file)
 
-                    schools_info = session.database.getSchools(q='', city_id=city_id, count=10000, v=token_v)
-                    sleep(timeout)
-                    self.load_schools(schools_info, city_id)
-                    print_log(start, f'Loaded schools      (country_id: {country_id}, region_id: {city_id})', log_file)
+                    #schools_info = session.database.getSchools(q='', city_id=city_id, count=10000, v=token_v)
+                    #sleep(timeout)
+                    #self.load_schools(schools_info, city_id)
+                    #print_log(start, f'Loaded schools      (country_id: {country_id}, city_id: {city_id})', log_file)
 
         print_log(start, 'Updating completed', log_file)
         log_file.close()

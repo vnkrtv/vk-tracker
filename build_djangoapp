@@ -25,4 +25,4 @@ read -p "Neo4j pass: " NEO4J_PASS
 rm ./VKInfoSite/config/config.json 2>/dev/null
 CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"neo_url\": \"${NEO4J_URL}\", \"neo_user\": \"${NEO4J_USER}\", \"neo_pass\": \"${NEO4J_PASS}\", \"vk_token\": \"${TOKEN}\"}"
 echo "${CONFIG}" >> ./VKInfoSite/config/config.json 2>/dev/null
-echo "===================================Initialize configuration file config.json===================================="
+echo "===================================Initialized configuration file config.json===================================="

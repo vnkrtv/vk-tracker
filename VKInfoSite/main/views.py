@@ -6,6 +6,7 @@ from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
 from VK_UserRelation import *
+from config import *
 
 
 def index(request):
@@ -13,7 +14,7 @@ def index(request):
 
 
 def change_settings(request):
-    info = json.load(open('config/config.json', 'r'))
+    info = json.load(open(CONFIG_FILE, 'r'))
     return render(request, 'main/changeSettings.html', info)
 
 
@@ -21,18 +22,18 @@ def change_settings_result(request):
     default = request.POST.get('default', '')
 
     if default:
-        new_config = json.load(open('config/default_config.json', 'r'))
-        json.dump(new_config, open('config/config.json', 'w'))
+        new_config = json.load(open(CONFIG_FILE, 'r'))
+        json.dump(new_config, open(CONFIG_FILE, 'w'))
     else:
         # {% костыль %}
-        json.dump(request.POST, open('config/config.json', 'w'))
-        new_config = json.load(open('config/config.json', 'r'))
+        json.dump(request.POST, open(CONFIG_FILE, 'w'))
+        new_config = json.load(open(CONFIG_FILE, 'r'))
         try:
             new_config.pop('csrfmiddlewaretoken')
         except:
             pass
         new_config['mdb_port'] = int(new_config['mdb_port'])
-        json.dump(new_config, open('config/config.json', 'w'))
+        json.dump(new_config, open(CONFIG_FILE, 'w'))
         # {% endкостыль %}
 
     return render(request, 'main/changeSettingsResult.html')
@@ -43,7 +44,7 @@ def get_domain_add(request):
 
 
 def add_result(request):
-    config = json.load(open('config/config.json', 'r'))
+    config = json.load(open(CONFIG_FILE, 'r'))
     info = {}
 
     try:
@@ -63,8 +64,8 @@ def add_result(request):
         info['error'] = 'user with input domain not found'
     except ServerSelectionTimeoutError:
         info['error'] = 'MongoDB is not connected'
-    #except ServiceUnavailable:
-    #    info['error'] = 'Neo4j is not connected'
+    except ServiceUnavailable:
+        info['error'] = 'Neo4j is not connected'
     except:
         info['error'] = traceback.format_exc()
 
@@ -76,7 +77,7 @@ def get_domain_info(request):
 
 
 def get_info(request):
-    config = json.load(open('config/config.json', 'r'))
+    config = json.load(open(CONFIG_FILE, 'r'))
 
     domain = request.POST['domain']
     info = {}
@@ -102,7 +103,7 @@ def get_domain_changes(request):
 
 
 def get_dates(request):
-    config = json.load(open('config/config.json', 'r'))
+    config = json.load(open(CONFIG_FILE, 'r'))
     domain = request.POST['domain']
     info = {}
 
@@ -126,7 +127,7 @@ def get_dates(request):
 
 
 def get_changes(request):
-    config = json.load(open('config/config.json', 'r'))
+    config = json.load(open(CONFIG_FILE, 'r'))
     args = {
         'date1':      request.POST['date1'],
         'date2':      request.POST['date2'],
@@ -150,7 +151,7 @@ def get_domains(request):
 
 
 def get_users_dates(request):
-    config = json.load(open('config/config.json', 'r'))
+    config = json.load(open(CONFIG_FILE, 'r'))
     first_domain = request.POST['first_domain']
     second_domain = request.POST['second_domain']
     info = {}
@@ -182,7 +183,7 @@ def get_users_dates(request):
 
 
 def get_relations(request):
-    config = json.load(open('config/config.json', 'r'))
+    config = json.load(open(CONFIG_FILE, 'r'))
     args = {
         'first_domain':  request.POST['first_domain'],
         'second_domain': request.POST['second_domain'],

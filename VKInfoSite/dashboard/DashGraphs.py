@@ -7,6 +7,7 @@ import pandas as pd
 import json
 from VK_UserInfo import *
 from datetime import datetime as dt
+from config import *
 
 
 class GenderPieChart:
@@ -406,7 +407,7 @@ class FriendsActivityGraph:
                     fullname = profiles[id]
                     df.loc[id] = [0, 1, fullname, 0]
 
-        token = json.load(open('config/config.json', 'r'))['vk_token']
+        token = json.load(open(CONFIG_FILE, 'r'))['vk_token']
         vk_user = VK_UserInfo(token=token, domain=user_info['main_info']['domain'])
         for friend in user_info['friends']['items']:
             id = friend['id']

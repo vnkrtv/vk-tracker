@@ -5,7 +5,8 @@ from django.shortcuts import render
 from requests.exceptions import ConnectionError
 from .vk_search import *
 from MongoDB import *
-
+from SQLiteDB import *
+from config import *
 
 def get_search_params(request):
     return render(request, 'vksearch/search/searchPage.html')
@@ -25,40 +26,32 @@ def get_result(request):
 
 
 def get_new_philter_countries(request):
-    with open('config/config.json', 'r') as file:
-        config = json.load(file)
-
-    mdb = VKDatabaseMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    db = SQLiteDB(db_file=DB_FILE)
     info = {
-        'countries': mdb.get_countries()['items']
+        'countries': [item for item in db.get_countries() if item[0] < 5]
     }
     return render(request, 'vksearch/add_philter/getCountry.html', info)
 
 
 def get_new_philter_region(request):
-    with open('config/config.json', 'r') as file:
-        config = json.load(file)
-
+    db = SQLiteDB(db_file=DB_FILE)
     country_id = request.POST['country'][0]
-    mdb = VKDatabaseMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    regions = request.POST['regions'][0]
     info = {
-        'regions': mdb.get_regions(country_id=country_id)['items'],
+        'regions': [item for item in db.get_regions(country_id=country_id) if regions in item[1]],
         'country_id': country_id
     }
     return render(request, 'vksearch/add_philter/getRegion.html', info)
 
 
 def get_new_philter_cities(request):
-    with open('config/config.json', 'r') as file:
-        config = json.load(file)
-
-    region_id = request.POST['region'][0]
-    country_id = request.POST['country_id'][0]
-    cities_num = request.POST['cities_num'][0]
-
-    mdb = VKDatabaseMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    region_id = request.POST['region']
+    country_id = request.POST['country_id']
+    cities_num = int(request.POST['cities_num'])
+    cities = request.POST['cities'][0]
+    db = SQLiteDB(db_file=DB_FILE)
     info = {
-        'cities': mdb.get_cities(country_id=country_id, region_id=region_id)['items'],
+        'cities': [item for item in db.get_cities(country_id=country_id, region_id=region_id) if cities in item[1]],
         'cities_num': list(range(cities_num)),
         'country_id': country_id,
         'region_id': region_id
@@ -67,41 +60,41 @@ def get_new_philter_cities(request):
 
 
 def get_new_philter_universities(request):
-    return render(request, 'vksearch/add_philter/getUniversities.html')
+    print(request.POST)
+    country_id = request.POST['country_id']
+    cities = []
+    for key in request.POST:
+        if 'city' in key:
+            cities.append(int(request.POST[key]))
+    if 'university_set' in request.POST:
+        universities_num = int(request.POST['universities_num'])
+    print(cities)
+    db = SQLiteDB(db_file=DB_FILE)
+    info = {
+        'cities': [item for item in db.get_universities(country_id=country_id, city_id=city_id)],
+        'universities_num': list(range(universities_num)),
+        'country_id': country_id,
+    }
+    return render(request, 'vksearch/add_philter/getUniversities.html', info)
 
 
 def get_new_philter_friends_and_groups(request):
-    return render(request, 'vksearch/add_philter/getGroupsAndFriends.html')
+    region_id = request.POST['region']
+    country_id = request.POST['country_id']
+    cities_num = int(request.POST['cities_num'])
+    cities = request.POST['cities'][0]
+    db = SQLiteDB(db_file=DB_FILE)
+    info = {
+        'cities': [item for item in db.get_cities(country_id=country_id, region_id=region_id) if cities in item[1]],
+        'cities_num': list(range(cities_num)),
+        'country_id': country_id,
+        'region_id': region_id
+    }
+    return render(request, 'vksearch/add_philter/getGroupsAndFriends.html', info)
 
 
 def add_new_philter(request):
     return render(request, 'vksearch/add_philter/addPhilter.html')
-
-
-def get_new_philte(request):
-    req = dict(request.POST)
-
-    keys = ['allowed_groups', 'friends_list', 'countries']
-    info = {}
-    for key in keys:
-        if key in req:
-            info[key] = True if req[key] == ['on'] else False
-        else:
-            info[key] = False
-
-    for key in keys:
-        info[key + '_num'] = [i for i in range(int(req[key + '_num'][0]))]
-
-    with open('config/config.json', 'r') as file:
-        config = json.load(file)
-
-    #mdb = VKDatabaseMongoDB(host=config['mdb_host'], port=config['mdb_port'])
-
-    #info['countries_list'] = mdb
-    info['cities_list'] = []
-    info['universities_list'] = []
-
-    return render(request, 'vksearch/add_philter/getCountry.html', info)
 
 
 def get_new_philter(request):
