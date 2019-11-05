@@ -182,6 +182,31 @@ class InstMongoDB(object):
             return [list(date.keys())[0] for date in dates]
 
 
+class VKSearchFilterMongoDB(object):
+
+    def __init__(self, host='localhost', port=27017):
+        self._client = MongoClient(host, port)
+        self._db = self._client.vk.search_filters
+
+    def load_philter(self, filter):
+        if self._db.find_one({'filters_names': {'$exists': True}}):
+            self._db.find_one_and_update({}, {'$push': {'filters_names': filter['name']}})
+            self._db.find_one_and_update({}, {'$push': {'filters': filter}})
+        else:
+            self._db.insert_one({'filters_names': [filter['name']]})
+            self._db.insert_one({'filters': [filter]})
+
+    def get_all_philters_names(self):
+        return self._db.find_one({'filters_names': {'$exists': True}})['filters_names']
+
+    def get_filter(self, filter_name):
+        filters = self._db.find_one({'filters': {'$exists': True}})['filters']
+        if filter_name in filters:
+            return filters['filter_name']
+        else:
+            return None
+
+
 class VKDatabaseMongoDB(object):
 
     def __init__(self, host='localhost', port=27017):

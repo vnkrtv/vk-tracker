@@ -1,12 +1,12 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="location.href='/search/resultPage/'" method="post">
+    <form action="{% url 'vksearch:get_search_result' %}" method="post">
         {% csrf_token %}
         Sex
-        <select required="required" id="sex" name="sex" >
-            <option value="Male" selected>Male</option>
-            <option value="Female">Female</option>
+        <select required="required" id="sex" name="sex">
+            <option value="0" selected>Male</option>
+            <option value="1">Female</option>
         </select>
         <br/>
         Age from <input type="number" name="age_from" id="age_from" value="18" size="2" min="0" max="100" style="width:50px" required="required">
@@ -14,14 +14,14 @@
         <br/>
         Has photo <input type="checkbox" name="has_photo">
         <br/>
-        Select philter
-        <select required="required" id="philter" name="philter" >
-            {% for filter in philters %}
-                <option value="{{ philter }}">{{ philter }}</option>
+        Select filter
+        <select required="required" id="filter" name="filter" >
+            {% for filter in filters %}
+                <option value="{{ filter }}">{{ filter }}</option>
             {% endfor %}
         </select>
         <br/>
-        <input type="submit" class="btn btn-dark btn-sm" value="Search" onclick="location.href='/search/resultPage/'">
+        <input type="submit" class="btn btn-dark btn-sm" value="Search">
     </form>
     <br/>
 {% endblock %}

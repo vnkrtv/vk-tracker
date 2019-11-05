@@ -1,21 +1,36 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="{% url 'vksearch:get_new_philter_universities' %}" method="post">
+    <form action="{% url 'vksearch:get_new_filter_universities' %}" method="post">
         {% csrf_token %}
         Select cities:<br>
         {% for i in cities_num %}
         	<select required="required" name="city_{{ i }}" id="city_{{ i }}" >
-                {% for id, title in cities %}
-                    <option value="{{ id }}">{{ title }}</option>
+                {% for city in cities %}
+                    <option value="{{ city.id }}">{{ city.title }}</option>
+                {% endfor %}
+            </select><br>
+        {% endfor %}
+        Select univercity cities:<br>
+        {% for i in un_cities_num %}
+            <select required="required" name="un_city_{{ i }}" id="un_city_{{ i }}" >
+                {% for city in un_cities %}
+                    <option value="{{ city.id }}">{{ city.title }}</option>
                 {% endfor %}
             </select><br>
         {% endfor %}
         <table>
             <tr>
                 <td>Universities</td>
-                <td><input type="checkbox" name="university_set" id="university_set"></td>
-                <td>number <input type="number" name="universities_num" id="universities_num" value="1" size="2" min="1" style="width:50px" required="required"></td>                
+                <td><input type="checkbox" name="university_set" id="university_set"></td>            
+            </tr>
+            <tr>
+                <td>Number </td>
+                <td><input type="number" name="universities_num" id="universities_num" value="1" size="2" min="1" style="width:50px" required="required"></td>
+            </tr>
+            <tr>
+                <td>Universities filter </td>
+                <td><input type="text" name="universities_filter" id="universities_filter" style="width:90px"></td>
             </tr>
         </table>
         <label for="country_id">

@@ -1,20 +1,22 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="{% url 'vksearch:get_new_philter_cities' %}" method="post">
+    <form action="{% url 'vksearch:get_new_filter_cities' %}" method="post">
         {% csrf_token %}
         Select region:
         <select required="required" name="region" id="region" >
-            {% for id, title in regions %}
-                <option value="{{ id }}">{{ title }}</option>
+            {% for region in regions %}
+                <option value="{{ region.id }}">{{ region.title }}</option>
             {% endfor %}
         </select><br>
-        Cities name philter <input type="text" name="cities" id="cities" style="width:90px" required="required"><br>
-        Cities <input type="number" name="cities_num" id="cities_num" value="1" size="2" min="1" style="width:50px" required="required"><br>
+        Cities name filter <input type="text" name="cities_filter" id="cities_filter" style="width:90px" required="required"><br>
+        Cities number <input type="number" name="cities_num" id="cities_num" value="1" size="2" min="1" style="width:50px" required="required"><br>
+        University cities name filter <input type="text" name="un_cities_filter" id="un_cities_filter" style="width:90px" required="required"><br>
+        University cities number <input type="number" name="un_cities_num" id="un_cities_num" value="1" size="2" min="1" style="width:50px" required="required"><br>
         <label for="country_id">
              <input type="hidden" id="country_id" name="country_id" value="{{ country_id }}">
         </label>
-        <input type="submit" class="btn btn-dark btn-sm" value="Next"">
+        <input type="submit" class="btn btn-dark btn-sm" value="Next">
     </form>
     <br/>
 {% endblock %}
