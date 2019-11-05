@@ -30,7 +30,7 @@ def get_search_params(request):
 
 def get_search_result(request):
     filter_name = request.POST['filter']
-    count = 100
+    count = 1000
 
     with open(CONFIG_FILE, 'r') as file:
         config = json.load(file)
@@ -38,7 +38,7 @@ def get_search_result(request):
     filter = mdb.get_filter(filter_name)
 
     kwargs = {
-        'q': request.POST['q'] if request.POST['q'] else '""',
+        'q': '"' + request.POST['q'] + '"' if request.POST['q'] else '""',
         'sex': request.POST['sex'],
         'age_from': request.POST['age_from'],
         'age_to': request.POST['age_to'],
@@ -72,7 +72,7 @@ def get_search_result(request):
                                                "age_to": {age_to},
                                                "has_photo": {has_photo},
                                                "group_id": {group_id},
-                                               "fields": "photo_200_orig"      
+                                               "fields": "photo_400_orig,domain"      
                                                }});
                         res.push(users);
                         t = t + 1;
@@ -85,14 +85,32 @@ def get_search_result(request):
         result.append(vk_api('execute', code=search_by_universities_and_groups)[0])
 
     groups_ids = []
+    for item in [item['items'] for item in result]:
+        ids = set()
+        for person in item:
+            ids.add(person['id'])
+
+        groups_ids.append(ids)
+
+    unique_ids = set(groups_ids[0])
+    for ids in groups_ids:
+        unique_ids &= set(ids)
+
+    print(unique_ids)
     result = [item['items'] for item in result]
     res = []
     for item in result:
         res += item
 
     info = {
-        'result': res
+        'count': len(unique_ids),
+        'persons': []
     }
+    for item in res:
+        if item['id'] in unique_ids:
+            info['persons'].append(item)
+            unique_ids.remove(item['id'])
+
     return render(request, 'vksearch/search/resultPage.html', info)
 
 
