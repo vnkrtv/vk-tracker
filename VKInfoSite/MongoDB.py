@@ -213,8 +213,9 @@ class VKSearchFilterMongoDB(object):
             self._db.insert_one({'filters': [filter['name']]})
 
     def get_all_philters_names(self):
-        filters = self._db.find_one({'filters': {'$exists': True}})['filters']
-        return filters
+        filters = self._db.find_one({'filters': {'$exists': True}})
+        return filters['filters'] if filters else []
+
 
     def get_filter(self, filter_name):
         """
