@@ -1,5 +1,10 @@
 #!/bin/bash
 source ./venv/bin/activate
+if [ "$?" -eq "1" ]
+then
+    echo "Error on activating venv. Have you created it? (python3 -m venv venv)"
+    exit 1
+fi
 mkdir tmp
 cp -r VKInfoSite tmp/VKInfoSite
 rm -r VKInfoSite
@@ -17,11 +22,11 @@ rm -r tmp
 echo "===========================================Initialized django app==============================================="
 echo "===========================================Enter configuration data:============================================"
 read -p "Vk token: " TOKEN
-read -p "Mongo host: " MDB_HOST
-read -p "Mongo port: " MDB_PORT
-read -p "Neo4j URL: " NEO4J_URL
-read -p "Neo4j user: " NEO4J_USER
-read -p "Neo4j pass: " NEO4J_PASS
+read -e -p "Mongo host: " -i "localhost" MDB_HOST
+read -e -p "Mongo port: " -i "27017" MDB_PORT
+read -e -p "Neo4j URL: " -i "bolt://localhost:7687" NEO4J_URL
+read -e -p "Neo4j user: " -i "neo4j" NEO4J_USER
+read -e -p "Neo4j pass: " -i "pass" NEO4J_PASS
 rm ./VKInfoSite/config/config.json 2>/dev/null
 CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"neo_url\": \"${NEO4J_URL}\", \"neo_user\": \"${NEO4J_USER}\", \"neo_pass\": \"${NEO4J_PASS}\", \"vk_token\": \"${TOKEN}\"}"
 echo "${CONFIG}" >> ./VKInfoSite/config/config.json 2>/dev/null
