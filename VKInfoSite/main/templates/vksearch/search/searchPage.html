@@ -3,9 +3,10 @@
 {% block content %}
     <form action="{% url 'vksearch:get_search_result' %}" method="post">
         {% csrf_token %}
+        Query string <input type="text" name="q" id="q" style="width:50px"><br>
         Sex
         <select required="required" id="sex" name="sex">
-            <option value="0" selected>Male</option>
+            <option value="2" selected>Male</option>
             <option value="1">Female</option>
         </select>
         <br/>

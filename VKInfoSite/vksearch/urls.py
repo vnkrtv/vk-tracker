@@ -14,4 +14,7 @@ urlpatterns = [
     url(r'^add_filter_5/$', views.get_new_filter_friends_and_groups, name='get_new_filter_friends_and_groups'),
     url(r'^add_filter_6/$', views.get_new_filter_name,               name='get_new_filter_name'),
     url(r'^add_filter/$',   views.add_new_filter,                    name='add_new_filter'),
+
+    url(r'^delete_filter/$',        views.delete_filter,        name='delete_filter'),
+    url(r'^delete_filter_result/$', views.delete_filter_result, name='delete_filter_result'),
 ]

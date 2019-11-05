@@ -189,22 +189,57 @@ class VKSearchFilterMongoDB(object):
         self._db = self._client.vk.search_filters
 
     def load_philter(self, filter):
-        if self._db.find_one({'filters_names': {'$exists': True}}):
-            self._db.find_one_and_update({}, {'$push': {'filters_names': filter['name']}})
-            self._db.find_one_and_update({}, {'$push': {'filters': filter}})
+        """
+
+        :param filter: {
+            'name': filter_name(str),
+            'country_id': country_id(int),
+            'cities': cities_ids(list of int),
+            'universities': universities_ids(list of int),
+            'friends': friends_domains(list of str),
+            'groups': groups_ids(list of int)
+        }
+        """
+        self._db.insert_one({'name': filter['name'], 'filter': filter})
+        if self._db.find_one({'filters': {'$exists': True}}):
+            #костыль, лень что-то придумать
+            #TODO: переписать это дерьмо
+            filters = self._db.find_one({'filters': {'$exists': True}})['filters']
+
+            self._db.delete_one({'filters': {'$exists': True}})
+            filters.append(filter['name'])
+            self._db.insert_one({'filters': filters})
         else:
-            self._db.insert_one({'filters_names': [filter['name']]})
-            self._db.insert_one({'filters': [filter]})
+            self._db.insert_one({'filters': [filter['name']]})
 
     def get_all_philters_names(self):
-        return self._db.find_one({'filters_names': {'$exists': True}})['filters_names']
+        filters = self._db.find_one({'filters': {'$exists': True}})['filters']
+        return filters
 
     def get_filter(self, filter_name):
+        """
+
+        :param filter_name: str
+        :return: {
+            'name': filter_name(str),
+            'country_id': country_id(int),
+            'cities': cities_ids(list of int),
+            'universities': universities_ids(list of int),
+            'friends': friends_domains(list of str),
+            'groups': groups_ids(list of int)
+        }
+        """
+        res = self._db.find_one({'name': filter_name})
+        return res['filter'] if 'filter' in res else None
+
+    def delete_philter(self, filter_name):
         filters = self._db.find_one({'filters': {'$exists': True}})['filters']
-        if filter_name in filters:
-            return filters['filter_name']
-        else:
-            return None
+
+        self._db.delete_one({'filters': {'$exists': True}})
+        filters.remove(filter_name)
+        self._db.insert_one({'filters': filters})
+
+        self._db.remove({'name': filter_name})
 
 
 class VKDatabaseMongoDB(object):

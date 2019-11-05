@@ -1,5 +1,6 @@
 import traceback
 import json
+import ast
 
 from django.shortcuts import render
 from requests.exceptions import ConnectionError
@@ -18,7 +19,8 @@ def vk_api(method, **kwargs):
 
 
 def get_search_params(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+    with open(CONFIG_FILE, 'r') as file:
+        config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     info = {
         'filters': mdb.get_all_philters_names()
@@ -27,15 +29,70 @@ def get_search_params(request):
 
 
 def get_search_result(request):
-    params = dict(request.POST)
-    print(params)
-    info = {}
+    filter_name = request.POST['filter']
+    count = 100
 
-    try:
-        pass
-    except Exception:
-        info['error'] = traceback.format_exc()
+    with open(CONFIG_FILE, 'r') as file:
+        config = json.load(file)
+    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    filter = mdb.get_filter(filter_name)
 
+    kwargs = {
+        'q': request.POST['q'] if request.POST['q'] else '""',
+        'sex': request.POST['sex'],
+        'age_from': request.POST['age_from'],
+        'age_to': request.POST['age_to'],
+        'has_photo': 1 if 'has_photo' in request.POST else 0,
+        'count': count,
+        'universities': filter['universities'],
+        'cities': filter['cities'],
+        'country_id': filter['country_id']
+    }
+
+    result = []
+    for group_id in filter['groups']:
+        kwargs['group_id'] = group_id
+        search_by_universities_and_groups = """
+                var universities = {universities};
+                var cities = {cities};
+                var res = [];
+                var i = 0;
+
+                while (i < universities.length) {{
+                    var t = 0;
+                    while (t < cities.length) {{
+                        var users = API.users.search({{
+                                               "q": {q},
+                                               "count": {count},
+                                               "country": {country_id},
+                                               "city": cities[t],
+                                               "university": universities[i],
+                                               "sex": {sex},
+                                               "age_from": {age_from},
+                                               "age_to": {age_to},
+                                               "has_photo": {has_photo},
+                                               "group_id": {group_id},
+                                               "fields": "photo_200_orig"      
+                                               }});
+                        res.push(users);
+                        t = t + 1;
+                    }}
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+
+        result.append(vk_api('execute', code=search_by_universities_and_groups)[0])
+
+    groups_ids = []
+    result = [item['items'] for item in result]
+    res = []
+    for item in result:
+        res += item
+
+    info = {
+        'result': res
+    }
     return render(request, 'vksearch/search/resultPage.html', info)
 
 
@@ -48,7 +105,7 @@ def get_new_filter_countries(request):
     info = {
         'countries': [item for item in countries['items'] if item['id'] < 5]
     }
-    return render(request, 'vksearch/add_philter/getCountry.html', info)
+    return render(request, 'vksearch/add_filter/getCountry.html', info)
 
 
 def get_new_filter_region(request):
@@ -65,7 +122,7 @@ def get_new_filter_region(request):
         'regions': [item for item in regions['items'] if regions_filter in item['title']],
         'country_id': country_id
     }
-    return render(request, 'vksearch/add_philter/getRegion.html', info)
+    return render(request, 'vksearch/add_filter/getRegion.html', info)
 
 
 def get_new_filter_cities(request):
@@ -101,18 +158,18 @@ def get_new_filter_cities(request):
         'country_id': country_id,
         'region_id': region_id
     }
-    return render(request, 'vksearch/add_philter/getCities.html', info)
+    return render(request, 'vksearch/add_filter/getCities.html', info)
 
 
 def get_new_filter_universities(request):
     cities = []
     for key in request.POST:
-        if 'city' in key:
+        if key.startswith('city'):
             cities.append(int(request.POST[key]))
 
     un_cities = []
     for key in request.POST:
-        if 'un_city' in key:
+        if key.startswith('un_city'):
             un_cities.append(int(request.POST[key]))
 
     info = {
@@ -138,7 +195,7 @@ def get_new_filter_universities(request):
         universities += [item for item in req['items']]
 
     info['universities'] = universities
-    return render(request, 'vksearch/add_philter/getUniversities.html', info)
+    return render(request, 'vksearch/add_filter/getUniversities.html', info)
 
 
 def get_new_filter_friends_and_groups(request):
@@ -165,7 +222,7 @@ def get_new_filter_friends_and_groups(request):
         if 'univercity_' in key:
             universities.append(int(request.POST[key]))
     info['universities'] = str(universities)
-    return render(request, 'vksearch/add_philter/getGroupsAndFriends.html', info)
+    return render(request, 'vksearch/add_filter/getGroupsAndFriends.html', info)
 
 
 def get_new_filter_name(request):
@@ -184,22 +241,24 @@ def get_new_filter_name(request):
     groups_screen_names = []
     for key in request.POST:
         if 'group_' in key:
-            groups_screen_names.append(request.POST[key])
+            id = vk_api('groups.getById', group_id=request.POST[key])[0]['id']
+            sleep(0.34)
+            groups_screen_names.append(id)
 
     info['groups'] = str(groups_screen_names)
-    return render(request, 'vksearch/add_philter/getName.html', info)
+    return render(request, 'vksearch/add_filter/getName.html', info)
 
 
 def add_new_filter(request):
     filter_name = request.POST['filter_name']
 
     filter = {
-        'name': filter_name,
-        'country_id': int(request.POST['country_id']),
-        'cities': list(request.POST['cities']),
-        'universities': list(request.POST['universities']),
-        'friends': list(request.POST['friends']),
-        'groups': list(request.POST['groups'])
+        'name':         filter_name,
+        'country_id':   int(request.POST['country_id']),
+        'cities':       ast.literal_eval(request.POST['cities']),
+        'universities': ast.literal_eval(request.POST['universities']) if request.POST['universities'] else [],
+        'friends':      ast.literal_eval(request.POST['friends'])      if request.POST['friends']      else [],
+        'groups':       ast.literal_eval(request.POST['groups'])       if request.POST['groups']       else []
     }
 
     config = json.load(open(CONFIG_FILE, 'r'))
@@ -209,4 +268,29 @@ def add_new_filter(request):
     info = {
         'filter_name': filter_name
     }
-    return render(request, 'vksearch/add_philter/getNewFilter.html', info)
+    return render(request, 'vksearch/add_filter/getNewFilter.html', info)
+
+
+def delete_filter(request):
+    with open(CONFIG_FILE, 'r') as file:
+        config = json.load(file)
+    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    info = {
+        'filters': mdb.get_all_philters_names()
+    }
+    return render(request, 'vksearch/delete_filter/getName.html', info)
+
+
+def delete_filter_result(request):
+    filter_name = request.POST['filter']
+
+    with open(CONFIG_FILE, 'r') as file:
+        config = json.load(file)
+    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    mdb.delete_philter(filter_name)
+
+    info = {
+        'filter_name': request.POST['filter']
+    }
+    return render(request, 'vksearch/delete_filter/deleteResult.html', info)
+
