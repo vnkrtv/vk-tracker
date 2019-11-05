@@ -1,2 +1,2 @@
-CONFIG_FILE = 'config/default_config.json'
+CONFIG_FILE = 'config/config.json'
 DB_FILE = 'db/VKDatabase.db'
