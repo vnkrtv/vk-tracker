@@ -3,11 +3,21 @@ import json
 import ast
 
 from django.shortcuts import render
+from django import template
 from requests.exceptions import ConnectionError
 from .vk_search import *
 from MongoDB import *
 from SQLiteDB import *
 from config import *
+
+
+register = template.Library()
+@register.filter(name='lookup')
+def lookup(d, key):
+    return d[key]
+
+
+register.filter('lookup', lookup)
 
 
 def vk_api(method, **kwargs):
@@ -49,7 +59,10 @@ def get_search_result(request):
         'country_id': filter['country_id']
     }
 
+    print('Filter: \n', json.dumps(filter, indent=2))
+
     result = []
+    filter['groups'][-1] = 28261334
     for group_id in filter['groups']:
         kwargs['group_id'] = group_id
         search_by_universities_and_groups = """
@@ -72,7 +85,7 @@ def get_search_result(request):
                                                "age_to": {age_to},
                                                "has_photo": {has_photo},
                                                "group_id": {group_id},
-                                               "fields": "photo_400_orig,domain"      
+                                               "fields": "photo_400_orig,domain,relation"      
                                                }});
                         res.push(users);
                         t = t + 1;
@@ -81,35 +94,49 @@ def get_search_result(request):
                 }}
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
+        sleep(0.34)
 
-        result.append(vk_api('execute', code=search_by_universities_and_groups)[0])
+        result.append(vk_api('execute', code=search_by_universities_and_groups))
 
+    #print([len(item['items']) for item in result])
+    print(json.dumps(result, indent=2))
     groups_ids = []
-    for item in [item['items'] for item in result]:
-        ids = set()
-        for person in item:
-            ids.add(person['id'])
-
+    for groups_search_res in [item for item in result]:
+        ids = []
+        for search_res in groups_search_res:
+            for person in search_res['items']:
+                ids.append(person['id'])
         groups_ids.append(ids)
 
-    unique_ids = set(groups_ids[0])
+    print(groups_ids)
+    unique_ids = []
     for ids in groups_ids:
-        unique_ids &= set(ids)
+        unique_ids += ids
 
+    unique_ids = set(unique_ids)
     print(unique_ids)
-    result = [item['items'] for item in result]
-    res = []
-    for item in result:
-        res += item
+    persons = []
+    for groups_search_res in [item for item in result]:
+        ids = []
+        for search_res in groups_search_res:
+            for person in search_res['items']:
+                if person['id'] in unique_ids:
+                    persons.append(person)
 
     info = {
         'count': len(unique_ids),
-        'persons': []
+        'persons': persons,
+        'relation': {
+            1: 'есть друг/есть подруга',
+            2: 'помолвлен/помолвлена',
+            3: 'женат/замужем',
+            4: 'всё сложно',
+            5: 'в активном поиске',
+            6: 'влюблён/влюблена',
+            7: 'в гражданском браке',
+            0: 'не указано'
+        }
     }
-    for item in res:
-        if item['id'] in unique_ids:
-            info['persons'].append(item)
-            unique_ids.remove(item['id'])
 
     return render(request, 'vksearch/search/resultPage.html', info)
 

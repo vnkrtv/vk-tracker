@@ -23,7 +23,8 @@
                         {% endif %}
                         <br>
                         ID: {{ person.id }}<br>
-                        Domain: {{ person.domain }}
+                        Domain: {{ person.domain }}<br>
+                        Relation: {{ relation|lookup: person.relation }}
                         </td>
                         <td><img 
      src={{ person.photo_400_orig }}></td>

@@ -10,7 +10,7 @@ class VKMongoDB(object):
         self._client = MongoClient(host, port) if port else MongoClient(host)
         self._db = self._client.vk.vk_data
 
-    def add_user(self, user):
+    def add_user(self, user) -> None:
         """
 
         :param user: json with vk user information
@@ -24,7 +24,7 @@ class VKMongoDB(object):
         else:
             self._db.insert_one({'user_id': id, 'domain': domain, 'dates': [{date: user}]})
 
-    def check_domain(self, domain):
+    def check_domain(self, domain) -> bool:
         """
 
         :param domain: vk user domain
@@ -34,7 +34,7 @@ class VKMongoDB(object):
             return True
         return False
 
-    def get_fullname(self, domain):
+    def get_fullname(self, domain) -> str:
         """
 
         :param domain: vk user domain
@@ -46,7 +46,7 @@ class VKMongoDB(object):
         else:
             return ''
 
-    def load_user_info(self, id=0, domain='', date=''):
+    def load_user_info(self, id=0, domain='', date='') -> dict:
         """
 
         :param id: vk user id (if input)
@@ -78,7 +78,7 @@ class VKMongoDB(object):
                 info = self._db.find_one({'domain': domain})
                 return list(info['dates'][-1].values())[0]
 
-    def get_user_info_dates(self, id=0, domain=''):
+    def get_user_info_dates(self, id=0, domain='') -> list:
         """
 
         :param id: vk user id
@@ -99,7 +99,7 @@ class InstMongoDB(object):
         self._client = MongoClient(host, port)
         self._db = self._client.inst.inst_data
 
-    def add_user(self, user):
+    def add_user(self, user) -> None:
         """
 
         :param user: json with instagram user information
@@ -113,7 +113,7 @@ class InstMongoDB(object):
         else:
             self._db.insert_one({'user_id': id, 'domain': domain, 'dates': [{date: user}]})
 
-    def check_domain(self, domain):
+    def check_domain(self, domain) -> bool:
         """
 
         :param username: instagram username
@@ -123,7 +123,7 @@ class InstMongoDB(object):
             return True
         return False
 
-    def get_fullname(self, domain):
+    def get_fullname(self, domain) -> str:
         """
 
         :param domain: vk user domain
@@ -135,7 +135,7 @@ class InstMongoDB(object):
         else:
             return ''
 
-    def load_user_info(self, id=0, domain='', date=''):
+    def load_user_info(self, id=0, domain='', date='') -> dict:
         """
 
         :param id: vk user id (if input)
@@ -167,7 +167,7 @@ class InstMongoDB(object):
                 info = self._db.find_one({'domain': domain})
                 return list(info['dates'][-1].values())[0]
 
-    def get_user_info_dates(self, id=0, domain=''):
+    def get_user_info_dates(self, id=0, domain='') -> list:
         """
 
         :param id: vk user id
@@ -188,7 +188,7 @@ class VKSearchFilterMongoDB(object):
         self._client = MongoClient(host, port)
         self._db = self._client.vk.search_filters
 
-    def load_philter(self, filter):
+    def load_philter(self, filter) -> None:
         """
 
         :param filter: {
@@ -212,12 +212,11 @@ class VKSearchFilterMongoDB(object):
         else:
             self._db.insert_one({'filters': [filter['name']]})
 
-    def get_all_philters_names(self):
+    def get_all_philters_names(self) -> list:
         filters = self._db.find_one({'filters': {'$exists': True}})
         return filters['filters'] if filters else []
 
-
-    def get_filter(self, filter_name):
+    def get_filter(self, filter_name) -> dict:
         """
 
         :param filter_name: str
@@ -233,7 +232,7 @@ class VKSearchFilterMongoDB(object):
         res = self._db.find_one({'name': filter_name})
         return res['filter'] if 'filter' in res else None
 
-    def delete_philter(self, filter_name):
+    def delete_philter(self, filter_name) -> None:
         filters = self._db.find_one({'filters': {'$exists': True}})['filters']
 
         self._db.delete_one({'filters': {'$exists': True}})
@@ -249,7 +248,7 @@ class VKDatabaseMongoDB(object):
         self._client = MongoClient(host, port)
         self._db = self._client.vk.database
 
-    def load_countries(self, countries_info):
+    def load_countries(self, countries_info) -> None:
         """
 
         :param countries_info: { 'count": <>, 'items': { ... } }
@@ -257,11 +256,11 @@ class VKDatabaseMongoDB(object):
         """
         self._db.insert_one({'countries': countries_info})
 
-    def get_countries(self):
+    def get_countries(self) -> list:
         countries = self._db.find_one({'countries': {'$exists': True}})['countries']
         return countries
 
-    def load_regions(self, regions_info, country_id):
+    def load_regions(self, regions_info, country_id) -> None:
         """
 
         :param country_id:
@@ -270,18 +269,18 @@ class VKDatabaseMongoDB(object):
         """
         self._db.insert_one({'regions': {str(country_id): regions_info}})
 
-    def get_regions(self, country_id):
+    def get_regions(self, country_id) -> list:
         regions = self._db.find_one({'regions': {'$exists': True}})['regions']
         return regions[str(country_id)]
 
-    def load_cities(self, cities_info, country_id, region_id):
+    def load_cities(self, cities_info, country_id, region_id) -> None:
         self._db.insert_one({'cities': {str(country_id): {str(region_id): cities_info}}})
 
-    def get_cities(self, country_id, region_id):
+    def get_cities(self, country_id, region_id) -> list:
         cities = self._db.find_one({'cities': {'$exists': True}})['cities']
         return cities[str(country_id)][str(region_id)]
 
-    def load_universities(self, universities_info, country_id, city_id):
+    def load_universities(self, universities_info, country_id, city_id) -> None:
         """
 
         :param universities_info:
@@ -295,11 +294,11 @@ class VKDatabaseMongoDB(object):
             }
         }})
 
-    def get_all_universities(self):
+    def get_all_universities(self) -> list:
         universities_list = self._db.find_one({'universities': {'$exists': True}})['universities']
         return universities_list
 
-    def get_universities(self, country_id, city_id):
+    def get_universities(self, country_id, city_id) -> list:
         """
 
         :param country_id:
@@ -309,7 +308,7 @@ class VKDatabaseMongoDB(object):
         universities_list = self._db.find_one({'universities': {'$exists': True}})['universities']
         return universities_list[str(country_id)][str(city_id)]
 
-    def load_schools(self, schools_info, city_id):
+    def load_schools(self, schools_info, city_id) -> None:
         """
 
         :param schools_info:
@@ -319,11 +318,11 @@ class VKDatabaseMongoDB(object):
             str(city_id): schools_info
         }})
 
-    def get_all_schools(self):
+    def get_all_schools(self) -> list:
         schools_list = self._db.find_one({'schools': {'$exists': True}})['schools']
         return schools_list
 
-    def get_schools(self, city_id):
+    def get_schools(self, city_id) -> list:
         """
 
         :param city_id:
@@ -338,7 +337,7 @@ class VKDatabaseMongoDB(object):
                 data.pop('_id')
                 json.dump(data, file, indent=2)
 
-    def update_base(self, vk_token):
+    def update_base(self, vk_token) -> None:
         """
 
         :param vk_token:

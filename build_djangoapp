@@ -22,11 +22,38 @@ rm -r tmp
 echo "===========================================Initialized django app==============================================="
 echo "===========================================Enter configuration data:============================================"
 read -p "Vk token: " TOKEN
-read -e -p "Mongo host: " -i "localhost" MDB_HOST
-read -e -p "Mongo port: " -i "27017" MDB_PORT
-read -e -p "Neo4j URL: " -i "bolt://localhost:7687" NEO4J_URL
-read -e -p "Neo4j user: " -i "neo4j" NEO4J_USER
-read -e -p "Neo4j pass: " -i "pass" NEO4J_PASS
+
+read -p "Mongo host: " MDB_HOST
+if [ "${MDB_HOST}" -eq "" ]
+then
+    MDB_HOST="localhost"
+fi
+
+read -p "Mongo port: " MDB_PORT
+if [ "${MDB_PORT}" -eq "" ]
+then
+    MDB_PORT="27017"
+fi
+
+read -p "Neo4j URL: " NEO4J_URL
+if [ "${NEO4J_URL}" -eq "" ]
+then
+    NEO4J_URL="bolt://localhost:7687"
+fi
+
+read -p "Neo4j user: " NEO4J_USER
+if [ "${NEO4J_USER}" -eq "" ]
+then
+    NEO4J_USER="neo4j"
+fi
+
+read -p "Neo4j pass: " NEO4J_PASS
+
+if [ "${NEO4J_PASS}" -eq "" ]
+then
+    NEO4J_PASS="pass"
+fi
+
 rm ./VKInfoSite/config/config.json 2>/dev/null
 CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"neo_url\": \"${NEO4J_URL}\", \"neo_user\": \"${NEO4J_USER}\", \"neo_pass\": \"${NEO4J_PASS}\", \"vk_token\": \"${TOKEN}\"}"
 echo "${CONFIG}" >> ./VKInfoSite/config/config.json 2>/dev/null
