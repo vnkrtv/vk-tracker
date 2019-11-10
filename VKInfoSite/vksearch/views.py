@@ -3,21 +3,11 @@ import json
 import ast
 
 from django.shortcuts import render
-from django import template
 from requests.exceptions import ConnectionError
 from .vk_search import *
 from MongoDB import *
 from SQLiteDB import *
 from config import *
-
-
-register = template.Library()
-@register.filter(name='lookup')
-def lookup(d, key):
-    return d[key]
-
-
-register.filter('lookup', lookup)
 
 
 def vk_api(method, **kwargs):
@@ -62,7 +52,7 @@ def get_search_result(request):
     print('Filter: \n', json.dumps(filter, indent=2))
 
     result = []
-    filter['groups'][-1] = 28261334
+    # filter['groups'][-1] = 28261334
     for group_id in filter['groups']:
         kwargs['group_id'] = group_id
         search_by_universities_and_groups = """
@@ -95,11 +85,25 @@ def get_search_result(request):
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
         sleep(0.34)
-
         result.append(vk_api('execute', code=search_by_universities_and_groups))
 
-    #print([len(item['items']) for item in result])
-    print(json.dumps(result, indent=2))
+    search_by_friends = """
+            var friends = {friends}
+            var res = [];
+            var i = 0;
+
+            while (i < friends.length) {{
+                var users = API.friends.get ({{
+                                       "user_id": friends[i],
+                                       "fields": "photo_400_orig,domain,relation"      
+                                       }});
+                res.push(users);
+                i = i + 1;
+            }}
+            return res;
+    """.format(friends=filter['friends']).replace('\n', '').replace('  ', '')
+    result.append(vk_api('execute', code=search_by_friends))
+
     groups_ids = []
     for groups_search_res in [item for item in result]:
         ids = []
@@ -108,34 +112,36 @@ def get_search_result(request):
                 ids.append(person['id'])
         groups_ids.append(ids)
 
-    print(groups_ids)
     unique_ids = []
     for ids in groups_ids:
         unique_ids += ids
 
     unique_ids = set(unique_ids)
-    print(unique_ids)
+
+    relation_options = {
+        1: 'has boyfriend/girlfriend',  # есть друг/есть подруга',
+        2: 'engaged',                  # 'помолвлен/помолвлена',
+        3: 'married',                  # 'женат/замужем',
+        4: 'it\'s complicated',        # 'всё сложно',
+        5: 'actively looking',         # 'в активном поиске',
+        6: 'in love',                  # 'влюблён/влюблена',
+        7: 'in a civil marriage',      # 'в гражданском браке',
+        0: 'not indicated'             # 'не указано'
+    }
     persons = []
     for groups_search_res in [item for item in result]:
-        ids = []
         for search_res in groups_search_res:
             for person in search_res['items']:
                 if person['id'] in unique_ids:
+                    if 'relation' in person:
+                        person['relation'] = relation_options[person['relation']]
+                    else:
+                        person['relation'] = relation_options[0]
                     persons.append(person)
 
     info = {
         'count': len(unique_ids),
         'persons': persons,
-        'relation': {
-            1: 'есть друг/есть подруга',
-            2: 'помолвлен/помолвлена',
-            3: 'женат/замужем',
-            4: 'всё сложно',
-            5: 'в активном поиске',
-            6: 'влюблён/влюблена',
-            7: 'в гражданском браке',
-            0: 'не указано'
-        }
     }
 
     return render(request, 'vksearch/search/resultPage.html', info)
@@ -276,12 +282,19 @@ def get_new_filter_name(request):
         'cities': request.POST['cities'],
         'universities': request.POST['universities']
     }
-    friends_domains = []
+    friends_ids = []
     for key in request.POST:
         if 'friend_' in key:
-            friends_domains.append(request.POST[key])
+            friend = vk_api('users.get', domain=request.POST[key])[0]
+            if friend['is_closed']:
+                info = {
+                    'error': 'user account with domain %s is closed.' % request.POST[key]
+                }
+                return render(request, 'vksearch/error.html', info)
+            sleep(0.34)
+            friends_ids.append(friend['id'])
 
-    info['friends'] = str(friends_domains)
+    info['friends'] = str(friends_ids)
 
     groups_screen_names = []
     for key in request.POST:
@@ -306,7 +319,8 @@ def add_new_filter(request):
         'groups':       ast.literal_eval(request.POST['groups'])       if request.POST['groups']       else []
     }
 
-    config = json.load(open(CONFIG_FILE, 'r'))
+    with open(CONFIG_FILE, 'r') as file:
+        config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     mdb.load_philter(filter)
 

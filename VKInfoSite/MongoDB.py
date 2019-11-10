@@ -225,7 +225,7 @@ class VKSearchFilterMongoDB(object):
             'country_id': country_id(int),
             'cities': cities_ids(list of int),
             'universities': universities_ids(list of int),
-            'friends': friends_domains(list of str),
+            'friends': friends_ids(list of int),
             'groups': groups_ids(list of int)
         }
         """
