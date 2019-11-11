@@ -379,3 +379,32 @@ class VKDatabaseMongoDB(object):
                     schools_info = session.database.getSchools(q='', city_id=city_id, count=10000, v=token_v)
                     sleep(timeout)
                     self.load_schools(schools_info, city_id)
+
+
+class VKActivityMongoDB(object):
+
+    def __init__(self, host='localhost', port=27017):
+        self._client = MongoClient(host, port)
+        self._db = self._client.vk.activity
+
+    def load_activity(self, id, strtime, online, platform):
+        if self._db.find_one({'user_id': id}):
+            self._db.find_one_and_update({'user_id': id}, {'$push': {
+                'activity': {
+                    'last_seen': strtime,
+                    'online': online,
+                    'platform': platform
+                }
+            }})
+        else:
+            self._db.insert_one({'user_id': id, 'activity': [{
+                'last_seen': strtime,
+                'online': online,
+                'platform': platform
+            }]})
+
+    def get_activity(self, id) -> list:
+        if self._db.find_one({'user_id': id}):
+            return list(self._db.find_one({'user_id': id})['activity'])
+        else:
+            return []

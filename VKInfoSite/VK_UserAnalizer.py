@@ -1,5 +1,6 @@
 from VK_UserInfo import *
 
+
 class VK_UserAnalizer:
 
     def __init__(self, domain, date1, date2, mongo_host, mongo_port):
