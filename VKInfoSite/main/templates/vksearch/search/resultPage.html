@@ -1,6 +1,11 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
+    {{ unique_ids }}<br><br>
+    {{ result_ids }}<br><br>
+    {{ filter }}<br><br>
+    {{ persons }}<br><br>
+    {{ result }}
     <span class="d-block p-2 bg-primary text-white">Search result: found {{ count }} persons</span>
     <table class="table table-striped table-dark">
         <thead>
@@ -24,7 +29,7 @@
                         <br>
                         ID: {{ person.id }}<br>
                         Domain: {{ person.domain }}<br>
-                        Relation: {{ relation|lookup:person.relation }}
+                        Relation: {{ person.relation }}
                         </td>
                         <td><img 
      src={{ person.photo_400_orig }}></td>
@@ -32,5 +37,4 @@
             {% endfor %}
         </tbody>
     </table>
-    <p>{{ persons }}</p>
 {% endblock %}

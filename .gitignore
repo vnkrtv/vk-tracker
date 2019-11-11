@@ -12,3 +12,4 @@ VKInfoSite/vksearch/__pycache__/
 VKInfoSite/vksearch/migrations/
 db/db.logs
 db/VKDatabase.db
+db/*

@@ -6,15 +6,16 @@
         {% if friends_set %}
         	Enter friends domains:<br>
         	{% for i in friends_num %}
-        		<input type="text" name="friend_{{ i }}" id="friend_{{ i }}" style="width:90px" required="required"><br>
+        		<input type="text" name="friend_{{ i }}" id="friend_{{ i }}" style="width:150px" required="required"><br>
         	{% endfor %}     
         {% endif %}
         {% if groups_set %}
             Enter groups screen names:<br>
             {% for i in groups_num %}
-                <input type="text" name="group_{{ i }}" id="group_{{ i }}" style="width:90px" required="required"><br>
+                <input type="text" name="group_{{ i }}" id="group_{{ i }}" style="width:150px" required="required"><br>
             {% endfor %}        
         {% endif %}
+        <br>
         <label for="country_id">
             <input type="hidden" id="country_id" name="country_id" value="{{ country_id }}">
         </label>

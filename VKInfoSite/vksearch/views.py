@@ -1,10 +1,8 @@
 import traceback
-import json
 import ast
 
 from django.shortcuts import render
 from requests.exceptions import ConnectionError
-from .vk_search import *
 from MongoDB import *
 from SQLiteDB import *
 from config import *
@@ -29,6 +27,15 @@ def get_search_params(request):
 
 
 def get_search_result(request):
+    if 'groups_selected' not in request.POST\
+            and 'cities_selected' not in request.POST \
+            and 'universities_selected' not in request.POST\
+            and 'friends_selected' not in request.POST:
+        info = {
+            'error': 'you must specify at least 1 search parameter'
+        }
+        return render(request, 'vksearch/error.html', info)
+
     filter_name = request.POST['filter']
     count = 1000
 
@@ -44,18 +51,55 @@ def get_search_result(request):
         'age_to': request.POST['age_to'],
         'has_photo': 1 if 'has_photo' in request.POST else 0,
         'count': count,
-        'universities': filter['universities'],
-        'cities': filter['cities'],
         'country_id': filter['country_id']
     }
-
-    print('Filter: \n', json.dumps(filter, indent=2))
+    if 'cities_selected' in request.POST:
+        kwargs['cities'] = filter['cities']
+    if 'universities_selected' in request.POST:
+        kwargs['universities'] = filter['universities']
 
     result = []
-    # filter['groups'][-1] = 28261334
-    for group_id in filter['groups']:
-        kwargs['group_id'] = group_id
-        search_by_universities_and_groups = """
+    if 'groups_selected' in request.POST\
+            and 'cities_selected' in request.POST\
+            and 'universities_selected' in request.POST:
+        for group_id in filter['groups']:
+            kwargs['group_id'] = group_id
+            search_by_universities_and_cities = """
+                    var universities = {universities};
+                    var cities = {cities};
+                    var res = [];
+                    var i = 0;
+
+                    while (i < universities.length) {{
+                        var t = 0;
+                        while (t < cities.length) {{
+                            var users = API.users.search({{
+                                                   "q": {q},
+                                                   "count": {count},
+                                                   "country": {country_id},
+                                                   "city": cities[t],
+                                                   "university": universities[i],
+                                                   "sex": {sex},
+                                                   "age_from": {age_from},
+                                                   "age_to": {age_to},
+                                                   "has_photo": {has_photo},
+                                                   "group_id": {group_id},
+                                                   "fields": "photo_400_orig,domain,relation"      
+                                                   }});
+                            res.push(users);
+                            t = t + 1;
+                        }}
+                        i = i + 1;
+                    }}
+                    return res;
+            """.format(**kwargs).replace('\n', '').replace('  ', '')
+            sleep(0.34)
+            result += vk_api('execute', code=search_by_universities_and_cities)
+
+    if 'groups_selected' not in request.POST\
+            and 'cities_selected' in request.POST\
+            and 'universities_selected' in request.POST:
+        search_by_universities_and_cities = """
                 var universities = {universities};
                 var cities = {cities};
                 var res = [];
@@ -74,7 +118,6 @@ def get_search_result(request):
                                                "age_from": {age_from},
                                                "age_to": {age_to},
                                                "has_photo": {has_photo},
-                                               "group_id": {group_id},
                                                "fields": "photo_400_orig,domain,relation"      
                                                }});
                         res.push(users);
@@ -85,38 +128,212 @@ def get_search_result(request):
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
         sleep(0.34)
-        result.append(vk_api('execute', code=search_by_universities_and_groups))
+        result += vk_api('execute', code=search_by_universities_and_cities)
 
-    search_by_friends = """
-            var friends = {friends}
-            var res = [];
-            var i = 0;
+    if 'groups_selected' in request.POST\
+            and 'cities_selected' in request.POST\
+            and 'universities_selected' not in request.POST:
+        for group_id in filter['groups']:
+            kwargs['group_id'] = group_id
+            search_by_cities = """
+                    var cities = {cities};
+                    var res = [];
+                    var i = 0;
 
-            while (i < friends.length) {{
-                var users = API.friends.get ({{
-                                       "user_id": friends[i],
-                                       "fields": "photo_400_orig,domain,relation"      
-                                       }});
-                res.push(users);
-                i = i + 1;
-            }}
-            return res;
-    """.format(friends=filter['friends']).replace('\n', '').replace('  ', '')
-    result.append(vk_api('execute', code=search_by_friends))
+                    while (i < cities.length) {{
+                        var users = API.users.search({{
+                                                "q": {q},
+                                                "count": {count},
+                                                "country": {country_id},
+                                                "city": cities[i],
+                                                "sex": {sex},
+                                                "age_from": {age_from},
+                                                "age_to": {age_to},
+                                                "has_photo": {has_photo},
+                                                "group_id": {group_id},
+                                                "fields": "photo_400_orig,domain,relation"      
+                                            }});
+                        res.push(users);
+                        i = i + 1;
+                    }}
+                    return res;
+            """.format(**kwargs).replace('\n', '').replace('  ', '')
+            sleep(0.34)
+            result += vk_api('execute', code=search_by_cities)
 
-    groups_ids = []
-    for groups_search_res in [item for item in result]:
-        ids = []
-        for search_res in groups_search_res:
-            for person in search_res['items']:
-                ids.append(person['id'])
-        groups_ids.append(ids)
+    if 'groups_selected' in request.POST\
+            and 'cities_selected' not in request.POST\
+            and 'universities_selected' in request.POST:
+        for group_id in filter['groups']:
+            kwargs['group_id'] = group_id
+            search_by_universities = """
+                    var universities = {universities};
+                    var res = [];
+                    var i = 0;
 
-    unique_ids = []
-    for ids in groups_ids:
-        unique_ids += ids
+                    while (i < universities.length) {{
+                        var users = API.users.search({{
+                                                "q": {q},
+                                                "count": {count},
+                                                "country": {country_id},
+                                                "sex": {sex},
+                                                "university": universities[i],
+                                                "age_from": {age_from},
+                                                "age_to": {age_to},
+                                                "has_photo": {has_photo},
+                                                "group_id": {group_id},
+                                                "fields": "photo_400_orig,domain,relation"      
+                                            }});
+                        res.push(users);
+                        i = i + 1;
+                    }}
+                    return res;
+            """.format(**kwargs).replace('\n', '').replace('  ', '')
+            sleep(0.34)
+            result += vk_api('execute', code=search_by_universities)
 
-    unique_ids = set(unique_ids)
+    if 'groups_selected' in request.POST\
+            and 'cities_selected' not in request.POST\
+            and 'universities_selected' not in request.POST:
+        kwargs['groups'] = filter['groups']
+        search_by_groups = """
+                var groups = {groups};
+                var res = [];
+                var i = 0;
+
+                while (i < groups.length) {{
+                    var users = API.users.search({{
+                                            "q": {q},
+                                            "count": {count},
+                                            "country": {country_id},
+                                            "sex": {sex},
+                                            "age_from": {age_from},
+                                            "age_to": {age_to},
+                                            "has_photo": {has_photo},
+                                            "group_id": groups[i],
+                                            "fields": "photo_400_orig,domain,relation"      
+                                        }});
+                    res.push(users);
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        sleep(0.34)
+        result += vk_api('execute', code=search_by_groups)
+
+    if 'groups_selected' not in request.POST \
+            and 'cities_selected' in request.POST \
+            and 'universities_selected' not in request.POST:
+        search_by_cities = """
+                var cities = {cities};
+                var res = [];
+                var i = 0;
+
+                while (i < cities.length) {{
+                    var users = API.users.search({{
+                                            "q": {q},
+                                            "count": {count},
+                                            "country": {country_id},
+                                            "sex": {sex},
+                                            "age_from": {age_from},
+                                            "age_to": {age_to},
+                                            "has_photo": {has_photo},
+                                            "city": cities[i],
+                                            "fields": "photo_400_orig,domain,relation"      
+                                        }});
+                    res.push(users);
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        sleep(0.34)
+        result += vk_api('execute', code=search_by_cities)
+
+    if 'groups_selected' not in request.POST \
+            and 'cities_selected' not in request.POST \
+            and 'universities_selected' in request.POST:
+        search_by_universities = """
+                var universities = {universities};
+                var res = [];
+                var i = 0;
+
+                while (i < universities.length) {{
+                    var users = API.users.search({{
+                                            "q": {q},
+                                            "count": {count},
+                                            "country": {country_id},
+                                            "sex": {sex},
+                                            "age_from": {age_from},
+                                            "age_to": {age_to},
+                                            "has_photo": {has_photo},
+                                            "university": universities[i],
+                                            "fields": "photo_400_orig,domain,relation"      
+                                        }});
+                    res.push(users);
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        sleep(0.34)
+        result += vk_api('execute', code=search_by_universities)
+
+    if 'groups_selected' not in request.POST \
+            and 'cities_selected' not in request.POST \
+            and 'universities_selected' in request.POST:
+        kwargs['groups'] = filter['groups']
+        search_by_universities = """
+                var universities = {universities};
+                var res = [];
+                var i = 0;
+
+                while (i < universities.length) {{
+                    var users = API.users.search({{
+                                            "q": {q},
+                                            "count": {count},
+                                            "country": {country_id},
+                                            "sex": {sex},
+                                            "age_from": {age_from},
+                                            "age_to": {age_to},
+                                            "has_photo": {has_photo},
+                                            "university": universities[i],
+                                            "fields": "photo_400_orig,domain,relation"      
+                                        }});
+                    res.push(users);
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        sleep(0.34)
+        result += vk_api('execute', code=search_by_universities)
+
+    if 'friends_selected' in request.POST:
+        search_by_friends = """
+                var friends = {friends};
+                var res = [];
+                var i = 0;
+
+                while (i < friends.length) {{
+                    var users = API.friends.get({{
+                                           "user_id": friends[i],
+                                           "fields": "photo_400_orig,domain,relation"      
+                                           }});
+                    res.push(users);
+                    i = i + 1;
+                }}
+                return res;
+        """.format(friends=filter['friends']).replace('\n', '').replace('  ', '')
+        result += vk_api('execute', code=search_by_friends)
+
+    result_ids = []
+    for search_res in result:
+        ids = set()
+        for person in search_res['items']:
+            ids.add(person['id'])
+        result_ids.append(ids)
+
+    unique_ids = result_ids[0]
+    for ids in result_ids:
+        unique_ids &= ids
 
     relation_options = {
         1: 'has boyfriend/girlfriend',  # есть друг/есть подруга',
@@ -129,21 +346,27 @@ def get_search_result(request):
         0: 'not indicated'             # 'не указано'
     }
     persons = []
-    for groups_search_res in [item for item in result]:
-        for search_res in groups_search_res:
-            for person in search_res['items']:
-                if person['id'] in unique_ids:
-                    if 'relation' in person:
-                        person['relation'] = relation_options[person['relation']]
-                    else:
-                        person['relation'] = relation_options[0]
-                    persons.append(person)
+    for search_res in result:
+        for person in search_res['items']:
+            fullname = person['first_name'] + ' ' + person['last_name']
+            if person['id'] in unique_ids and kwargs['q'][1:-1] in fullname:
+                if 'relation' in person:
+                    person['relation'] = relation_options[person['relation']]
+                else:
+                    person['relation'] = relation_options[0]
+                persons.append(person)
+                unique_ids.remove(person['id'])
 
     info = {
-        'count': len(unique_ids),
+        'count': len(persons),
         'persons': persons,
+        'request': request.POST
     }
-
+    #info['result'] = json.dumps(result, indent=2)
+    info['result_ids'] = result_ids
+    info['unique_ids'] = unique_ids
+    info['request'] = request.POST
+    info['filter'] = filter
     return render(request, 'vksearch/search/resultPage.html', info)
 
 
@@ -159,73 +382,46 @@ def get_new_filter_countries(request):
     return render(request, 'vksearch/add_filter/getCountry.html', info)
 
 
-def get_new_filter_region(request):
-    country_id = request.POST['country']
-    regions_filter = request.POST['regions_filter']
-
-    kwargs = {
-        'country_id': country_id,
-        'count': 1000
-    }
-    regions = vk_api('database.getRegions', **kwargs)
-
-    info = {
-        'regions': [item for item in regions['items'] if regions_filter in item['title']],
-        'country_id': country_id
-    }
-    return render(request, 'vksearch/add_filter/getRegion.html', info)
-
-
 def get_new_filter_cities(request):
-    region_id = request.POST['region']
-    country_id = request.POST['country_id']
-
+    country_id = request.POST['country']
     cities_num = int(request.POST['cities_num'])
     un_cities_num = int(request.POST['un_cities_num'])
 
-    cities_filter = request.POST['cities_filter']
-    un_cities_filter = request.POST['un_cities_filter']
-
-    kwargs = {
-        'country_id': country_id,
-        'region_id': region_id,
-        'count': 1000
-    }
-    req = vk_api('database.getCities', **kwargs)
-    cities = [item for item in req['items'] if cities_filter in item['title']]
-    un_cities = [item for item in req['items'] if un_cities_filter in item['title']]
-
-    for city in [dict(title='Москва', id=1), dict(title='Санкт-Петербург', id=2), dict(title='Севастополь', id=185)]:
-        if cities_filter in city['title']:
-            cities.append(city)
-        if un_cities_filter in city['title']:
-            un_cities.append(city)
-
     info = {
-        'cities': cities,
         'cities_num': list(range(cities_num)),
-        'un_cities': un_cities,
         'un_cities_num': list(range(un_cities_num)),
         'country_id': country_id,
-        'region_id': region_id
     }
     return render(request, 'vksearch/add_filter/getCities.html', info)
 
 
 def get_new_filter_universities(request):
+    country_id = request.POST['country_id']
     cities = []
     for key in request.POST:
         if key.startswith('city'):
-            cities.append(int(request.POST[key]))
+            req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
+            if req['count'] == 0:
+                info = {
+                    'error': 'city %s not found.' % request.POST[key]
+                }
+                return render(request, 'vksearch/error.html', info)
+            cities.append(req['items'][0]['id'])
 
     un_cities = []
     for key in request.POST:
         if key.startswith('un_city'):
-            un_cities.append(int(request.POST[key]))
+            req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
+            if req['count'] == 0:
+                info = {
+                    'error': 'city %s not found.' % request.POST[key]
+                }
+                return render(request, 'vksearch/error.html', info)
+            un_cities.append(req['items'][0]['id'])
 
     info = {
         'cities': str(cities),
-        'country_id': request.POST['country_id'],
+        'country_id': country_id,
     }
 
     if 'university_set' in request.POST:
@@ -237,13 +433,37 @@ def get_new_filter_universities(request):
     universities = []
     for city in un_cities:
         kwargs = {
-            'q': request.POST['universities_filter'],
+            'universities_filter': request.POST['universities_filter'].split(','),
             'country_id': request.POST['country_id'],
             'city_id': city,
             'count': 1000
         }
-        req = vk_api('database.getUniversities', **kwargs)
-        universities += [item for item in req['items']]
+        code = """
+            var q = {universities_filter};
+            var res = [];
+            var i = 0;
+            
+            while (i < q.length) {{
+                var users = API.database.getUniversities({{
+                                        "q": q[i],
+                                        "country_id": {country_id},
+                                        "city_id": {city_id},
+                                        "count": {count}                                              
+                                    }});
+                res.push(users);
+                i = i + 1;
+            }}
+            return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        req = vk_api('execute', code=code)
+        for search_by_q in req:
+            universities += [item for item in search_by_q['items']]
+
+    if not universities:
+        info = {
+            'error': 'no universities found.'
+        }
+        return render(request, 'vksearch/error.html', info)
 
     info['universities'] = universities
     return render(request, 'vksearch/add_filter/getUniversities.html', info)
@@ -285,7 +505,13 @@ def get_new_filter_name(request):
     friends_ids = []
     for key in request.POST:
         if 'friend_' in key:
-            friend = vk_api('users.get', domain=request.POST[key])[0]
+            try:
+                friend = vk_api('users.get', user_ids=request.POST[key])[0]
+            except vk.api.VkAPIError:
+                info = {
+                    'error': 'user with domain %s not found.' % request.POST[key]
+                }
+                return render(request, 'vksearch/error.html', info)
             if friend['is_closed']:
                 info = {
                     'error': 'user account with domain %s is closed.' % request.POST[key]
@@ -299,7 +525,13 @@ def get_new_filter_name(request):
     groups_screen_names = []
     for key in request.POST:
         if 'group_' in key:
-            id = vk_api('groups.getById', group_id=request.POST[key])[0]['id']
+            try:
+                id = vk_api('groups.getById', group_id=request.POST[key])[0]['id']
+            except vk.api.VkAPIError:
+                info = {
+                    'error': 'group with screen name %s not found.' % request.POST[key]
+                }
+                return render(request, 'vksearch/error.html', info)
             sleep(0.34)
             groups_screen_names.append(id)
 

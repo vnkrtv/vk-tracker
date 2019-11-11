@@ -1,7 +1,7 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <form action="{% url 'vksearch:get_new_filter_region' %}" method="post">
+    <form action="{% url 'vksearch:get_new_filter_cities' %}" method="post">
         {% csrf_token %}
         Select country:
         <select required="required" name="country" id="country" >
@@ -9,8 +9,11 @@
                 <option value="{{ country.id }}">{{ country.title }}</option>
             {% endfor %}
         </select><br>
-        Regions name filter <input type="text" name="regions_filter" id="regions_filter" style="width:90px" required="required">
-        <br>
+        Cities number <input type="number" name="cities_num" id="cities_num" value="1" size="2" min="1" style="width:50px" required="required"><br>
+        University cities number <input type="number" name="un_cities_num" id="un_cities_num" value="1" size="2" min="1" style="width:50px" required="required"><br>
+        <label for="country_id">
+             <input type="hidden" id="country_id" name="country_id" value="{{ country_id }}">
+        </label>
         <input type="submit" class="btn btn-dark btn-sm" value="Next">
     </form>
     <br/>

@@ -3,11 +3,12 @@
 {% block content %}
     <form action="{% url 'vksearch:get_search_result' %}" method="post">
         {% csrf_token %}
-        Query string <input type="text" name="q" id="q" style="width:50px"><br>
+        Query string <input type="text" name="q" id="q" style="width:100px"><br>
         Sex
         <select required="required" id="sex" name="sex">
             <option value="2" selected>Male</option>
             <option value="1">Female</option>
+            <option value="0">Any</option>            
         </select>
         <br/>
         Age from <input type="number" name="age_from" id="age_from" value="18" size="2" min="0" max="100" style="width:50px" required="required">
@@ -21,7 +22,11 @@
                 <option value="{{ filter }}">{{ filter }}</option>
             {% endfor %}
         </select>
-        <br/>
+        <br>Search by the following filter settings:<br>
+        Cities <input type="checkbox" name="cities_selected" checked><br>
+        Universities <input type="checkbox" name="universities_selected" checked><br>
+        Friends <input type="checkbox" name="friends_selected" checked><br>
+        Groups <input type="checkbox" name="groups_selected" checked><br>
         <input type="submit" class="btn btn-dark btn-sm" value="Search">
     </form>
     <br/>

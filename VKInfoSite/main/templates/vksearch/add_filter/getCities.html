@@ -3,21 +3,13 @@
 {% block content %}
     <form action="{% url 'vksearch:get_new_filter_universities' %}" method="post">
         {% csrf_token %}
-        Select cities:<br>
+        Enter cities:<br>
         {% for i in cities_num %}
-        	<select required="required" name="city_{{ i }}" id="city_{{ i }}" >
-                {% for city in cities %}
-                    <option value="{{ city.id }}">{{ city.title }}</option>
-                {% endfor %}
-            </select><br>
+            <input type="text" name="city_{{ i }}" id="city_{{ i }}" required="required" style="width:120px"><br>
         {% endfor %}
-        Select univercity cities:<br>
+        Enter univercity cities:<br>
         {% for i in un_cities_num %}
-            <select required="required" name="un_city_{{ i }}" id="un_city_{{ i }}" >
-                {% for city in un_cities %}
-                    <option value="{{ city.id }}">{{ city.title }}</option>
-                {% endfor %}
-            </select><br>
+            <input type="text" name="un_city_{{ i }}" id="un_city_{{ i }}" required="required" style="width:120px"><br>
         {% endfor %}
         <table>
             <tr>
@@ -30,9 +22,11 @@
             </tr>
             <tr>
                 <td>Universities filter </td>
-                <td><input type="text" name="universities_filter" id="universities_filter" style="width:90px"></td>
+                <td><input type="text" name="universities_filter" id="universities_filter" style="width:150px"></td>
             </tr>
         </table>
+        <p>To search for multiple values, enter them separated by commas. Example: МГУ,МГТУ Баумана,РАНХиГС<br>
+        If you do not specify a filter, you will be selected from all universities located in the specified cities</p>
         <label for="country_id">
             <input type="hidden" id="country_id" name="country_id" value="{{ country_id }}">
         </label>
