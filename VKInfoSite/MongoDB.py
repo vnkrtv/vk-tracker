@@ -196,6 +196,7 @@ class VKSearchFilterMongoDB(object):
             'name': filter_name(str),
             'country_id': country_id(int),
             'cities': cities_ids(list of int),
+            'cities_titles': cities_names(list of str),
             'universities': universities_ids(list of int),
             'friends': friends_domains(list of str),
             'groups': groups_ids(list of int)
@@ -225,6 +226,7 @@ class VKSearchFilterMongoDB(object):
             'name': filter_name(str),
             'country_id': country_id(int),
             'cities': cities_ids(list of int),
+            'cities_titles': cities_names(list of str),
             'universities': universities_ids(list of int),
             'friends': friends_ids(list of int),
             'groups': groups_ids(list of int)
