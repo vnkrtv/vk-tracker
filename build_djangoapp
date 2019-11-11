@@ -24,32 +24,32 @@ echo "===========================================Enter configuration data:======
 read -p "Vk token: " TOKEN
 
 read -p "Mongo host: " MDB_HOST
-if [ "${MDB_HOST}" -eq "" ]
+if [ "${MDB_HOST}" == "" ]
 then
     MDB_HOST="localhost"
 fi
 
 read -p "Mongo port: " MDB_PORT
-if [ "${MDB_PORT}" -eq "" ]
+if [ "${MDB_PORT}" == "" ]
 then
     MDB_PORT="27017"
 fi
 
 read -p "Neo4j URL: " NEO4J_URL
-if [ "${NEO4J_URL}" -eq "" ]
+if [ "${NEO4J_URL}" == "" ]
 then
     NEO4J_URL="bolt://localhost:7687"
 fi
 
 read -p "Neo4j user: " NEO4J_USER
-if [ "${NEO4J_USER}" -eq "" ]
+if [ "${NEO4J_USER}" == "" ]
 then
     NEO4J_USER="neo4j"
 fi
 
 read -p "Neo4j pass: " NEO4J_PASS
 
-if [ "${NEO4J_PASS}" -eq "" ]
+if [ "${NEO4J_PASS}" == "" ]
 then
     NEO4J_PASS="pass"
 fi
