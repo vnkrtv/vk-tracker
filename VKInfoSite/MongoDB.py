@@ -387,24 +387,36 @@ class VKActivityMongoDB(object):
         self._client = MongoClient(host, port)
         self._db = self._client.vk.activity
 
-    def load_activity(self, id, strtime, online, platform):
+    def load_activity(self, id, last_seen_timestamp, online, platform):
+        info = 0b00000000000000000000000000000000
+
+        # first bit - online info
+        info |= (online << 31)
+
+        # 2-5 bits - platform
+        info |= (platform << 28)
+
         if self._db.find_one({'user_id': id}):
+            # 5 - 32 bits - info
+            info |= (last_seen_timestamp - self._db.find_one({'user_id': id})['start_monitoring_timestamp'])
             self._db.find_one_and_update({'user_id': id}, {'$push': {
-                'activity': {
-                    'last_seen': strtime,
-                    'online': online,
-                    'platform': platform
-                }
+                'activity': info
             }})
         else:
-            self._db.insert_one({'user_id': id, 'activity': [{
-                'last_seen': strtime,
-                'online': online,
-                'platform': platform
-            }]})
+            self._db.insert_one({
+                'user_id': id,
+                'start_monitoring_timestamp': last_seen_timestamp,
+                'activity': [info]
+            })
 
-    def get_activity(self, id) -> list:
-        if self._db.find_one({'user_id': id}):
-            return list(self._db.find_one({'user_id': id})['activity'])
+    def get_activity(self, id):
+        """
+
+        :param id:
+        :return: tuple of (start_monitoring_timestamp, activity info list) if user is tracked; None, None else
+        """
+        data = self._db.find_one({'user_id': id})
+        if data:
+            return data['start_monitoring_timestamp'], data['activity']
         else:
-            return []
+            return None, None
