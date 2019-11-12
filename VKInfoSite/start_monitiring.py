@@ -1,10 +1,11 @@
+import sys
 from VK_UserActivity import *
 
 if __name__ == '__main__':
     with open('config/config.json', 'r') as file:
         token = json.load(file)['vk_token']
 
-    domain = input("Enter domain: ")
+    domain = sys.argv[0]
     try:
         user = VK_UserActivity(domain=domain, token=token)
         print('Start monitoring %s[%s]' % ((user.get_first_name() + ' ' + user.get_last_name()), domain))
