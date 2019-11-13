@@ -1,6 +1,7 @@
 from MongoDB import VKMongoDB
 from .DashGraphs import *
 
+
 def dispatcher(request, domain):
     app = _create_app(domain)
     app.config['suppress_callback_exceptions'] = True

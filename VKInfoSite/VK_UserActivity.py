@@ -55,6 +55,7 @@ class VK_UserActivity(VK_User):
                 platform = (info >> 28 & 0b111) + 1
                 timestamp = start_monitoring_timestamp + delta
                 last_seen_time = datetime.datetime.fromtimestamp(timestamp)
+                """
                 activity.append({
                     'online':   online,
                     'platform': platform_dict[platform],
@@ -63,6 +64,12 @@ class VK_UserActivity(VK_User):
                     'day':      last_seen_time.day,
                     'month':    last_seen_time.month,
                     'year':     last_seen_time.year
+                })
+                """
+                activity.append({
+                    'online':   online,
+                    'platform': platform_dict[platform],
+                    'time': last_seen_time.strftime('%Y-%m-%d %H:%M:%S')
                 })
             return activity
 
