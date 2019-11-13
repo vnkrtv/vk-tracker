@@ -76,5 +76,5 @@ class VK_UserActivity(VK_User):
         with open(CONFIG_FILE, 'r') as file:
             config = json.load(file)
             mdb = VKActivityMongoDB(host=config['mdb_host'], port=config['mdb_port'])
-            activity = parse_info(mdb.get_activity(self._id))
+            activity = parse_info(*mdb.get_activity(self._id))
         return activity
