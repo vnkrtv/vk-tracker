@@ -8,7 +8,7 @@ if __name__ == '__main__':
         token = json.load(file)['vk_token']
 
     try:
-        data = VK_UserActivity(domain=sys.argv[1], token=token).load_activity()
+        data = VK_UserActivity(domain=sys.argv[1], token=token).get_activity()
     except Exception as e:
         print(e)
         exit(1)
