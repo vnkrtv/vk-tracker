@@ -4,7 +4,7 @@ import sys
 from VK_UserActivity import *
 
 if __name__ == '__main__':
-    with open('config/default_config.json', 'r') as file:
+    with open('config/config.json', 'r') as file:
         token = json.load(file)['vk_token']
 
     try:
