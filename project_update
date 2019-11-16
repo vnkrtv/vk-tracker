@@ -14,7 +14,7 @@ else
     if [ -d "$1" ]
     then
         PROJECT_DIR="$1"
-        if [ "$1" -eq "." ]
+        if [ "$1" == "." ]
         then
             echo "Project directory: $(pwd)"
         else
@@ -41,7 +41,6 @@ CONFIG="${CONFIG/\"localhost\"/\"mongodb\"}"
 echo "${CONFIG}" >> "./docker/VKInfoSite/config/config.json"
 echo "${CONFIG}" >> "./docker/VKInfoSite/config/default_config.json"
 
-CONFIG=$(cat ./VKInfoSite/config.py)
-rm "./VKInfoSite/config.py"
-CONFIG="${VIEWS//(\'config/(\'/app/VKInfoSite/config}"
-echo "${VIEWS//(\'../(\'/app}" >> "./VKInfoSite/config.py"
+CONFIG=$(cat ./docker/VKInfoSite/config.py)
+rm "./docker/VKInfoSite/config.py"
+echo "${CONFIG//\'config/\'/app/VKInfoSite/config}" >> "./docker/VKInfoSite/config.py"

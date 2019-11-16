@@ -456,11 +456,39 @@ class FriendsActivityGraph:
         return graph
 
 
+class OnlineGraph:
+
+    def __init__(self, activity_list):
+        self._df = pd.DataFrame({
+            'online':   [item['online'] for item in activity_list],
+            'platform': [item['platform'] for item in activity_list],
+            'time':     [item['time'] for item in activity_list]
+        })
+
+    def create_graph(self):
+        graph = html.Div([
+            html.H3('Online', style={'text-align': 'center'}),
+            dcc.Graph(
+                id='online-graph',
+                figure=go.Figure(
+                    data=[go.Scatter(
+                        x=self._df['time'],
+                        y=self._df['online'],
+                        name=self._df.at[i, 'platform'],
+                        xaxis_range=['2016-07-01', '2016-12-31']
+                    ) for i in range(len(self._df))]
+                )
+            )
+        ])
+        return graph
+
+
 if __name__ == '__main__':
+    with open('../db/ivan_nikitinn.txt', 'r') as file:
+        data = json.load(file)
 
-    #friends_list = MongoDB().load_user_info(domain='ich_bin_sanya')['friends']['items']
-    #print(GenderPieChart(friends_list=friends_list).create_graph())
-
-    AgeDistributionGraph(VKMongoDB().load_user_info(domain='ivan_nikitinn')).create_graph()
+    app = dash.Dash(__name__)
+    app.layout = OnlineGraph(activity_list=data).create_graph()
+    app.run_server(debug=True)
 
     #data = VKMongoDB().load_user_info(domain='ivan_nikitinn')['wall']['items']
