@@ -100,7 +100,7 @@ def get_search_result(request):
                                                    "q": {q},
                                                    "count": {count},
                                                    "country": {country_id},
-                                                   "hometown": cities[t],
+                                                   "hometown": "cities[t]",
                                                    "university": universities[i],
                                                    "sex": {sex},
                                                    "age_from": {age_from},
@@ -337,14 +337,15 @@ def get_search_result(request):
         unique_ids &= ids
 
     relation_options = {
-        1: 'has boyfriend/girlfriend',  # есть друг/есть подруга',
-        2: 'engaged',                  # 'помолвлен/помолвлена',
-        3: 'married',                  # 'женат/замужем',
-        4: 'it\'s complicated',        # 'всё сложно',
-        5: 'actively looking',         # 'в активном поиске',
-        6: 'in love',                  # 'влюблён/влюблена',
-        7: 'in a civil marriage',      # 'в гражданском браке',
-        0: 'not indicated'             # 'не указано'
+        1: 'not married',               # не женат/не замужем
+        2: 'has boyfriend/girlfriend',  # есть друг/есть подруга',
+        3: 'engaged',                   # 'помолвлен/помолвлена',
+        4: 'married',                   # 'женат/замужем',
+        5: 'it\'s complicated',         # 'всё сложно',
+        6: 'actively looking',          # 'в активном поиске',
+        7: 'in love',                   # 'влюблён/влюблена',
+        8: 'in a civil marriage',       # 'в гражданском браке',
+        0: 'not indicated',             # 'не указано'
     }
     persons = []
     for search_res in result:
@@ -364,7 +365,7 @@ def get_search_result(request):
         'persons': persons,
     }
     info['result'] = json.dumps(result, indent=2)
-    info['result_ids'] = result_ids
+    info['result_ids'] = [len(item) for item in result_ids]
     info['unique_ids'] = unique_ids
     info['request'] = request.POST
     info['filter'] = filter
