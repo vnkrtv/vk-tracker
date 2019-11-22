@@ -406,8 +406,9 @@ def get_new_filter_universities(request):
         if key.startswith('city'):
             req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
+                country = vk_api('database.getCountriesById', country_ids=country_id)[0]['title']
                 info = {
-                    'error': 'city %s not found.' % request.POST[key]
+                    'error': 'city %s not found in %s.' % (request.POST[key], country)
                 }
                 return render(request, 'vksearch/error.html', info)
             cities.append(req['items'][0]['id'])

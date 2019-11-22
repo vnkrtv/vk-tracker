@@ -27,8 +27,8 @@ class GenderPieChart:
             gender = 'male' if friend['sex'] == 2 else 'female'
             counter[gender] = counter[gender] + 1
 
-        labels = ['Male', 'Female']
-        values = [counter['male'], counter['female']]
+        labels = ['Female', 'Male']
+        values = [counter['female'], counter['male']]
 
         fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
         fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
@@ -408,16 +408,59 @@ class FriendsActivityGraph:
                     df.loc[id] = [0, 1, fullname, 0]
 
         token = json.load(open(CONFIG_FILE, 'r'))['vk_token']
-        vk_user = VK_UserInfo(token=token, domain=user_info['main_info']['domain'])
-        for friend in user_info['friends']['items']:
-            id = friend['id']
-            mutual_friends = vk_user.get_mutual_friends(id=id)
-            if id in df.index:
-                df.loc[id, 'Mutual friends'] = len(mutual_friends) if mutual_friends else 0
+        session = vk.API(vk.Session(access_token=token))
+        code = """
+                    var friends = {friends};
+                    var res = [];
+                    var i = 0;
+                    while (i < friends.length) {{
+                        var mutual_friends = API.friends.getMutual({{
+                                "source_uid": {user_id},
+                                "target_uid": friends[i],
+                            }});
+                        res.push(mutual_friends);
+                        i = i + 1;
+                    }}
+                    return res;
+        """
+
+        user_id = user_info['main_info']['id']
+        friends_ids = [friend['id'] for friend in user_info['friends']['items']]
+
+        # 25 - max API requests per one execute method
+        friends_groups = list(zip(*[iter(friends_ids)] * 25))
+        remaining_friends_count = len(friends_ids) - 25 * len(friends_groups)
+        friends_groups.append(friends_ids[len(friends_ids) - remaining_friends_count:])
+
+        for friends_group in friends_groups:
+            friends = list(friends_group)
+            req_code = code.format(user_id=user_id, friends=friends).replace('\n', '').replace('  ', '')
+
+            mutual_friends_dict = {}
+            for friend_id, mutual_friends in zip(friends, session.execute(code=req_code, v=5.102)):
+                if friend_id in df.index:
+                    df.loc[friend_id, 'Mutual friends'] = len(mutual_friends) if mutual_friends else 0
+            sleep(0.34)
 
         self._df = df
 
     def create_graph(self):
+        def get_hovertext(df):
+            kwargs = {
+                'name': df['Fullname'],
+                'likes_count': df['Likes'],
+                'comments_count': df['Comments'],
+                'mut_friends_count': df['Mutual friends']
+            }
+            text = """
+            {name}
+            Likes: {likes_count}
+            Comments: {comments_count}
+            Mutual friends: {mut_friends_count}
+            """.format(**kwargs)
+            return text
+
+
         graph = html.Div([
             html.H3('Friends activity', style={'text-align': 'center'}),
             dcc.Graph(
@@ -429,19 +472,27 @@ class FriendsActivityGraph:
                             y=self._df['Comments'],
                             z=self._df['Mutual friends'],
                             text=self._df['Fullname'],
+                            hovertemplate='%{text}<br>'
+                                          'Likes: %{x}<br>'
+                                          'Comments: %{y}<br>'
+                                          'Mutual friends: %{z}'
+                                          '<extra></extra>',
                             mode='markers',
                             opacity=0.7,
+                            showlegend=False,
                             marker=dict(opacity=0.9,
                                         reversescale=True,
                                         colorscale='Blues',
+                                        #x='Likes',
+                                        #y='Comments',
+                                        #z='Mutual friends',
                                         size=5),
                             line=dict(width=0.02),
-                            name=self._df['Fullname'].values[0]
                         )
                     ],
                     'layout': go.Layout(
                         height=950,
-                        #width=950,
+                        #  width=950,
                         scene=dict(
                             xaxis=dict(title="Likes"),
                             yaxis=dict(title="Comments"),

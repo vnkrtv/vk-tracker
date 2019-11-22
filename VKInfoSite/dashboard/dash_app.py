@@ -21,7 +21,7 @@ def dispatcher(request, domain):
 
 def _create_app(domain):
     graphs_list = [['Gender', 'GenderPieChart'],
-                   ['Activity', 'ActivityGraph'],
+                 # ['Activity', 'ActivityGraph'],
                    ['University', 'UniversityDistributionGraph'],
                    ['City', 'CitiesDistributionGraph'],
                    ['Country', 'CountriesDistributionGraph'],
@@ -29,8 +29,12 @@ def _create_app(domain):
                    ['Friends activity', 'FriendsActivityGraph'],
                    ]
 
+    external_stylesheets = ['static/main/css/bootstrap.css',
+                            'static/main/css/bootstrap-grid.css',
+                            'static/main/css/bootstrap-reboot.css']
     app = dash.Dash(name='VK User Info',
                     url_base_pathname="/graphs/",
+                    external_stylesheets=external_stylesheets,
                     csrf_protect=False)
     app.config.suppress_callback_exceptions = True
 
@@ -39,6 +43,7 @@ def _create_app(domain):
             html.H1([
                 html.A('VK User Info', href='/', style={'color': 'black'})
             ]),
+            html.Button('Back'),
             dcc.Dropdown(
                 id='info-graphs-input',
                 options=[{'label': s[0], 'value': s[1]} for s in graphs_list],
@@ -52,6 +57,7 @@ def _create_app(domain):
     ],
         className='jumbotron'
     )
+    cached_graphs = {}
 
     @app.callback(
         dash.dependencies.Output('graphs', 'children'),
@@ -75,7 +81,9 @@ def _create_app(domain):
                 ))
                 continue
 
-            graphs.append(graph.create_graph())
+            if class_name not in cached_graphs:
+                cached_graphs[class_name] = graph.create_graph()
+            graphs.append(cached_graphs[class_name])
 
         return graphs
 
@@ -85,17 +93,3 @@ def _create_app(domain):
 if __name__ == "__main__":
     app = _create_app()
     app.run_server()
-
-"""
-        for i, class_name in enumerate(graphs_list):
-            try:
-                user_info = VKMongoDB().load_user_info(domain=domain)
-                graph = type(class_name, (), {'user_info': user_info}).create_graph()
-            except:
-                graphs.append(html.H3(
-                    'Graph is not available for {}'.format('you'),
-                    style={'marginTop': 20, 'marginBottom': 20}
-                ))
-                continue
-
-            graphs.append(graph)"""
