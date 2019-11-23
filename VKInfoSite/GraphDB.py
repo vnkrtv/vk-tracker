@@ -80,7 +80,7 @@ class GraphDB(object):
 
         self._graph.create(added_user)
 
-        LIKED  = Relationship.type('LIKED')
+        LIKED = Relationship.type('LIKED')
 
         for post in self._graph.nodes.match('Post'):
             for person in self._graph.nodes.match('Person'):

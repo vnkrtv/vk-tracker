@@ -16,4 +16,4 @@ if __name__ == '__main__':
     with open(f'/home/leadness/{sys.argv[1]}.txt', 'w') as file:
         json.dump(data, file)
 
-    #print(sql.SQLiteDB(db_file='../db/VKDatabase.db').get_countries())
+    #  print(sql.SQLiteDB(db_file='../db/VKDatabase.db').get_countries())

@@ -30,4 +30,4 @@ class InstUserInfo:
 
 
 if __name__ == '__main__':
-    #print(InstUserInfo(username='van4ester__').get_info())
+    #  print(InstUserInfo(username='van4ester__').get_info())

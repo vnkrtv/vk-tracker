@@ -483,9 +483,6 @@ class FriendsActivityGraph:
                             marker=dict(opacity=0.9,
                                         reversescale=True,
                                         colorscale='Blues',
-                                        #x='Likes',
-                                        #y='Comments',
-                                        #z='Mutual friends',
                                         size=5),
                             line=dict(width=0.02),
                         )
@@ -542,4 +539,4 @@ if __name__ == '__main__':
     app.layout = OnlineGraph(activity_list=data).create_graph()
     app.run_server(debug=True)
 
-    #data = VKMongoDB().load_user_info(domain='ivan_nikitinn')['wall']['items']
+    #  data = VKMongoDB().load_user_info(domain='ivan_nikitinn')['wall']['items']
