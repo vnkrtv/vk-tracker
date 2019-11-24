@@ -143,7 +143,7 @@ class VK_UserInfo(VK_User):
                 photos_list = list(photos_group)
                 req_code = code.format(photos=photos_list, user_id=self._id).replace('\n', '').replace('  ', '')
                 photos['items'] += self._user.execute(code=req_code, v='5.65')
-                sleep(0.34)
+                sleep(self._timeout)
         except:
             photos = {
                 'count': 0,
@@ -214,7 +214,7 @@ class VK_UserInfo(VK_User):
                 posts_list = list(posts_group)
                 req_code = code.format(posts=posts_list, user_id=self._id).replace('\n', '').replace('  ', '')
                 wall['items'] += self._user.execute(code=req_code, v='5.65')
-                sleep(0.34)
+                sleep(self._timeout)
         except:
             wall = {
                 'count': 0,

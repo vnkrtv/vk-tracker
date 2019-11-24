@@ -110,7 +110,7 @@ class VK_UserAnalizer:
         }
 
         for item in cmp_dict:
-            if cmpDict[item][1]:
+            if cmp_dict[item][1]:
                 changes_dict['new'].append(cmp_dict[item][0])
             else:
                 changes_dict['deleted'].append(cmp_dict[item][0])
