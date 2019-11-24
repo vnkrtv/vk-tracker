@@ -90,49 +90,66 @@ class VK_UserInfo(VK_User):
             sleep(self._timeout)
 
             photos = {
-                'photos': {
-                    'count': len(resp['items']),
-                    'items': []
-                     }
+                'count': resp['count'],
+                'items': []
             }
 
-            for item in resp['items']:
+            code = """
+                var photos = {photos};
+                var res = [];
+                var i = 0;
+                while (i < photos.length) {{
+                    var photo = {};
+                    photo.photo_id = photos[i];
+                    var likes = API.likes.getList({{
+                                     "type": "photo",
+                                     "owner_id": {user_id}},
+                                     "item_id": photos[i],
+                                     "filter": "likes",
+                                     "extended": 1
+                    }});
+                    if (likes.f) {{
+                        photo.likes = { "count": 0, "items": [] };
+                    }} else {{
+                        photo.likes = likes;
+                    }}
+                    
+                    var comments = API.photos.getComments({{
+                                     "owner_id": {user_id}},
+                                     "photo_id": photos[i],
+                                     "fields": "first_name,last_name",
+                                     "extended": 1
+                    }});
+                    if (comments.f) {{
+                        photo.comments = { "count": 0, "items": [] };
+                    }} else {{
+                        photo.comments = comments;
+                    }}
+                    
+                    res.push(photo);
+                    i = i + 1;
+                }}
+                return res;
+            """
 
-                photo = {
-                    'photo_id': item['id']
-                }
+            photos_ids = [photo['id'] for photo in resp['items']]
 
-                try:
-                    photo['likes'] = self._user.likes.getList(type='photo', owner_id=self._id, item_id=photo['photo_id'],
-                                                              filter='likes', extended=1, v='5.65')
-                except:
-                    photo['likes'] = {
-                        'count': 0,
-                        'items': []
-                    }
+            # 25 - max API requests per one execute method
+            photos_groups = list(zip(*[iter(photos_ids)] * 12))
+            remaining_photos_count = len(photos_ids) - 12 * len(photos_groups)
+            photos_groups.append(photos_ids[len(photos_ids) - remaining_photos_count:])
 
-                sleep(self._timeout)
-
-                try:
-                    photo['comments'] = self._user.photos.getComments(owner_id=self._id, photo_id=photo['photo_id'], extended=1,
-                                                                      fields='first_name,last_name', v='5.65')
-                except:
-                    photo['comments'] = {
-                        'count': 0,
-                        'items': []
-                    }
-
-                photos['photos']['items'].append(photo)
-                sleep(self._timeout)
+            for photos_group in photos_groups:
+                photos_list = list(photos_group)
+                req_code = code.format(photos=photos_list, user_id=self._id).replace('\n', '').replace('  ', '')
+                photos['items'] += self._user.execute(code=req_code, v='5.65')
+                sleep(0.34)
         except:
             photos = {
-                'photos': {
-                    'count': 0,
-                    'items': []
-                }
+                'count': 0,
+                'items': []
             }
-
-        return photos['photos']
+        return photos
 
     def get_wall(self):
         try:
@@ -140,62 +157,75 @@ class VK_UserInfo(VK_User):
             sleep(self._timeout)
 
             wall = {
-                'wall': {
-                    'count': len(resp['items']),
-                    'items': []
-                }
+                'count': resp['count'],
+                'items': []
             }
 
-            for item in resp['items']:
+            code = """
+                var posts = {posts};
+                var res = [];
+                var i = 0;
+                while (i < posts.length) {{
+                    var post = {};
+                    post.post_id = posts[i].id;
+                    post.text = posts[i].text
+                    var likes = API.likes.getList({{
+                                     "type": "post",
+                                     "owner_id": {user_id}},
+                                     "item_id": posts[i].id,
+                                     "filter": "likes",
+                                     "extended": 1
+                    }});
+                    if (likes.f) {{
+                        post.likes = { "count": 0, "items": [] };
+                    }} else {{
+                        post.likes = likes;
+                    }}
+                    
+                    if (posts[i].attachments) {{
+                        post.attachments = posts[i].attachments;
+                    }}            
+        
+                    var comments = API.wall.getComments({{
+                                     "owner_id": {user_id}},
+                                     "post_id": posts[i].id,
+                                     "fields": "first_name,last_name",
+                                     "extended": 1
+                    }});
+                    if (comments.f) {{
+                        post.comments = { "count": 0, "items": [] };
+                    }} else {{
+                        post.comments = comments;
+                    }}
 
-                post = {
-                    'text':    item['text'],
-                    'post_id': item['id']
-                }
+                    res.push(post);
+                    i = i + 1;
+                }}
+                return res;
+            """
+            posts = resp['items']
 
-                try:
-                    post['likes'] = self._user.likes.getList(type='post', owner_id=self._id, item_id=post['post_id'],
-                                                             filter='likes', extended=1, v='5.65')
-                except:
-                    post['likes'] = {
-                        'count': 0,
-                        'items': []
-                    }
+            # 25 - max API requests per one execute method
+            posts_groups = list(zip(*[iter(posts)] * 12))
+            remaining_posts_count = len(posts) - 12 * len(posts_groups)
+            posts_groups.append(posts[len(posts) - remaining_posts_count:])
 
-                sleep(self._timeout)
-
-                try:
-                    post['attachments'] = item['attachments']
-                except:
-                    pass
-
-                try:
-                    post['comments'] = self._user.photos.getComments(owner_id=self._id, post_id=post['post_id'], extended=1,
-                                                                     fields='first_name,last_name', v='5.65')
-                except:
-                    post['comments'] = {
-                        'count': 0,
-                        'items': []
-                    }
-
-                wall['wall']['items'].append(post)
-                sleep(self._timeout)
+            for posts_group in posts_groups:
+                posts_list = list(posts_group)
+                req_code = code.format(posts=posts_list, user_id=self._id).replace('\n', '').replace('  ', '')
+                wall['items'] += self._user.execute(code=req_code, v='5.65')
+                sleep(0.34)
         except:
             wall = {
-                'wall': {
-                    'count': 0,
-                    'items': []
-                }
+                'count': 0,
+                'items': []
             }
-
-        return wall['wall']
+        return wall
 
     def get_groups(self):
         try:
-            groups = {}
             groups = self._user.groups.get(user_id=self._id, count=200, extended=1,
                                                      fields='id,name,screen_name', v='5.65')
-
             for item in groups['items']:
                 item.pop('is_advertiser')
                 item.pop('is_member')
@@ -206,7 +236,6 @@ class VK_UserInfo(VK_User):
             groups = {
                 'items': []
             }
-
         sleep(self._timeout)
         return groups
 
@@ -215,7 +244,6 @@ class VK_UserInfo(VK_User):
             friends = self._user.friends.getMutual(source_uid=self._id, target_uid=id, v='5.101')
         except:
             friends = None
-
         sleep(self._timeout)
         return friends
 
