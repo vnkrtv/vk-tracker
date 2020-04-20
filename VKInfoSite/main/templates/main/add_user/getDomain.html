@@ -1,12 +1,12 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
+	<h2>Add user</h2>
     <form action="{% url 'main:add_result' %}" method="post">
         {% csrf_token %}
-
         <label for="domain">Enter user domain: </label>
         <input type="text" name="domain" id="domain"/><br/>
-        <input type="submit" class="btn btn-dark btn-sm" value="Add user" onclick="location.href='/add_user/show_result/'">
+        <input type="submit" class="btn btn-dark" value="Add user" onclick="location.href='/add_user/show_result/'">
     </form>
     <br/>
 {% endblock %}

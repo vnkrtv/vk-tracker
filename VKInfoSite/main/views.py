@@ -1,6 +1,5 @@
 import traceback
 import json
-
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from requests.exceptions import ConnectionError
@@ -44,7 +43,7 @@ def change_settings(request):
     if not request.user.is_superuser:
         return redirect('/add_user/')
     info = json.load(open(settings.CONFIG, 'r'))
-    return render(request, 'main/changeSettings.html', info)
+    return render(request, 'main/settings/changeSettings.html', info)
 
 
 def change_settings_result(request):
@@ -65,7 +64,11 @@ def change_settings_result(request):
         json.dump(new_config, open(settings.CONFIG, 'w'))
         # {% endкостыль %}
 
-    return render(request, 'main/changeSettingsResult.html')
+    info = {
+        'title': 'Change result',
+        'message': 'Settings have been successfully changed.'
+    }
+    return render(request, 'main/info.html', info)
 
 
 def add_user(request):
@@ -74,30 +77,33 @@ def add_user(request):
 
 def add_result(request):
     config = json.load(open(settings.CONFIG, 'r'))
-    info = {}
+    error = ''
 
     try:
         vk_user = VK_UserInfo(token=config['vk_token'], domain=request.POST['domain'])
         config.pop('vk_token')
         user = vk_user.add_user_to_DBs(**config)
-
-        info['info'] = {
+        info = {
             'first_name': user['main_info']['first_name'],
-            'last_name':  user['main_info']['last_name'],
-            'domain':     user['main_info']['domain'],
-            'id':         user['main_info']['id']
+            'last_name': user['main_info']['last_name'],
+            'domain': user['main_info']['domain']
         }
     except ConnectionError:
-        info['error'] = 'no connection to the internet'
+        error = 'No connection to the internet.'
     except vk.exceptions.VkAPIError:
-        info['error'] = 'user with input domain not found'
+        error = 'User with input domain not found.'
     except ServerSelectionTimeoutError:
-        info['error'] = 'MongoDB is not connected'
+        error = 'MongoDB is not connected.'
     except ServiceUnavailable:
-        info['error'] = 'Neo4j is not connected'
-    except:
-        info['error'] = traceback.format_exc()
-
+        error = 'Neo4j is not connected.'
+    except Exception:
+        error = traceback.format_exc()
+    if error:
+        info = {
+            'title': 'Error',
+            'message': error
+        }
+        return render(request, 'main/info.html', info)
     return render(request, 'main/add_user/addResult.html', info)
 
 

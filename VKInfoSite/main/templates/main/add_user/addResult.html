@@ -1,12 +1,9 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if not error %}
+    <h2>Add result</h2>
     <p class="font-weight-normal">
-        <a style="color: black" href="https://vk.com/{{ info.domain }}">{{ info.first_name }} {{ info.last_name }}</a>
-        was successfully added to DBs!
+        <a style="color: black" href="https://vk.com/{{ domain }}">{{ first_name }} {{ last_name }}</a>
+        was successfully added to databases!
     </p>
-    {% else %}
-        <p>Error: {{ error }}</p>
-    {% endif %}
 {% endblock %}
