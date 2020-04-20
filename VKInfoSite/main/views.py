@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
 from VK_UserRelation import *
-from config import *
+from django.conf import settings
 
 
 def index(request):
@@ -14,7 +14,7 @@ def index(request):
 
 
 def change_settings(request):
-    info = json.load(open(CONFIG_FILE, 'r'))
+    info = json.load(open(settings.CONFIG, 'r'))
     return render(request, 'main/changeSettings.html', info)
 
 
@@ -22,29 +22,29 @@ def change_settings_result(request):
     default = request.POST.get('default', '')
 
     if default:
-        new_config = json.load(open(CONFIG_FILE, 'r'))
-        json.dump(new_config, open(CONFIG_FILE, 'w'))
+        new_config = json.load(open(settings.CONFIG, 'r'))
+        json.dump(new_config, open(settings.CONFIG, 'w'))
     else:
         # {% костыль %}
-        json.dump(request.POST, open(CONFIG_FILE, 'w'))
-        new_config = json.load(open(CONFIG_FILE, 'r'))
+        json.dump(request.POST, open(settings.CONFIG, 'w'))
+        new_config = json.load(open(settings.CONFIG, 'r'))
         try:
             new_config.pop('csrfmiddlewaretoken')
         except:
             pass
         new_config['mdb_port'] = int(new_config['mdb_port'])
-        json.dump(new_config, open(CONFIG_FILE, 'w'))
+        json.dump(new_config, open(settings.CONFIG, 'w'))
         # {% endкостыль %}
 
     return render(request, 'main/changeSettingsResult.html')
 
 
-def get_domain_add(request):
+def add_user(request):
     return render(request, 'main/add_user/getDomain.html')
 
 
 def add_result(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+    config = json.load(open(settings.CONFIG, 'r'))
     info = {}
 
     try:
@@ -72,12 +72,12 @@ def add_result(request):
     return render(request, 'main/add_user/addResult.html', info)
 
 
-def get_domain_info(request):
+def user_info(request):
     return render(request, 'main/user_info/getDomain.html')
 
 
 def get_info(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+    config = json.load(open(settings.CONFIG, 'r'))
 
     domain = request.POST['domain']
     info = {}
@@ -98,12 +98,12 @@ def get_info(request):
     return render(request, 'main/user_info/userInfo.html', info)
 
 
-def get_domain_changes(request):
+def get_changes(request):
     return render(request, 'main/user_changes/getDomain.html')
 
 
 def get_dates(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+    config = json.load(open(settings.CONFIG, 'r'))
     domain = request.POST['domain']
     info = {}
 
@@ -126,8 +126,8 @@ def get_dates(request):
     return render(request, 'main/user_changes/getDates.html', info)
 
 
-def get_changes(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+def get_user_changes(request):
+    config = json.load(open(settings.CONFIG, 'r'))
     args = {
         'date1':      request.POST['date1'],
         'date2':      request.POST['date2'],
@@ -146,12 +146,12 @@ def get_changes(request):
     return render(request, 'main/user_changes/getChanges.html', info)
 
 
-def get_domains(request):
+def get_mutual_activity(request):
     return render(request, 'main/users_relations/getDomains.html')
 
 
 def get_users_dates(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+    config = json.load(open(settings.CONFIG, 'r'))
     first_domain = request.POST['first_domain']
     second_domain = request.POST['second_domain']
     info = {}
@@ -183,7 +183,7 @@ def get_users_dates(request):
 
 
 def get_relations(request):
-    config = json.load(open(CONFIG_FILE, 'r'))
+    config = json.load(open(settings.CONFIG, 'r'))
     args = {
         'first_domain':  request.POST['first_domain'],
         'second_domain': request.POST['second_domain'],

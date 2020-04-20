@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'^search/$',         views.get_search_params,      name='get_search_params'),
     url(r'^result/$',         views.get_search_result,      name='get_search_result'),
 
-    url(r'^add_filter_1/$', views.get_new_filter_countries,          name='get_new_filter_countries'),
+    url(r'^add_filter_1/$', views.add_search_filter,          name='add_search_filter'),
     url(r'^add_filter_2/$', views.get_new_filter_cities,             name='get_new_filter_cities'),
     url(r'^add_filter_3/$', views.get_new_filter_universities,       name='get_new_filter_universities'),
     url(r'^add_filter_4/$', views.get_new_filter_friends_and_groups, name='get_new_filter_friends_and_groups'),

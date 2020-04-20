@@ -5,11 +5,11 @@ from django.shortcuts import render
 from requests.exceptions import ConnectionError
 from MongoDB import *
 from SQLiteDB import *
-from config import *
+from django.conf import settings
 
 
 def vk_api(method, **kwargs):
-    with open(CONFIG_FILE, 'r') as file:
+    with open(settings.CONFIG, 'r') as file:
         token = json.load(file)['vk_token']
 
     session = vk.API(vk.Session(access_token=token))
@@ -17,7 +17,7 @@ def vk_api(method, **kwargs):
 
 
 def get_search_params(request):
-    with open(CONFIG_FILE, 'r') as file:
+    with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     info = {
@@ -62,7 +62,7 @@ def get_search_result(request):
     filter_name = request.POST['filter']
     count = 1000
 
-    with open(CONFIG_FILE, 'r') as file:
+    with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     filter = mdb.get_filter(filter_name)
@@ -328,9 +328,10 @@ def get_search_result(request):
     result_ids = []
     for search_res in result:
         ids = set()
-        for person in search_res['items']:
-            ids.add(person['id'])
-        result_ids.append(ids)
+        if search_res:
+            for person in search_res['items']:
+                ids.add(person['id'])
+            result_ids.append(ids)
 
     unique_ids = result_ids[0].copy()
     for ids in result_ids:
@@ -349,16 +350,17 @@ def get_search_result(request):
     }
     persons = []
     for search_res in result:
-        for person in search_res['items']:
-            fullname = person['first_name'] + ' ' + person['last_name']
-            if person['id'] in unique_ids and kwargs['q'][1:-1] in fullname:
-                if person['sex'] == int(kwargs['sex']) or int(kwargs['sex']) == 0:
-                    if 'relation' in person:
-                        person['relation'] = relation_options[person['relation']]
-                    else:
-                        person['relation'] = relation_options[0]
-                    persons.append(person)
-                    unique_ids.remove(person['id'])
+        if search_res:
+            for person in search_res['items']:
+                fullname = person['first_name'] + ' ' + person['last_name']
+                if person['id'] in unique_ids and kwargs['q'][1:-1] in fullname:
+                    if person['sex'] == int(kwargs['sex']) or int(kwargs['sex']) == 0:
+                        if 'relation' in person:
+                            person['relation'] = relation_options[person['relation']]
+                        else:
+                            person['relation'] = relation_options[0]
+                        persons.append(person)
+                        unique_ids.remove(person['id'])
 
     info = {
         'count': len(persons),
@@ -373,7 +375,7 @@ def get_search_result(request):
     return render(request, 'vksearch/search/resultPage.html', info)
 
 
-def get_new_filter_countries(request):
+def add_search_filter(request):
     kwargs = {
         'need_all': 1,
         'count': 1000
@@ -561,7 +563,7 @@ def add_new_filter(request):
         'groups':        ast.literal_eval(request.POST['groups'])       if request.POST['groups']       else []
     }
 
-    with open(CONFIG_FILE, 'r') as file:
+    with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     mdb.load_philter(filter)
@@ -573,7 +575,7 @@ def add_new_filter(request):
 
 
 def delete_filter(request):
-    with open(CONFIG_FILE, 'r') as file:
+    with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     info = {
@@ -585,7 +587,7 @@ def delete_filter(request):
 def delete_filter_result(request):
     filter_name = request.POST['filter']
 
-    with open(CONFIG_FILE, 'r') as file:
+    with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
     mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
     mdb.delete_philter(filter_name)

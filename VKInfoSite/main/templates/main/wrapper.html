@@ -1,41 +1,92 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>VK User Info</title>
+<html lang="en">
+  <head>
+  	
+	<!-- Leadness, 2020 -->
+	<!-- https://github.com/LeadNess/Quizer -->
+
+  	<title>VKUserInfo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	{% load static %}
+	<link rel="stylesheet" href="{% static 'main/css/sidebar.css' %}">
 	<link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
-</head>
-	<body>
-	<div class="jumbotron">
-		<dir class="container">
-			<h1>
-				{% include "main/includes/header.html" %}
-			</h1>
-			{% block content %}
+  </head>
+  <body>
+	<div class="sidebar-container">
+	  <div class="sidebar-logo" href='/'>
+	    VKUserInfo
+	  </div>
+	  <ul class="sidebar-navigation">
+	  	<li class="header">User</li>
+	  	<li>
+	      <a href="{% url 'main:index' %}">
+	        <i class="fa fa-tachometer" aria-hidden="true"></i> 
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{% url 'main:index' %}">
+	        <i class="fa fa-tachometer" aria-hidden="true"></i> Logout
+	      </a>
+	    </li>
+	    <li class="header">Tracking</li>
+	    <li>
+	      <a href="{% url 'main:add_user' %}">
+	        <i class="fa fa-home" aria-hidden="true"></i> Add user
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{% url 'main:user_info' %}">
+	        <i class="fa fa-home" aria-hidden="true"></i> Get info
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{% url 'main:get_changes' %}">
+	        <i class="fa fa-tachometer" aria-hidden="true"></i> Get changes
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{% url 'main:get_mutual_activity' %}">
+	        <i class="fa fa-tachometer" aria-hidden="true"></i> Get mutual activity
+	      </a>
+	    </li>
+	    <li class="header">Search</li>
+	    <li>
+	      <a href="{% url 'vksearch:get_search_params' %}">
+	        <i class="fa fa-home" aria-hidden="true"></i> Search
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{% url 'vksearch:add_search_filter' %}">
+	        <i class="fa fa-home" aria-hidden="true"></i> New search filter
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{% url 'vksearch:delete_filter' %}">
+	        <i class="fa fa-tachometer" aria-hidden="true"></i> Delete search filter
+	      </a>
+	    </li>
+	    <li class="header">Settings</li>
+	    <li>
+	      <a href="{% url 'main:change_settings' %}">
+	        <i class="fa fa-home" aria-hidden="true"></i> Change
+	      </a>
+	    </li>
+	    <li class="header">Neo4j</li>
+	    <li>
+	      <a href="#">
+	        <i class="fa fa-home" aria-hidden="true"></i> Neo4j browser
+	      </a>
+	    </li>
+	  </ul>
+	</div>
+	<div class="content-container">
+	  <div class="container-fluid">
+	  	<div class="jumbotron">
+	  		{% block content %}
 			{% endblock %}
-			<p>
-				<!--a href="/"                            class="btn btn-primary btn-sm">Main page</a-->
-				<a href="/add_user"                       class="btn btn-primary btn-sm">Add user</a>
-				<a href="/user_info"                      class="btn btn-primary btn-sm">Get user info</a>
-				<a href="/user_changes"                   class="btn btn-primary btn-sm">Get user account changes</a>
-				<a href="/users_relation"                 class="btn btn-primary btn-sm">Get users mutual activity</a>
-				<a href="http://localhost:7474/browser/"  class="btn btn-primary btn-sm">Go to Neo4j browser &raquo;</a>
-			</p>
-			<p>
-				<a href="/search" class="btn btn-primary btn-sm">Search</a>
-				<a href="/add_filter_1" class="btn btn-primary btn-sm">Add new search filter</a>
-				<a href="/delete_filter" class="btn btn-primary btn-sm">Delete search filter</a>
-			</p>
-		</dir>
+	  	</div>
+	  </div>
 	</div>
-	<div class="container">
-		<a style="color: black" href="/settings">Change settings</a>
-	</div>
-	<div class="container">
-		<a style="color: black" href="https://github.com/LeadNess/VKUserInfo">&copy; Korotaev Ivan, 2019</a>
-	</div>
-	</body>
+  </body>
 </html>

@@ -193,6 +193,3 @@ class GraphDB(object):
                 self._graph.merge(FOLLOWS(person, added_user))
 
         return user_info
-
-if __name__ == '__main__':
-    pass
