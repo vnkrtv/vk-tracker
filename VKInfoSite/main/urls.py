@@ -4,7 +4,7 @@ from . import views
 app_name = 'main'
 
 urlpatterns = [
-    url(r'^$',                              views.index,                  name='index'),
+    url(r'^$',                              views.login_page,                  name='login_page'),
     url(r'^settings/$',                     views.change_settings,        name='change_settings'),
     url(r'^changes_result/&',               views.change_settings_result, name='change_settings_result'),
 

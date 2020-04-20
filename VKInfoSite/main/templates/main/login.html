@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Leadness, 2020 -->
+        <!-- https://github.com/LeadNess/VKUserInfo -->
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="icon" href="Favicon.png">
+
+        {% load static %}
+    	<link rel="stylesheet" href="{% static 'main/css/sidebar.css' %}">
+    	<link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
+
+        <title>VKUserInfo</title>
+    </head>
+    <body class="sidebar-logo">
+        <div class="row justify-content-center">
+            <h1 style="color: white">VKUserInfo  </h1>
+        </div>
+        <main class="login-form">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">Зайти в систему</div>
+                            {% if error %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <form action="{% url 'main:login_page' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group row">
+                                        <label for="username" class="col-md-4 col-form-label text-md-right">Учетная запись</label>
+                                        <div class="col-md-6">
+                                            <input type="text" id="username" class="form-control" name="username" required autofocus>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="password" class="col-md-4 col-form-label text-md-right">Пароль</label>
+                                        <div class="col-md-6">
+                                            <input type="password" id="password" class="form-control" name="password" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 offset-md-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            Авторизироваться
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </body>
+</html>

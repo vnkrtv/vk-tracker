@@ -20,12 +20,12 @@
 	  <ul class="sidebar-navigation">
 	  	<li class="header">User</li>
 	  	<li>
-	      <a href="{% url 'main:index' %}">
-	        <i class="fa fa-tachometer" aria-hidden="true"></i> 
+	      <a href="#">
+	        <i class="fa fa-tachometer" aria-hidden="true"></i> {{ user.username }}
 	      </a>
 	    </li>
 	    <li>
-	      <a href="{% url 'main:index' %}">
+	      <a href="{% url 'main:login_page' %}">
 	        <i class="fa fa-tachometer" aria-hidden="true"></i> Logout
 	      </a>
 	    </li>
@@ -66,12 +66,14 @@
 	        <i class="fa fa-tachometer" aria-hidden="true"></i> Delete search filter
 	      </a>
 	    </li>
-	    <li class="header">Settings</li>
-	    <li>
-	      <a href="{% url 'main:change_settings' %}">
-	        <i class="fa fa-home" aria-hidden="true"></i> Change
-	      </a>
-	    </li>
+	    {% if request.user.is_superuser %}
+		    <li class="header">Settings</li>
+		    <li>
+		      <a href="{% url 'main:change_settings' %}">
+		        <i class="fa fa-home" aria-hidden="true"></i> Change
+		      </a>
+		    </li>
+	    {% endif %}
 	    <li class="header">Neo4j</li>
 	    <li>
 	      <a href="#">

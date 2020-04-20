@@ -1,7 +1,8 @@
 import traceback
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
 from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
@@ -9,11 +10,39 @@ from VK_UserRelation import *
 from django.conf import settings
 
 
-def index(request):
-    return render(request, 'main/index.html')
+def unauthenticated_user(view_func):
+    """
+    Checked if user is authorized
+    """
+    def wrapper_func(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return view_func(request, *args, **kwargs)
+        else:
+            return redirect('/')
+    return wrapper_func
+
+
+def login_page(request):
+    logout(request)
+    if 'username' not in request.POST or 'password' not in request.POST:
+        return render(request, 'main/login.html')
+    user = authenticate(
+        username=request.POST['username'],
+        password=request.POST['password']
+    )
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            return redirect('/add_user/')
+        else:
+            return render(request, 'main/login.html', {'error': 'Ошибка: аккаунт пользователя отключен!'})
+    else:
+        return render(request, 'main/login.html', {'error': 'Ошибка: неправильное имя пользователя или пароль!'})
 
 
 def change_settings(request):
+    if not request.user.is_superuser:
+        return redirect('/add_user/')
     info = json.load(open(settings.CONFIG, 'r'))
     return render(request, 'main/changeSettings.html', info)
 
