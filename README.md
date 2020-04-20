@@ -6,6 +6,6 @@ Install:
 - cd VKUserInfo
 - python -m venv venv
 - ./build_djangoapp   #create django app in current folder
-- ./build_project     #create docker containers for docker-compose
+- ./build_docker     #create docker container
 
   

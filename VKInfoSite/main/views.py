@@ -34,9 +34,9 @@ def login_page(request):
             login(request, user)
             return redirect('/add_user/')
         else:
-            return render(request, 'main/login.html', {'error': 'Ошибка: аккаунт пользователя отключен!'})
+            return render(request, 'main/login.html', {'error': 'Error: user account is disabled!'})
     else:
-        return render(request, 'main/login.html', {'error': 'Ошибка: неправильное имя пользователя или пароль!'})
+        return render(request, 'main/login.html', {'error': 'Error: username and password are incorrect!'})
 
 
 def change_settings(request):
