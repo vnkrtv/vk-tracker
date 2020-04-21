@@ -1,0 +1,75 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <h2>Add new filter</h2>
+    <form action="{% url 'vksearch:get_new_filter_2' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">    
+            Select country:
+            <select required="required" name="country" id="country" >
+            {% for country in countries %}
+                <option value="{{ country.id }}">{{ country.title }}</option>
+            {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            Cities number:
+            <input type="number" id="cities_num" value="0" size="2" min="0" max="5" style="width:50px" required="required">
+        </div>
+        <div id="cities" class="form-group"></div>
+        <div class="form-group">
+            University cities number:
+            <input type="number" id="un_cities_num" value="0" size="2" min="0" max="5" style="width:50px" required="required">
+        </div>
+        <div id="un_cities" class="form-group"></div>
+        <div class="form-group">
+            Universities filter:
+            <input type="text" name="universities_filter" id="universities_filter">
+            <small class="text-muted">
+              To search for multiple values, enter them separated by commas. Example: МГУ,МГТУ Баумана,РАНХиГС
+            </small>
+        </div>
+        <input type="submit" class="btn btn-dark" value="Next">
+    </form>
+    <script type="text/javascript">
+        function getCity(i, label, name) {
+            const container = document.createElement('div');
+            container.className = "col-md-4 mb-3";
+
+            const option_label = document.createElement('label');
+            option_label.htmlFor = `${name}_${i}`;
+            option_label.innerHTML = `${label} ${i + 1} :`;
+
+            const option_input = document.createElement('input');
+            option_input.type = 'text';
+            option_input.id = `${name}_${i}`;
+            option_input.name = `${name}_${i}`;
+            option_input.required = 'required';
+
+            container.appendChild(option_label);
+            container.appendChild(option_input);
+
+            return container;
+        }
+
+        const cities = document.getElementById('cities');     
+        const cities_num = document.getElementById('cities_num');
+        cities_num.onkeyup = cities_num.onchange = () => {
+            const count = +(cities_num.value);
+            cities.innerHTML = '';
+            for (let i = 0; i < count; ++i) {
+                cities.appendChild(getCity(i, 'City', 'city'))
+            };
+        };
+
+        const un_cities = document.getElementById('un_cities');
+        const un_cities_num = document.getElementById('un_cities_num');
+        un_cities_num.onkeyup = un_cities_num.onchange = () => {
+            const count = +(un_cities_num.value);
+            un_cities.innerHTML = '';
+            for (let i = 0; i < count; ++i) {
+                un_cities.appendChild(getCity(i, 'University city', 'un_city'))
+            };
+        };
+    </script>
+{% endblock %}

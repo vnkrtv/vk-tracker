@@ -1,15 +1,16 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
+    <h2>Delete filter</h2>
     <form action="{% url 'vksearch:delete_filter_result' %}" method="post">
         {% csrf_token %}
-        Select filter to delete
+        Select filter to delete:
         <select required="required" id="filter" name="filter" >
             {% for filter in filters %}
                 <option value="{{ filter }}">{{ filter }}</option>
             {% endfor %}
         </select><br> 
-        <input type="submit" class="btn btn-dark btn-sm" value="Next">
+        <input type="submit" class="btn btn-dark" value="Delete">
     </form>
     <br/>
 {% endblock %}

@@ -1,33 +1,75 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
+    <h2>Search</h2>
     <form action="{% url 'vksearch:get_search_result' %}" method="post">
         {% csrf_token %}
-        Query string <input type="text" name="q" id="q" style="width:100px"><br>
-        Sex
-        <select required="required" id="sex" name="sex">
-            <option value="2" selected>Male</option>
-            <option value="1">Female</option>
-            <option value="0">Any</option>            
-        </select>
-        <br/>
-        Age from <input type="number" name="age_from" id="age_from" value="18" size="2" min="0" max="100" style="width:50px" required="required">
-        to <input type="number" name="age_to" id="age_to" value="21" size="2" min="0" max="100" style="width:50px" required="required">
-        <br/>
-        Has photo <input type="checkbox" name="has_photo">
-        <br/>
-        Select filter
-        <select required="required" id="filter" name="filter" >
-            {% for filter in filters %}
-                <option value="{{ filter }}">{{ filter }}</option>
-            {% endfor %}
-        </select>
-        <br>Search by the following filter settings:<br>
-        Cities <input type="checkbox" name="cities_selected" checked><br>
-        Universities <input type="checkbox" name="universities_selected" checked><br>
-        Friends <input type="checkbox" name="friends_selected" checked><br>
-        Groups <input type="checkbox" name="groups_selected" checked><br>
-        <input type="submit" class="btn btn-dark btn-sm" value="Search">
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <table>
+                    <tr>
+                        <td>Query string:</td>
+                        <td>
+                            <input type="text" class="form-control" id="q" name="q">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sex:</td>
+                        <td>
+                            <select required="required" id="sex" name="sex">
+                                <option value="2" selected>Male</option>
+                                <option value="1">Female</option>
+                                <option value="0">Any</option>            
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Age:</td>
+                        <td>
+                            from <input type="number" name="age_from" id="age_from" value="18" size="2" min="18" max="100" style="width:60px" required>
+                            to <input type="number" name="age_to" id="age_to" value="20" size="2" min="18" max="100" style="width:60px" required><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Has photo:</td>
+                        <td>    
+                            <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                                <input type="checkbox" class="custom-control-input" id="has_photo" name="has_photo">
+                                <label class="custom-control-label" for="has_photo"></label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Select filter:</td>
+                        <td>
+                            <select required="required" id="filter" name="filter" >
+                            {% for filter in filters %}
+                                <option value="{{ filter }}">{{ filter }}</option>
+                            {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <br>Search by the following filter settings:<br>
+                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="cities_selected" name="cities_selected">
+                    <label class="custom-control-label" for="cities_selected">Cities</label>
+                </div>
+                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="universities_selected" name="universities_selected">
+                    <label class="custom-control-label" for="universities_selected">Universities</label>
+                </div>
+                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="friends_selected" name="friends_selected">
+                    <label class="custom-control-label" for="friends_selected">Friends</label>
+                </div>
+                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="groups_selected" name="groups_selected">
+                    <label class="custom-control-label" for="groups_selected">Groups</label>
+                </div>
+            </div>
+        </div>
+        <input type="submit" class="btn btn-dark" value="Search">
     </form>
     <br/>
 {% endblock %}

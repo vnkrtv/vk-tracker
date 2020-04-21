@@ -11,7 +11,7 @@ def vk_api(method, **kwargs):
     with open(settings.CONFIG, 'r') as file:
         token = json.load(file)['vk_token']
     session = vk.API(vk.Session(access_token=token))
-    return eval('session.' + method)(v=5.102, **kwargs)
+    return eval('session.' + method)(v=5.103, **kwargs)
 
 
 def get_search_params(request):
@@ -384,26 +384,15 @@ def add_search_filter(request):
     info = {
         'countries': [item for item in countries['items'] if item['id'] < 5]
     }
-    return render(request, 'vksearch/add_filter/getCountry.html', info)
+    return render(request, 'vksearch/add_filter/addFilter1.html', info)
 
 
-def get_new_filter_cities(request):
-    country_id = request.POST['country']
-    cities_num = int(request.POST['cities_num'])
-    un_cities_num = int(request.POST['un_cities_num'])
-
-    info = {
-        'cities_num': list(range(cities_num)),
-        'un_cities_num': list(range(un_cities_num)),
-        'country_id': country_id,
-    }
-    return render(request, 'vksearch/add_filter/getCities.html', info)
-
-
-def get_new_filter_universities(request):
-    country_id = request.POST['country_id']
+def get_new_filter_2(request):
+    # country_id = request.POST['country_id']
     cities = []
     cities_titles = []
+
+    return render(request, 'main/info.html', {'message': request.POST})
     for key in request.POST:
         if key.startswith('city'):
             req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
@@ -475,7 +464,7 @@ def get_new_filter_universities(request):
         return render(request, 'vksearch/error.html', info)
 
     info['universities'] = universities
-    return render(request, 'vksearch/add_filter/getUniversities.html', info)
+    return render(request, 'vksearch/add_filter/addFilter2.html', info)
 
 
 def get_new_filter_friends_and_groups(request):
