@@ -20,7 +20,7 @@ def get_search_params(request):
     mdb = VKSearchFiltersStorage.connect_to_mongodb(
         host=config['mdb_host'],
         port=config['mdb_port'],
-        db_name='vk'
+        db_name=config['mdb_dbname']
     )
     info = {
         'filters': mdb.get_all_philters_names()
@@ -69,7 +69,7 @@ def get_search_result(request):
     mdb = VKSearchFiltersStorage.connect_to_mongodb(
         host=config['mdb_host'],
         port=config['mdb_port'],
-        db_name='vk'
+        db_name=config['mdb_dbname']
     )
     filter = mdb.get_filter(filter_name)
 
@@ -568,7 +568,7 @@ def add_new_filter(request):
     mdb = VKSearchFiltersStorage.connect_to_mongodb(
         host=config['mdb_host'],
         port=config['mdb_port'],
-        db_name='vk'
+        db_name=config['mdb_dbname']
     )
     mdb.load_philter(filter)
     info = {

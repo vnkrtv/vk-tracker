@@ -1,47 +1,41 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if not error %}
-        <form action="{% url 'main:get_relations' %}" method="post">
-            {% csrf_token %}
-            <table>
-                <tr>
-                    <td><a style="color: black" href="https://vk.com/{{ first_domain }}">{{ first_user }}</a></td>
-                    <td><a style="color: black" href="https://vk.com/{{ second_domain }}">{{ second_user }}</a></td>
-                </tr>
-                <tr>
-                    <td>
-                        <select size="5" required="required" name="date1">
-                            {% for date1 in first_dates %}
-                                <option value="{{ date1 }}">{{ date1 }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                    <td>
-                        <select size="5" required="required" name="date2">
-                            {% for date2 in second_dates %}
-                                <option value="{{ date2 }}">{{ date2 }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="button" class="btn btn-dark btn-sm" onclick="history.back();" value="Back"/>
-                    </td>
-                    <td>
-                        <input type="submit" class="btn btn-dark btn-sm" value="Choose dates">
-                    </td>
-                </tr>
-            </table>
-            <label for="first_domain">
-                <input type="hidden" id="first_domain" name="first_domain" value="{{ first_domain }}">
-            </label>
-            <label for="second_domain">
-                <input type="hidden" id="second_domain" name="second_domain" value="{{ second_domain }}">
-            </label>
-        </form>
-    {% else %}
-        <p>Error: {{ error }}</p>
-    {% endif %}
+    <h2>Get dates</h2>
+    <form action="{% url 'main:get_relations' %}" method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td><a style="color: black" href="https://vk.com/{{ first_domain }}">{{ first_user }}</a></td>
+                <td><a style="color: black" href="https://vk.com/{{ second_domain }}">{{ second_user }}</a></td>
+            </tr>
+            <tr>
+                <td>
+                    <select size="5" required="required" name="date1">
+                        {% for date1 in first_dates %}
+                            <option value="{{ date1 }}">{{ date1 }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select size="5" required="required" name="date2">
+                        {% for date2 in second_dates %}
+                            <option value="{{ date2 }}">{{ date2 }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" class="btn btn-dark" value="Choose dates">
+                </td>
+            </tr>
+        </table>
+        <label for="first_domain">
+            <input type="hidden" id="first_domain" name="first_domain" value="{{ first_domain }}">
+        </label>
+        <label for="second_domain">
+            <input type="hidden" id="second_domain" name="second_domain" value="{{ second_domain }}">
+        </label>
+    </form>
 {% endblock %}

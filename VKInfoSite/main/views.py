@@ -43,6 +43,7 @@ def login_page(request):
         return render(request, 'main/login.html', {'error': 'Error: username and password are incorrect!'})
 
 
+@unauthenticated_user
 def change_settings(request):
     if not request.user.is_superuser:
         return redirect('/add_user/')
@@ -50,6 +51,7 @@ def change_settings(request):
     return render(request, 'main/settings/changeSettings.html', info)
 
 
+@unauthenticated_user
 def change_settings_result(request):
     default = request.POST.get('default', '')
 
@@ -75,11 +77,13 @@ def change_settings_result(request):
     return render(request, 'main/info.html', info)
 
 
+@unauthenticated_user
 def add_user(request):
     return render(request, 'main/add_user/getDomain.html')
 
 
-def add_result(request):
+@unauthenticated_user
+def add_user_result(request):
     config = json.load(open(settings.CONFIG, 'r'))
     error = ''
 
@@ -98,7 +102,7 @@ def add_result(request):
         mdb = VKInfoStorage.connect_to_mongodb(
             host=config['mdb_host'],
             port=config['mdb_port'],
-            db_name='vk'
+            db_name=config['mdb_dbname']
         )
         mdb.add_user(user_info)
 
@@ -126,11 +130,13 @@ def add_result(request):
     return render(request, 'main/add_user/addResult.html', info)
 
 
+@unauthenticated_user
 def user_info(request):
     return render(request, 'main/user_info/getDomain.html')
 
 
-def get_info(request):
+@unauthenticated_user
+def get_user_info(request):
     config = json.load(open(settings.CONFIG, 'r'))
 
     domain = request.POST['domain']
@@ -140,7 +146,7 @@ def get_info(request):
         mdb = VKInfoStorage.connect_to_mongodb(
             host=config['mdb_host'],
             port=config['mdb_port'],
-            db_name='vk'
+            db_name=config['mdb_dbname']
         )
 
         info['info'] = mdb.get_user(domain=domain)
@@ -156,45 +162,55 @@ def get_info(request):
     return render(request, 'main/user_info/userInfo.html', info)
 
 
+@unauthenticated_user
 def get_changes(request):
     return render(request, 'main/user_changes/getDomain.html')
 
 
+@unauthenticated_user
 def get_dates(request):
     config = json.load(open(settings.CONFIG, 'r'))
     domain = request.POST['domain']
-    info = {}
+    error = ''
 
     try:
         mdb = VKInfoStorage.connect_to_mongodb(
             host=config['mdb_host'],
             port=config['mdb_port'],
-            db_name='vk'
+            db_name=config['mdb_dbname']
         )
 
         if not mdb.check_domain(domain):
-            raise ValueError('user with input domain not found in database')
-        info['info'] = {
+            error = 'user with input domain not found in database'
+        info = {
             'dates': mdb.get_user_info_dates(domain=domain),
             'domain': domain
         }
+        print(info)
+
     except ServerSelectionTimeoutError:
-        info['error'] = 'MongoDB is not connected'
-    except ValueError as e:
-        info['error'] = e
+        error = 'MongoDB is not connected'
     except Exception:
-        info['error'] = traceback.format_exc()
+        error = traceback.format_exc()
+
+    if error:
+        info = {
+            'title': 'Error',
+            'message': error
+        }
+        return render(request, 'main/info.html', info)
 
     return render(request, 'main/user_changes/getDates.html', info)
 
 
+@unauthenticated_user
 def get_user_changes(request):
     config = json.load(open(settings.CONFIG, 'r'))
     domain = request.POST['domain']
     mdb = VKInfoStorage.connect_to_mongodb(
         host=config['mdb_host'],
         port=config['mdb_port'],
-        db_name='vk'
+        db_name=config['mdb_dbname']
     )
     new_info = mdb.get_user(
         domain=domain,
@@ -206,33 +222,35 @@ def get_user_changes(request):
     )
     cmp_info = VKAnalizer(new_info=new_info, old_info=old_info).get_changes()
     info = {
-        'info':   cmp_info,
         'domain': domain,
-        'id':     cmp_info['id']
+        'id':     cmp_info['id'],
+        **cmp_info
     }
     return render(request, 'main/user_changes/getChanges.html', info)
 
 
+@unauthenticated_user
 def get_mutual_activity(request):
     return render(request, 'main/users_relations/getDomains.html')
 
 
+@unauthenticated_user
 def get_users_dates(request):
     config = json.load(open(settings.CONFIG, 'r'))
     first_domain = request.POST['first_domain']
     second_domain = request.POST['second_domain']
-    info = {}
+    error = ''
 
     try:
         mdb = VKInfoStorage.connect_to_mongodb(
             host=config['mdb_host'],
             port=config['mdb_port'],
-            db_name='vk'
+            db_name=config['mdb_dbname']
         )
         if not mdb.check_domain(first_domain):
-            raise ValueError('user with first domain not found in database')
+            error = 'user with first domain not found in database'
         if not mdb.check_domain(second_domain):
-            raise ValueError('user with second domain not found in database')
+            error = 'user with second domain not found in database'
         info = {
             'first_domain':  first_domain,
             'second_domain': second_domain,
@@ -242,22 +260,28 @@ def get_users_dates(request):
             'second_dates':  mdb.get_user_info_dates(domain=second_domain)
         }
     except ServerSelectionTimeoutError:
-        info['error'] = 'MongoDB is not connected'
-    except ValueError as e:
-        info['error'] = e
+        error = 'MongoDB is not connected'
     except Exception:
-        info['error'] = traceback.format_exc()
+        error = traceback.format_exc()
+
+    if error:
+        info = {
+            'title': 'Error',
+            'message': error
+        }
+        return render(request, 'main/info.html', info)
 
     return render(request, 'main/users_relations/getUsersDates.html', info)
 
 
+@unauthenticated_user
 def get_relations(request):
     config = json.load(open(settings.CONFIG, 'r'))
     try:
         mdb = VKInfoStorage.connect_to_mongodb(
             host=config['mdb_host'],
             port=config['mdb_port'],
-            db_name='vk'
+            db_name=config['mdb_dbname']
         )
         user1_info = mdb.get_user(
             domain=request.POST['first_domain'],

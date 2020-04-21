@@ -1,1 +1,0 @@
-{"mdb_host": "localhost", "mdb_port": 27017, "neo_url": "bolt://localhost:7687", "neo_user": "neo4j", "neo_pass": "pass", "vk_token": "b70e8c1466f3c0311b3cdd8f5bea92807a8d46264c37ca7f27c7057b1db676a6afe9699067588db697797"}

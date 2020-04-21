@@ -1,12 +1,13 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
+	<h2>Get changes</h2>
     <form action="{% url 'main:get_dates' %}" method="post">
         {% csrf_token %}
 
         <label for="domain">Enter user domain: </label>
         <input type="text" name="domain" id="domain"/><br/>
-        <input type="submit" class="btn btn-dark btn-sm" value="Get changes">
+        <input type="submit" class="btn btn-dark" value="Get changes">
     </form>
     <br/>
 {% endblock %}

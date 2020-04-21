@@ -12,20 +12,17 @@ class VKUser:
     _first_name = ''
     _last_name = ''
 
-    @staticmethod
-    def get_user(token: str, domain: str):
-        user = VKUser()
-        user._token = token
-        user._session = vk.API(vk.Session(access_token=token))
-        user._domain = user._session.users.get(user_ids=domain, fields='domain', v='5.65')[0]['domain']
+    def open_session(self, token: str, domain: str):
+        self._token = token
+        self._session = vk.API(vk.Session(access_token=token))
+        self._domain = self._session.users.get(user_ids=domain, fields='domain', v='5.65')[0]['domain']
 
-        if user._domain != domain:
+        if self._domain != domain:
             raise Exception('wrong domain')
 
-        user._id = user._session.users.get(user_ids=domain, v='5.65')[0]['id']
-        user._first_name = user._session.users.get(user_ids=domain, v='5.65')[0]['first_name']
-        user._last_name = user._session.users.get(user_ids=domain, v='5.65')[0]['last_name']
-        return user
+        self._id = self._session.users.get(user_ids=domain, v='5.65')[0]['id']
+        self._first_name = self._session.users.get(user_ids=domain, v='5.65')[0]['first_name']
+        self._last_name = self._session.users.get(user_ids=domain, v='5.65')[0]['last_name']
 
     def get_first_name(self):
         return self._first_name
@@ -43,6 +40,14 @@ class VKUser:
 class VKInfo(VKUser):
 
     _timeout = 0.35
+    _api_version = '5.103'
+
+    @staticmethod
+    def get_user(token: str, domain: str):
+        obj = VKInfo()
+        obj.open_session(token, domain)
+        time.sleep(0.35)
+        return obj
 
     def get_main_info(self) -> dict:
         """
@@ -55,7 +60,7 @@ class VKInfo(VKUser):
         try:
             main_info = self._session.users.get(user_ids=self._id,
                                              fields=fields,
-                                             v='5.65')[0]
+                                             v=self._api_version)[0]
             main_info['counters'].pop('online_friends')
         except:
             main_info = None
@@ -84,7 +89,7 @@ class VKInfo(VKUser):
         try:
             friends = self._session.friends.get(user_id=self._id,
                                                 fields='domain,sex,bdate,country,city,contacts,education',
-                                                v='5.65')
+                                                v=self._api_version)
             for friend in friends['items']:
                 friend.pop('online')
         except:
@@ -103,7 +108,7 @@ class VKInfo(VKUser):
                                                          fields='domain,sex,bdate,country,city,contacts,education',
                                                          v='5.65')
         except:
-            followers = None
+            followers = []
 
         time.sleep(self._timeout)
         return followers
@@ -114,7 +119,13 @@ class VKInfo(VKUser):
         :return: dict of
         """
         try:
-            resp = self._session.photos.getAll(owner_id=self._id, count=200, photo_sizes=0, extended=0, v='5.65')
+            resp = self._session.photos.getAll(
+                owner_id=self._id,
+                count=200,
+                photo_sizes=0,
+                extended=0,
+                v=self._api_version
+            )
             time.sleep(self._timeout)
 
             photos = {
@@ -127,31 +138,31 @@ class VKInfo(VKUser):
                 var res = [];
                 var i = 0;
                 while (i < photos.length) {{
-                    var photo = {};
+                    var photo = {{}};
                     photo.photo_id = photos[i];
                     var likes = API.likes.getList({{
                                      "type": "photo",
-                                     "owner_id": {user_id}},
+                                     "owner_id": {user_id},
                                      "item_id": photos[i],
                                      "filter": "likes",
                                      "extended": 1
                     }});
-                    if (likes.f) {{
-                        photo.likes = { "count": 0, "items": [] };
-                    }} else {{
+                    if (likes) {{
                         photo.likes = likes;
+                    }} else {{
+                        photo.likes = {{ "count": 0, "items": [] }};
                     }}
 
                     var comments = API.photos.getComments({{
-                                     "owner_id": {user_id}},
+                                     "owner_id": {user_id},
                                      "photo_id": photos[i],
                                      "fields": "first_name,last_name",
                                      "extended": 1
                     }});
-                    if (comments.f) {{
-                        photo.comments = { "count": 0, "items": [] };
-                    }} else {{
+                    if (comments) {{
                         photo.comments = comments;
+                    }} else {{
+                        photo.comments = {{ "count": 0, "items": [] }};
                     }}
 
                     res.push(photo);
@@ -170,7 +181,7 @@ class VKInfo(VKUser):
             for photos_group in photos_groups:
                 photos_list = list(photos_group)
                 req_code = code.format(photos=photos_list, user_id=self._id).replace('\n', '').replace('  ', '')
-                photos['items'] += self._session.execute(code=req_code, v='5.65')
+                photos['items'] += self._session.execute(code=req_code, v=self._api_version)
                 time.sleep(self._timeout)
         except:
             photos = {
@@ -181,7 +192,13 @@ class VKInfo(VKUser):
 
     def get_wall(self) -> dict:
         try:
-            resp = self._session.wall.get(owner_id=self._id, count=100, photo_sizes=0, extended=0, v='5.65')
+            resp = self._session.wall.get(
+                owner_id=self._id,
+                count=100,
+                photo_sizes=0,
+                extended=0,
+                v=self._api_version
+            )
             time.sleep(self._timeout)
 
             wall = {
@@ -194,20 +211,20 @@ class VKInfo(VKUser):
                 var res = [];
                 var i = 0;
                 while (i < posts.length) {{
-                    var post = {};
+                    var post = {{}};
                     post.post_id = posts[i].id;
-                    post.text = posts[i].text
+                    post.text = posts[i].text;
                     var likes = API.likes.getList({{
                                      "type": "post",
-                                     "owner_id": {user_id}},
+                                     "owner_id": {user_id},
                                      "item_id": posts[i].id,
                                      "filter": "likes",
                                      "extended": 1
                     }});
-                    if (likes.f) {{
-                        post.likes = { "count": 0, "items": [] };
-                    }} else {{
+                    if (likes) {{
                         post.likes = likes;
+                    }} else {{
+                        post.likes = {{ "count": 0, "items": [] }};
                     }}
 
                     if (posts[i].attachments) {{
@@ -215,15 +232,15 @@ class VKInfo(VKUser):
                     }}            
 
                     var comments = API.wall.getComments({{
-                                     "owner_id": {user_id}},
+                                     "owner_id": {user_id},
                                      "post_id": posts[i].id,
                                      "fields": "first_name,last_name",
                                      "extended": 1
                     }});
-                    if (comments.f) {{
-                        post.comments = { "count": 0, "items": [] };
-                    }} else {{
+                    if (comments) {{
                         post.comments = comments;
+                    }} else {{
+                        post.comments = {{ "count": 0, "items": [] }};
                     }}
 
                     res.push(post);
@@ -232,16 +249,22 @@ class VKInfo(VKUser):
                 return res;
             """
             posts = resp['items']
-
             # 25 - max API requests per one execute method
             posts_groups = list(zip(*[iter(posts)] * 12))
             remaining_posts_count = len(posts) - 12 * len(posts_groups)
             posts_groups.append(posts[len(posts) - remaining_posts_count:])
 
             for posts_group in posts_groups:
-                posts_list = list(posts_group)
+                posts_list = []
+                for post in posts_group:
+                    posts_list.append({
+                        'id': post['id'],
+                        'text': post['text']
+                    })
+                    if 'attachments' in post:
+                        posts_list[-1]['attachments'] = post['attachments']
                 req_code = code.format(posts=posts_list, user_id=self._id).replace('\n', '').replace('  ', '')
-                wall['items'] += self._session.execute(code=req_code, v='5.65')
+                wall['items'] += self._session.execute(code=req_code, v=self._api_version)
                 time.sleep(self._timeout)
         except:
             wall = {
@@ -253,10 +276,8 @@ class VKInfo(VKUser):
     def get_groups(self) -> dict:
         try:
             groups = self._session.groups.get(user_id=self._id, count=200, extended=1,
-                                              fields='id,name,screen_name', v='5.65')
+                                              fields='id,name,screen_name', v=self._api_version)
             for item in groups['items']:
-                item.pop('is_advertiser')
-                item.pop('is_member')
                 item.pop('photo_200')
                 item.pop('photo_100')
                 item.pop('photo_50')
@@ -269,9 +290,9 @@ class VKInfo(VKUser):
 
     def get_mutual_friends(self, _id: str) -> dict:
         try:
-            friends = self._session.friends.getMutual(source_uid=self._id, target_uid=_id, v='5.101')
+            friends = self._session.friends.getMutual(source_uid=self._id, target_uid=_id, v=self._api_version)
         except:
-            friends = None
+            friends = []
         time.sleep(self._timeout)
         return friends
 

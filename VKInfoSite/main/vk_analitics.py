@@ -487,7 +487,7 @@ class VKRelation:
         result[1]['likes']['counter'] = likes_count
         result[1]['comments']['counter'] = comm_count
 
-        likes_count = comm_count = 0
+        likes_count, comm_count = 0, 0
 
         for photo in user2_photos['items']:
             photo_id = photo['photo_id']

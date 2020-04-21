@@ -1,28 +1,24 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    {% if not error %}
-        <form action="{% url 'main:get_changes' %}" method="post">
-            {% csrf_token %}
-            <label for="domain">
-                <input type="hidden" id="domain" name="domain" value="{{ info.domain }}">
-            </label>
-            <select size="5" required="required" name="date1">
-            {% for date in info.dates %}
-                    <option value="{{ date }}">{{ date }}</option>
-            {% endfor %}
-            </select>
-            <select size="5" required="required" name="date2">
-            {% for date in info.dates %}
-                    <option value="{{ date }}">{{ date }}</option>
-            {% endfor %}
-            </select>
-            <br>
-            <input type="button" class="btn btn-dark btn-sm" onclick="history.back();" value="Back"/>
-            <input type="submit" class="btn btn-dark btn-sm" value="Choose date">
-            <p></p>
-        </form>
-    {% else %}
-        <p>Error: {{ error }}</p>
-    {% endif %}
+    <h2>Get dates</h2>
+    <form action="{% url 'main:get_user_changes' %}" method="post">
+        {% csrf_token %}
+        <label for="domain">
+            <input type="hidden" id="domain" name="domain" value="{{ domain }}">
+        </label>
+        <select size="5" required="required" name="date1">
+        {% for date in dates %}
+                <option value="{{ date }}">{{ date }}</option>
+        {% endfor %}
+        </select>
+        <select size="5" required="required" name="date2">
+        {% for date in dates %}
+                <option value="{{ date }}">{{ date }}</option>
+        {% endfor %}
+        </select>
+        <br>
+        <input type="submit" class="btn btn-dark" value="Choose dates">
+        <p></p>
+    </form>
 {% endblock %}

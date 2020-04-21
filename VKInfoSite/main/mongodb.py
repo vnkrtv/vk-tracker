@@ -63,7 +63,7 @@ class VKInfoStorage(MongoDB):
         user['id'] = user['main_info']['id']
         user['domain'] = user['main_info']['domain']
         user['date'] = "{hour:02}-{minutes:02} {day}-{month:02}-{year}".format(**user['date'])
-        self._db.insert_one(user)
+        self._col.insert_one(user)
 
     def check_domain(self, domain) -> bool:
         """
@@ -71,7 +71,7 @@ class VKInfoStorage(MongoDB):
         :param domain: vk user domain
         :return: True if user exist in db, False else
         """
-        if self._db.find_one({'domain': domain}):
+        if self._col.find_one({'domain': domain}):
             return True
         return False
 
@@ -98,9 +98,9 @@ class VKInfoStorage(MongoDB):
         info = {}
         if _id != 0:
             if date:
-                info = self._col.find_one({'user_id': _id, 'date': date})
+                info = self._col.find_one({'id': _id, 'date': date})
             else:
-                info = self._col.find_one({'user_id': _id})
+                info = self._col.find_one({'id': _id})
         elif domain != '':
             if date:
                 info = self._col.find_one({'domain': domain, 'date': date})
@@ -117,9 +117,9 @@ class VKInfoStorage(MongoDB):
         """
         info_list = []
         if id != 0:
-            info_list = self._col.find_many({'user_id': _id})
-        elif domain != '':
-            info_list = self._col.find_many({'domain': domain})
+            info_list = self._col.find({'id': _id})
+        if domain != '':
+            info_list = self._col.find({'domain': domain})
         return [info['date'] for info in info_list] if info_list else []
 
 
@@ -153,10 +153,10 @@ class VKOnlineInfoStorage(MongoDB):
         # 2-5 bits - platform
         info |= (platform << 28)
 
-        if self._db.find_one({'user_id': id}):
+        if self._db.find_one({'id': id}):
             # 5 - 32 bits - info
-            info |= (last_seen_timestamp - self._db.find_one({'user_id': id})['start_monitoring_timestamp'])
-            self._db.find_one_and_update({'user_id': id}, {'$push': {
+            info |= (last_seen_timestamp - self._db.find_one({'id': id})['start_monitoring_timestamp'])
+            self._db.find_one_and_update({'id': id}, {'$push': {
                 'activity': info
             }})
         else:
