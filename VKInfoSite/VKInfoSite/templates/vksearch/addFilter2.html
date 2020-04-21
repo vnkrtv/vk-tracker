@@ -1,0 +1,112 @@
+{% extends "main/wrapper.html" %}
+
+{% block content %}
+    <h2>Add new filter(2/2)</h2>
+    <form action="{% url 'vksearch:add_filter_result' %}" method="post">
+        {% csrf_token %}
+        <h4>Filter name</h4>
+        <div class="form-group">
+            Name:
+            <input type="text" id="filter_name" name="filter_name" required>
+        </div>
+        <h4>Universities</h4>
+        <div class="form-group">
+            Universities number:
+            <input type="number" id="universities_num" value="0" size="2" min="0" max="5" style="width:50px" required>
+            <div id="universities_container" class="form-group"></div>
+        </div>
+        <h4>Friends</h4>
+        <div class="form-group">
+            Friends number:
+            <input type="number" id="friends_num" value="0" size="2" min="0" max="5" style="width:50px" required>
+        </div>
+        <div id="friends" class="form-group"></div>
+        <h4>Groups</h4>
+        <div class="form-group">
+            Groups number:
+            <input type="number" id="groups_num" value="0" size="2" min="0" max="5" style="width:50px" required>
+        </div>
+        <div id="groups" class="form-group"></div>
+        <input type="submit" class="btn btn-dark" value="Next">
+        <label for="country_id">
+            <input type="hidden" id="country_id" name="country_id" value="{{ country_id }}">
+        </label>    
+        <label for="cities_ids">
+            <input type="hidden" id="cities_ids" name="cities_ids" value="{{ cities_ids }}">
+        </label>
+        <label for="cities_titles">
+            <input type="hidden" id="cities_titles" name="cities_titles" value="{{ cities_titles }}">
+        </label>
+    </form>
+    <script type="text/javascript">
+        function getInputDiv(i, label, name) {
+            const container = document.createElement('div');
+            container.className = "col-md-4 mb-3";
+
+            const option_label = document.createElement('label');
+            option_label.htmlFor = `${name}_${i}`;
+            option_label.innerHTML = `${label} ${i + 1} :`;
+
+            const option_input = document.createElement('input');
+            option_input.type = 'text';
+            option_input.id = `${name}_${i}`;
+            option_input.name = `${name}_${i}`;
+            option_input.required = 'required';
+
+            container.appendChild(option_label);
+            container.appendChild(option_input);
+
+            return container;
+        }
+
+        function getUniversitySelect(i) {
+            const container = document.createElement('div');
+            container.className = 'col-md-4 mb-3';
+
+            const select = document.createElement('select');
+            select.className = 'form-control';
+            select.name = `university_${i}`;
+            select.id = `university_${i}`;
+
+            for (let i = 0; i < all_universities_count; ++i) {
+                const option = document.createElement('option');
+                option.value = `${universities[i].id}`;
+                option.innerHTML = `${universities[i].title}`;
+                select.appendChild(option);
+            }
+            container.appendChild(select);
+
+            return container;
+        }
+
+        const universities = JSON.parse('{{ universities }}'.replace(/&#39;/gi, '"'));
+        const all_universities_count = parseInt('{{ universities|length }}');
+        const universities_container = document.getElementById("universities_container");
+
+        const universities_num = document.getElementById("universities_num");
+        universities_num.onkeyup = universities_num.onchange = () =>  {
+            universities_container.innerHTML = universities_num.value != 0 ? 'Select univercities:': '';
+            for (let i = 0; i < universities_num.value; ++i) {
+                universities_container.appendChild(getUniversitySelect(i))
+            }
+        };
+
+        const friends = document.getElementById('friends');     
+        const friends_num = document.getElementById('friends_num');
+        friends_num.onkeyup = friends_num.onchange = () => {
+            friends.innerHTML = friends_num.value != 0 ? 'Enter friends domains:': '';
+            for (let i = 0; i < friends_num.value; ++i) {
+                friends.appendChild(getInputDiv(i, 'Domain', 'friend'))
+            };
+        };
+
+        const groups = document.getElementById('groups');
+        const groups_num = document.getElementById('groups_num');
+        groups_num.onkeyup = groups_num.onchange = () => {
+            groups.innerHTML = groups_num.value != 0 ? 'Enter groups screen names:': '';
+            for (let i = 0; i < groups_num.value; ++i) {
+                groups.appendChild(getInputDiv(i, 'Screen name', 'group'))
+            };
+        };
+    </script>
+{% endblock %}

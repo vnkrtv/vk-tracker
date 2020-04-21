@@ -25,7 +25,7 @@ def get_search_params(request):
     info = {
         'filters': mdb.get_all_philters_names()
     }
-    return render(request, 'vksearch/search/searchPage.html', info)
+    return render(request, 'vksearch/searchPage.html', info)
 
 
 def get_search_result(request):
@@ -372,7 +372,7 @@ def get_search_result(request):
         'count': len(persons),
         'persons': persons,
     }
-    return render(request, 'vksearch/search/resultPage.html', info)
+    return render(request, 'vksearch/searchResultPage.html', info)
 
 
 def add_search_filter(request):
@@ -384,52 +384,36 @@ def add_search_filter(request):
     info = {
         'countries': [item for item in countries['items'] if item['id'] < 5]
     }
-    return render(request, 'vksearch/add_filter/addFilter1.html', info)
+    return render(request, 'vksearch/addFilter1.html', info)
 
 
 def get_new_filter_2(request):
-    # country_id = request.POST['country_id']
-    cities = []
-    cities_titles = []
-
-    return render(request, 'main/info.html', {'message': request.POST})
+    country_id = request.POST['country_id']
+    cities_ids, un_cities_ids, cities_titles = [], [], []
     for key in request.POST:
         if key.startswith('city'):
             req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
                 country = vk_api('database.getCountriesById', country_ids=country_id)[0]['title']
                 info = {
-                    'error': 'city %s not found in %s.' % (request.POST[key], country)
+                    'title': 'Error',
+                    'message': "City '%s' not found in %s." % (request.POST[key], country)
                 }
-                return render(request, 'vksearch/error.html', info)
-            cities.append(req['items'][0]['id'])
+                return render(request, 'info.html', info)
+            cities_ids.append(req['items'][0]['id'])
             cities_titles.append(request.POST[key])
-
-    un_cities = []
-    for key in request.POST:
         if key.startswith('un_city'):
             req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
                 info = {
-                    'error': 'city %s not found.' % request.POST[key]
+                    'title': 'Error',
+                    'message': "City '%s' not found." % request.POST[key]
                 }
-                return render(request, 'vksearch/error.html', info)
-            un_cities.append(req['items'][0]['id'])
-
-    info = {
-        'cities': str(cities),
-        'cities_titles': str(cities_titles),
-        'country_id': country_id,
-    }
-
-    if 'university_set' in request.POST:
-        info['university_set'] = 1
-        info['universities_num'] = range(int(request.POST['universities_num']))
-    else:
-        info['university_set'] = 0
+                return render(request, 'info.html', info)
+            un_cities_ids.append(req['items'][0]['id'])
 
     universities = []
-    for city in un_cities:
+    for city in un_cities_ids:
         kwargs = {
             'universities_filter': request.POST['universities_filter'].split(','),
             'country_id': request.POST['country_id'],
@@ -454,54 +438,35 @@ def get_new_filter_2(request):
             return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
         req = vk_api('execute', code=code)
+        time.sleep(0.35)
         for search_by_q in req:
             universities += [item for item in search_by_q['items']]
-
     if not universities:
         info = {
-            'error': 'no universities found.'
+            'title': 'Error',
+            'message': 'Universities not found.'
         }
-        return render(request, 'vksearch/error.html', info)
-
-    info['universities'] = universities
-    return render(request, 'vksearch/add_filter/addFilter2.html', info)
-
-
-def get_new_filter_friends_and_groups(request):
-    print(request.POST)
+        return render(request, 'info.html', info)
     info = {
-        'country_id': request.POST['country_id'],
-        'cities': request.POST['cities'],
-        'cities_titles': request.POST['cities_titles']
+        'universities': universities,
+        'country_id': country_id,
+        'cities_ids': cities_ids,
+        'cities_titles': cities_titles
     }
+    return render(request, 'vksearch/addFilter2.html', info)
 
-    if 'friends_set' in request.POST:
-        info['friends_set'] = 1
-        info['friends_num'] = range(int(request.POST['friends_num']))
-    else:
-        info['friends_set'] = 0
 
-    if 'groups_set' in request.POST:
-        info['groups_set'] = 1
-        info['groups_num'] = range(int(request.POST['groups_num']))
-    else:
-        info['groups_set'] = 0
+def add_filter_result(request):
+    country_id = int(request.POST['country_id'])
+    cities_ids = request.POST['cities_ids']
+    cities_titles = request.POST['cities_titles']
+    filter_name = request.POST['filter_name']
 
-    universities = []
+    universities_ids = []
     for key in request.POST:
-        if 'univercity_' in key:
-            universities.append(int(request.POST[key]))
-    info['universities'] = str(universities)
-    return render(request, 'vksearch/add_filter/getGroupsAndFriends.html', info)
+        if 'university_' in key:
+            universities_ids.append(int(request.POST[key]))
 
-
-def get_new_filter_name(request):
-    info = {
-        'country_id': request.POST['country_id'],
-        'cities': request.POST['cities'],
-        'cities_titles': request.POST['cities_titles'],
-        'universities': request.POST['universities']
-    }
     friends_ids = []
     for key in request.POST:
         if 'friend_' in key:
@@ -509,47 +474,41 @@ def get_new_filter_name(request):
                 friend = vk_api('users.get', user_ids=request.POST[key])[0]
             except vk.api.VkAPIError:
                 info = {
-                    'error': 'user with domain %s not found.' % request.POST[key]
+                    'title': 'Error',
+                    'message': "User with domain '%s' not found." % request.POST[key]
                 }
-                return render(request, 'vksearch/error.html', info)
+                return render(request, 'info.html', info)
             if friend['is_closed']:
                 info = {
-                    'error': 'user account with domain %s is closed.' % request.POST[key]
+                    'title': 'Error',
+                    'message': "User account with domain '%s' is closed." % request.POST[key]
                 }
-                return render(request, 'vksearch/error.html', info)
+                return render(request, 'info.html', info)
             time.sleep(0.34)
             friends_ids.append(friend['id'])
 
-    info['friends'] = str(friends_ids)
-
-    groups_screen_names = []
+    groups_ids = []
     for key in request.POST:
         if 'group_' in key:
             try:
-                id = vk_api('groups.getById', group_id=request.POST[key])[0]['id']
+                _id = vk_api('groups.getById', group_id=request.POST[key])[0]['id']
             except vk.api.VkAPIError:
                 info = {
-                    'error': 'group with screen name %s not found.' % request.POST[key]
+                    'title': 'Error',
+                    'message': "Group with screen name '%s' not found." % request.POST[key]
                 }
-                return render(request, 'vksearch/error.html', info)
+                return render(request, 'info.html', info)
             time.sleep(0.34)
-            groups_screen_names.append(id)
+            groups_ids.append(_id)
 
-    info['groups'] = str(groups_screen_names)
-    return render(request, 'vksearch/add_filter/getName.html', info)
-
-
-def add_new_filter(request):
-    filter_name = request.POST['filter_name']
-
-    filter = {
+    _filter = {
         'name':          filter_name,
-        'country_id':    int(request.POST['country_id']),
-        'cities':        ast.literal_eval(request.POST['cities']),
-        'cities_titles': ast.literal_eval(request.POST['cities_titles']),
-        'universities':  ast.literal_eval(request.POST['universities']) if request.POST['universities'] else [],
-        'friends':       ast.literal_eval(request.POST['friends'])      if request.POST['friends']      else [],
-        'groups':        ast.literal_eval(request.POST['groups'])       if request.POST['groups']       else []
+        'country_id':    country_id,
+        'cities':        ast.literal_eval(cities_ids),
+        'cities_titles': cities_titles,
+        'universities':  universities_ids,
+        'friends':       friends_ids,
+        'groups':        groups_ids
     }
 
     with open(settings.CONFIG, 'r') as file:
@@ -559,11 +518,12 @@ def add_new_filter(request):
         port=config['mdb_port'],
         db_name=config['mdb_dbname']
     )
-    mdb.load_philter(filter)
+    mdb.add_filter(_filter)
     info = {
-        'filter_name': filter_name
+        'title': 'Adding result',
+        'message': f"Filter '{filter_name}' was successfully added to base."
     }
-    return render(request, 'vksearch/add_filter/getNewFilter.html', info)
+    return render(request, 'info.html', info)
 
 
 def delete_filter(request):
@@ -572,27 +532,27 @@ def delete_filter(request):
     mdb = VKSearchFiltersStorage.connect_to_mongodb(
         host=config['mdb_host'],
         port=config['mdb_port'],
-        db_name='vk'
+        db_name=config['mdb_dbname']
     )
     info = {
         'filters': mdb.get_all_philters_names()
     }
-    return render(request, 'vksearch/delete_filter/getName.html', info)
+    return render(request, 'vksearch/deleteFilter.html', info)
 
 
 def delete_filter_result(request):
     filter_name = request.POST['filter']
-
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
     mdb = VKSearchFiltersStorage.connect_to_mongodb(
         host=config['mdb_host'],
         port=config['mdb_port'],
-        db_name='vk'
+        db_name=config['mdb_dbname']
     )
     mdb.delete_philter(filter_name)
     info = {
-        'filter_name': request.POST['filter']
+        'title': 'Deleting result',
+        'message': f"Filter '{filter_name}' was successfully deleted."
     }
-    return render(request, 'vksearch/delete_filter/deleteResult.html', info)
+    return render(request, 'info.html', info)
 

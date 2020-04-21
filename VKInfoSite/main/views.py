@@ -74,7 +74,7 @@ def change_settings_result(request):
         'title': 'Change result',
         'message': 'Settings have been successfully changed.'
     }
-    return render(request, 'main/info.html', info)
+    return render(request, 'info.html', info)
 
 
 @unauthenticated_user
@@ -126,7 +126,7 @@ def add_user_result(request):
             'title': 'Error',
             'message': error
         }
-        return render(request, 'main/info.html', info)
+        return render(request, 'info.html', info)
     return render(request, 'main/add_user/addResult.html', info)
 
 
@@ -198,7 +198,7 @@ def get_dates(request):
             'title': 'Error',
             'message': error
         }
-        return render(request, 'main/info.html', info)
+        return render(request, 'info.html', info)
 
     return render(request, 'main/user_changes/getDates.html', info)
 
@@ -269,7 +269,7 @@ def get_users_dates(request):
             'title': 'Error',
             'message': error
         }
-        return render(request, 'main/info.html', info)
+        return render(request, 'info.html', info)
 
     return render(request, 'main/users_relations/getUsersDates.html', info)
 

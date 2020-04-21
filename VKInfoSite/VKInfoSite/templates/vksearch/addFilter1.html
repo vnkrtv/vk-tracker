@@ -1,22 +1,25 @@
 {% extends "main/wrapper.html" %}
 
 {% block content %}
-    <h2>Add new filter</h2>
+    <h2>Add new filter (1/2)</h2>
     <form action="{% url 'vksearch:get_new_filter_2' %}" method="post">
         {% csrf_token %}
+        <h4>Country</h4>
         <div class="form-group">    
             Select country:
-            <select required="required" name="country" id="country" >
+            <select name="country_id" id="country_id" required>
             {% for country in countries %}
                 <option value="{{ country.id }}">{{ country.title }}</option>
             {% endfor %}
             </select>
         </div>
+        <h4>Cities</h4>
         <div class="form-group">
             Cities number:
             <input type="number" id="cities_num" value="0" size="2" min="0" max="5" style="width:50px" required="required">
         </div>
         <div id="cities" class="form-group"></div>
+        <h4>Universities parametrs</h4>
         <div class="form-group">
             University cities number:
             <input type="number" id="un_cities_num" value="0" size="2" min="0" max="5" style="width:50px" required="required">
