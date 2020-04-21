@@ -30,36 +30,25 @@ def get_search_params(request):
 
 def get_search_result(request):
 
-    def get_result_for_groups(result):
-        new_result = []
-        for group_res_search in result:
-            new_result.append({
-                'count': 0,
-                'items': []
-            })
-            for i in range(len(group_res_search)):
-                new_result[-1]['count'] += group_res_search[i]['count']
-                new_result[-1]['items'] += group_res_search[i]['items']
-        return new_result
-
-    def get_result(result):
-        new_result = [{
+    def parse_response(response):
+        result = {
             'count': 0,
             'items': []
-        }]
-        for i in range(len(result)):
-            new_result[-1]['count'] += result[i]['count']
-            new_result[-1]['items'] += result[i]['items']
-        return new_result
+        }
+        for item in response:
+            result['count'] += item['count']
+            result['items'] += item['items']
+        return result
 
     if 'groups_selected' not in request.POST\
             and 'cities_selected' not in request.POST \
             and 'universities_selected' not in request.POST\
             and 'friends_selected' not in request.POST:
         info = {
-            'error': 'you must specify at least 1 search parameter'
+            'title': 'Error',
+            'message': 'You must specify at least 1 search parameter'
         }
-        return render(request, 'vksearch/error.html', info)
+        return render(request, 'info.html', info)
 
     filter_name = request.POST['filter']
     count = 1000
@@ -91,6 +80,7 @@ def get_search_result(request):
     if 'groups_selected' in request.POST\
             and 'cities_selected' in request.POST\
             and 'universities_selected' in request.POST:
+        response = []
         for group_id in filter['groups']:
             kwargs['group_id'] = group_id
             search_by_universities_and_cities = """
@@ -106,7 +96,7 @@ def get_search_result(request):
                                                    "q": {q},
                                                    "count": {count},
                                                    "country": {country_id},
-                                                   "hometown": "cities[t]",
+                                                   "hometown": cities[t],
                                                    "university": universities[i],
                                                    "sex": {sex},
                                                    "age_from": {age_from},
@@ -122,9 +112,9 @@ def get_search_result(request):
                     }}
                     return res;
             """.format(**kwargs).replace('\n', '').replace('  ', '')
+            response += vk_api('execute', code=search_by_universities_and_cities)
             time.sleep(0.34)
-            result.append(vk_api('execute', code=search_by_universities_and_cities))
-        result = get_result_for_groups(result)
+        result.append(parse_response(response))
 
     if 'groups_selected' not in request.POST\
             and 'cities_selected' in request.POST\
@@ -157,73 +147,139 @@ def get_search_result(request):
                 }}
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
+        response = vk_api('execute', code=search_by_universities_and_cities)
         time.sleep(0.34)
-        result += vk_api('execute', code=search_by_universities_and_cities)
-        result = get_result(result)
+        result.append(parse_response(response))
+
+    if 'groups_selected' not in request.POST \
+            and 'cities_selected' in request.POST \
+            and 'universities_selected' not in request.POST:
+        search_by_cities = """
+                            var cities = {cities};
+                            var res = [];
+                            var i = 0;
+
+                            while (i < cities.length) {{
+                                var users = API.users.search({{
+                                                        "q": {q},
+                                                        "count": {count},
+                                                        "country": {country_id},
+                                                        "hometown": cities[i],
+                                                        "sex": {sex},
+                                                        "age_from": {age_from},
+                                                        "age_to": {age_to},
+                                                        "has_photo": {has_photo},
+                                                        "fields": "photo_400_orig,domain,relation,sex"      
+                                                    }});
+                                res.push(users);
+                                i = i + 1;
+                            }}
+                            return res;
+                    """.format(**kwargs).replace('\n', '').replace('  ', '')
+        response = vk_api('execute', code=search_by_cities)
+        time.sleep(0.34)
+        result.append(parse_response(response))
+
+    if 'groups_selected' not in request.POST \
+            and 'cities_selected' not in request.POST \
+            and 'universities_selected' in request.POST:
+        search_by_universities = """
+                            var universities = {universities};
+                            var res = [];
+                            var i = 0;
+
+                            while (i < universities.length) {{
+                                var users = API.users.search({{
+                                                        "q": {q},
+                                                        "count": {count},
+                                                        "country": {country_id},
+                                                        "sex": {sex},
+                                                        "university": universities[i],
+                                                        "age_from": {age_from},
+                                                        "age_to": {age_to},
+                                                        "has_photo": {has_photo},
+                                                        "fields": "photo_400_orig,domain,relation,sex"      
+                                                    }});
+                                res.push(users);
+                                i = i + 1;
+                            }}
+                            return res;
+                    """.format(**kwargs).replace('\n', '').replace('  ', '')
+        response = vk_api('execute', code=search_by_universities)
+        time.sleep(0.34)
+        result.append(parse_response(response))
 
     if 'groups_selected' in request.POST\
             and 'cities_selected' in request.POST\
             and 'universities_selected' not in request.POST:
-        for group_id in filter['groups']:
-            kwargs['group_id'] = group_id
-            search_by_cities = """
-                    var cities = {cities};
-                    var res = [];
-                    var i = 0;
+        kwargs['groups'] = filter['groups']
+        search_by_groups_and_cities = """
+                var groups = {groups};
+                var cities = {cities};
+                var res = [];
+                var i = 0;
 
-                    while (i < cities.length) {{
+                while (i < groups.length) {{
+                    var t = 0;
+                    while (t < cities.length) {{
                         var users = API.users.search({{
-                                                "q": {q},
-                                                "count": {count},
-                                                "country": {country_id},
-                                                "hometown": cities[i],
-                                                "sex": {sex},
-                                                "age_from": {age_from},
-                                                "age_to": {age_to},
-                                                "has_photo": {has_photo},
-                                                "group_id": {group_id},
-                                                "fields": "photo_400_orig,domain,relation,sex"      
-                                            }});
+                                               "q": {q},
+                                               "count": {count},
+                                               "country": {country_id},
+                                               "hometown": cities[t],
+                                               "group_id": groups[i],
+                                               "sex": {sex},
+                                               "age_from": {age_from},
+                                               "age_to": {age_to},
+                                               "has_photo": {has_photo},
+                                               "fields": "photo_400_orig,domain,relation,sex"      
+                                               }});
                         res.push(users);
-                        i = i + 1;
+                        t = t + 1;
                     }}
-                    return res;
-            """.format(**kwargs).replace('\n', '').replace('  ', '')
-            time.sleep(0.34)
-            result.append(vk_api('execute', code=search_by_cities))
-        result = get_result_for_groups(result)
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        response = vk_api('execute', code=search_by_groups_and_cities)
+        time.sleep(0.34)
+        result.append(parse_response(response))
 
     if 'groups_selected' in request.POST\
             and 'cities_selected' not in request.POST\
             and 'universities_selected' in request.POST:
-        for group_id in filter['groups']:
-            kwargs['group_id'] = group_id
-            search_by_universities = """
-                    var universities = {universities};
-                    var res = [];
-                    var i = 0;
+        kwargs['groups'] = filter['groups']
+        search_by_groups_and_universities = """
+                var groups = {groups};
+                var universities = {universities};
+                var res = [];
+                var i = 0;
 
-                    while (i < universities.length) {{
+                while (i < groups.length) {{
+                    var t = 0;
+                    while (t < universities.length) {{
                         var users = API.users.search({{
-                                                "q": {q},
-                                                "count": {count},
-                                                "country": {country_id},
-                                                "sex": {sex},
-                                                "university": universities[i],
-                                                "age_from": {age_from},
-                                                "age_to": {age_to},
-                                                "has_photo": {has_photo},
-                                                "group_id": {group_id},
-                                                "fields": "photo_400_orig,domain,relation,sex"      
-                                            }});
+                                               "q": {q},
+                                               "count": {count},
+                                               "country": {country_id},
+                                               "university": universities[t],
+                                               "group_id": groups[i],
+                                               "sex": {sex},
+                                               "age_from": {age_from},
+                                               "age_to": {age_to},
+                                               "has_photo": {has_photo},
+                                               "fields": "photo_400_orig,domain,relation,sex"      
+                                               }});
                         res.push(users);
-                        i = i + 1;
+                        t = t + 1;
                     }}
-                    return res;
-            """.format(**kwargs).replace('\n', '').replace('  ', '')
-            time.sleep(0.34)
-            result.append(vk_api('execute', code=search_by_universities))
-        result = get_result_for_groups(result)
+                    i = i + 1;
+                }}
+                return res;
+        """.format(**kwargs).replace('\n', '').replace('  ', '')
+        response = vk_api('execute', code=search_by_groups_and_universities)
+        time.sleep(0.34)
+        result.append(parse_response(response))
 
     if 'groups_selected' in request.POST\
             and 'cities_selected' not in request.POST\
@@ -252,66 +308,8 @@ def get_search_result(request):
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
         time.sleep(0.34)
-        result += vk_api('execute', code=search_by_groups)
-
-    if 'groups_selected' not in request.POST \
-            and 'cities_selected' in request.POST \
-            and 'universities_selected' not in request.POST:
-        search_by_cities = """
-                var cities = {cities};
-                var res = [];
-                var i = 0;
-
-                while (i < cities.length) {{
-                    var users = API.users.search({{
-                                            "q": {q},
-                                            "count": {count},
-                                            "country": {country_id},
-                                            "sex": {sex},
-                                            "age_from": {age_from},
-                                            "age_to": {age_to},
-                                            "has_photo": {has_photo},
-                                            "hometown": cities[i],
-                                            "fields": "photo_400_orig,domain,relation,sex"      
-                                        }});
-                    res.push(users);
-                    i = i + 1;
-                }}
-                return res;
-        """.format(**kwargs).replace('\n', '').replace('  ', '')
-        time.sleep(0.34)
-        result += vk_api('execute', code=search_by_cities)
-        result = get_result(result)
-
-    if 'groups_selected' not in request.POST \
-            and 'cities_selected' not in request.POST \
-            and 'universities_selected' in request.POST:
-        search_by_universities = """
-                var universities = {universities};
-                var res = [];
-                var i = 0;
-
-                while (i < universities.length) {{
-                    var users = API.users.search({{
-                                            "q": {q},
-                                            "count": {count},
-                                            "country": {country_id},
-                                            "sex": {sex},
-                                            "age_from": {age_from},
-                                            "age_to": {age_to},
-                                            "has_photo": {has_photo},
-                                            "university": universities[i],
-                                            "fields": "photo_400_orig,domain,relation,sex"      
-                                        }});
-                    res.push(users);
-                    i = i + 1;
-                }}
-                return res;
-        """.format(**kwargs).replace('\n', '').replace('  ', '')
-        time.sleep(0.34)
-
-        result += vk_api('execute', code=search_by_universities)
-        result = get_result(result)
+        response = vk_api('execute', code=search_by_groups)
+        result.append(parse_response(response))
 
     if 'friends_selected' in request.POST:
         search_by_friends = """
@@ -333,11 +331,15 @@ def get_search_result(request):
 
     result_ids = []
     for search_res in result:
-        ids = set()
-        if search_res:
-            for person in search_res['items']:
-                ids.add(person['id'])
-            result_ids.append(ids)
+        ids = {person['id'] for person in search_res['items']}
+        result_ids.append(ids)
+
+    if not result_ids:
+        info = {
+            'title': 'Error',
+            'message': '0 persons were found.'
+        }
+        return render(request, 'info.html', info)
 
     unique_ids = result_ids[0].copy()
     for ids in result_ids:
@@ -354,19 +356,19 @@ def get_search_result(request):
         8: 'in a civil marriage',       # 'в гражданском браке',
         0: 'not indicated',             # 'не указано'
     }
+
     persons = []
     for search_res in result:
-        if search_res:
-            for person in search_res['items']:
-                fullname = person['first_name'] + ' ' + person['last_name']
-                if person['id'] in unique_ids and kwargs['q'][1:-1] in fullname:
-                    if person['sex'] == int(kwargs['sex']) or int(kwargs['sex']) == 0:
-                        if 'relation' in person:
-                            person['relation'] = relation_options[person['relation']]
-                        else:
-                            person['relation'] = relation_options[0]
-                        persons.append(person)
-                        unique_ids.remove(person['id'])
+        for person in search_res['items']:
+            fullname = person['first_name'] + ' ' + person['last_name']
+            if person['id'] in unique_ids and kwargs['q'][1:-1] in fullname:
+                if person['sex'] == int(kwargs['sex']) or int(kwargs['sex']) == 0:
+                    if 'relation' in person:
+                        person['relation'] = relation_options[person['relation']]
+                    else:
+                        person['relation'] = relation_options[0]
+                    persons.append(person)
+                    unique_ids.remove(person['id'])
 
     info = {
         'count': len(persons),
