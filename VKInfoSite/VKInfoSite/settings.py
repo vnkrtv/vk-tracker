@@ -16,8 +16,7 @@ import sys
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-PROJECT_ROOT = os.path.dirname(__file__)
-sys.path.insert(0, os.path.join(PROJECT_ROOT, 'apps'))
+PROJECT_ROOT = os.path.join(BASE_DIR, 'VKInfoSite')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -36,9 +35,9 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'main',
-    'dashboard',
-    'vksearch',
+    'main.apps.MainConfig',
+    'dashboard.apps.DashboardConfig',
+    'vksearch.apps.VKSearchConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +61,9 @@ ROOT_URLCONF = 'VKInfoSite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(PROJECT_ROOT, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,9 +129,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'
 
-CONFIG_ROOT = os.path.join(BASE_DIR, 'config')
+CONFIG_ROOT = os.path.join(PROJECT_ROOT, 'config')
 CONFIG = os.path.join(CONFIG_ROOT, 'config.json')
 DEFAULT_CONFIG = os.path.join(CONFIG_ROOT, 'default_config.json')

@@ -1,41 +1,69 @@
-from VK_User import *
-from datetime import datetime as time
-from time import clock, sleep
-from GraphDB import GraphDB
-from MongoDB import VKMongoDB
+import vk
+import time
+from datetime import datetime
 
 
-class VK_UserInfo(VK_User):
+class VKUser:
+
+    _token = ''
+    _session = None
+    _domain = ''
+    _id = ''
+    _first_name = ''
+    _last_name = ''
+
+    @staticmethod
+    def get_user(token: str, domain: str):
+        user = VKUser()
+        user._token = token
+        user._session = vk.API(vk.Session(access_token=token))
+        user._domain = user._session.users.get(user_ids=domain, fields='domain', v='5.65')[0]['domain']
+
+        if user._domain != domain:
+            raise Exception('wrong domain')
+
+        user._id = user._session.users.get(user_ids=domain, v='5.65')[0]['id']
+        user._first_name = user._session.users.get(user_ids=domain, v='5.65')[0]['first_name']
+        user._last_name = user._session.users.get(user_ids=domain, v='5.65')[0]['last_name']
+        return user
+
+    def get_first_name(self):
+        return self._first_name
+
+    def get_last_name(self):
+        return self._last_name
+
+    def get_id(self):
+        return self._id
+
+    def get_domain(self):
+        return self._domain
+
+
+class VKInfo(VKUser):
+
     _timeout = 0.35
 
-    def __init__(self, token, domain):
-        """
-
-        :param token: vk token (must have all rights)
-        :param domain: vk user domain
-        """
-        super(VK_UserInfo, self).__init__(token, domain)
-
-    def get_main_info(self):
+    def get_main_info(self) -> dict:
         """
 
         :return: dict of vk user main info
         """
-        fields  = 'counters,photo_id,verified,sex,bdate,city,country,home_town,domain,contacts,site,education,universities,schools,'
+        fields = 'counters,photo_id,verified,sex,bdate,city,country,home_town,domain,contacts,site,education,universities,schools,'
         fields += 'status,followers_count,occupation,relatives,relation,personal,connections,activities,interests,about,career'
 
         try:
-            main_info = self._user.users.get(user_ids=self._id,
+            main_info = self._session.users.get(user_ids=self._id,
                                              fields=fields,
                                              v='5.65')[0]
             main_info['counters'].pop('online_friends')
         except:
             main_info = None
 
-        sleep(self._timeout)
+        time.sleep(self._timeout)
         return main_info
 
-    def get_friends(self):
+    def get_friends(self) -> dict:
         """
 
         :return: dict of vk user's friends
@@ -54,40 +82,40 @@ class VK_UserInfo(VK_User):
 
         """
         try:
-            friends = self._user.friends.get(user_id=self._id,
-                                             fields='domain,sex,bdate,country,city,contacts,education',
-                                             v='5.65')
+            friends = self._session.friends.get(user_id=self._id,
+                                                fields='domain,sex,bdate,country,city,contacts,education',
+                                                v='5.65')
             for friend in friends['items']:
                 friend.pop('online')
         except:
             friends = None
 
-        sleep(self._timeout)
+        time.sleep(self._timeout)
         return friends
 
-    def get_followers(self):
+    def get_followers(self) -> dict:
         """
 
         :return: dict of vk user's followers
         """
         try:
-            followers = self._user.users.getFollowers(user_id=self._id,
-                                                      fields='domain,sex,bdate,country,city,contacts,education',
-                                                      v='5.65')
+            followers = self._session.users.getFollowers(user_id=self._id,
+                                                         fields='domain,sex,bdate,country,city,contacts,education',
+                                                         v='5.65')
         except:
             followers = None
 
-        sleep(self._timeout)
+        time.sleep(self._timeout)
         return followers
 
-    def get_photos(self):
+    def get_photos(self) -> dict:
         """
 
         :return: dict of
         """
         try:
-            resp = self._user.photos.getAll(owner_id=self._id, count=200, photo_sizes=0, extended=0, v='5.65')
-            sleep(self._timeout)
+            resp = self._session.photos.getAll(owner_id=self._id, count=200, photo_sizes=0, extended=0, v='5.65')
+            time.sleep(self._timeout)
 
             photos = {
                 'count': resp['count'],
@@ -113,7 +141,7 @@ class VK_UserInfo(VK_User):
                     }} else {{
                         photo.likes = likes;
                     }}
-                    
+
                     var comments = API.photos.getComments({{
                                      "owner_id": {user_id}},
                                      "photo_id": photos[i],
@@ -125,7 +153,7 @@ class VK_UserInfo(VK_User):
                     }} else {{
                         photo.comments = comments;
                     }}
-                    
+
                     res.push(photo);
                     i = i + 1;
                 }}
@@ -142,8 +170,8 @@ class VK_UserInfo(VK_User):
             for photos_group in photos_groups:
                 photos_list = list(photos_group)
                 req_code = code.format(photos=photos_list, user_id=self._id).replace('\n', '').replace('  ', '')
-                photos['items'] += self._user.execute(code=req_code, v='5.65')
-                sleep(self._timeout)
+                photos['items'] += self._session.execute(code=req_code, v='5.65')
+                time.sleep(self._timeout)
         except:
             photos = {
                 'count': 0,
@@ -151,10 +179,10 @@ class VK_UserInfo(VK_User):
             }
         return photos
 
-    def get_wall(self):
+    def get_wall(self) -> dict:
         try:
-            resp = self._user.wall.get(owner_id=self._id, count=100, photo_sizes=0, extended=0, v='5.65')
-            sleep(self._timeout)
+            resp = self._session.wall.get(owner_id=self._id, count=100, photo_sizes=0, extended=0, v='5.65')
+            time.sleep(self._timeout)
 
             wall = {
                 'count': resp['count'],
@@ -181,11 +209,11 @@ class VK_UserInfo(VK_User):
                     }} else {{
                         post.likes = likes;
                     }}
-                    
+
                     if (posts[i].attachments) {{
                         post.attachments = posts[i].attachments;
                     }}            
-        
+
                     var comments = API.wall.getComments({{
                                      "owner_id": {user_id}},
                                      "post_id": posts[i].id,
@@ -213,8 +241,8 @@ class VK_UserInfo(VK_User):
             for posts_group in posts_groups:
                 posts_list = list(posts_group)
                 req_code = code.format(posts=posts_list, user_id=self._id).replace('\n', '').replace('  ', '')
-                wall['items'] += self._user.execute(code=req_code, v='5.65')
-                sleep(self._timeout)
+                wall['items'] += self._session.execute(code=req_code, v='5.65')
+                time.sleep(self._timeout)
         except:
             wall = {
                 'count': 0,
@@ -222,10 +250,10 @@ class VK_UserInfo(VK_User):
             }
         return wall
 
-    def get_groups(self):
+    def get_groups(self) -> dict:
         try:
-            groups = self._user.groups.get(user_id=self._id, count=200, extended=1,
-                                                     fields='id,name,screen_name', v='5.65')
+            groups = self._session.groups.get(user_id=self._id, count=200, extended=1,
+                                              fields='id,name,screen_name', v='5.65')
             for item in groups['items']:
                 item.pop('is_advertiser')
                 item.pop('is_member')
@@ -236,68 +264,90 @@ class VK_UserInfo(VK_User):
             groups = {
                 'items': []
             }
-        sleep(self._timeout)
+        time.sleep(self._timeout)
         return groups
 
-    def get_mutual_friends(self, id):
+    def get_mutual_friends(self, _id: str) -> dict:
         try:
-            friends = self._user.friends.getMutual(source_uid=self._id, target_uid=id, v='5.101')
+            friends = self._session.friends.getMutual(source_uid=self._id, target_uid=_id, v='5.101')
         except:
             friends = None
-        sleep(self._timeout)
+        time.sleep(self._timeout)
         return friends
 
-    def get_all_info(self):
-
-        info = {}
-        start = clock()
-
-        print('Start loading information about %s\n' % (self._user_name + ' ' + self._user_surname))
-
-        info['main_info'] = self.get_main_info()
-        print('[%d s]Main information was loaded...\n' % (clock() - start))
-
-        info['friends'] = self.get_friends()
-        print('[%d s]Friends were loaded...\n' % (clock() - start))
-
-        info['followers'] = self.get_followers()
-        print('[%d s]Followers were loaded...\n' % (clock() - start))
-
-        info['groups'] = self.get_groups()
-        print('[%d s]Groups were loaded...\n' % (clock() - start))
-
-        info['wall'] = self.get_wall()
-        print('[%d s]Wallposts were loaded...\n' % (clock() - start))
-
-        info['photos'] = self.get_photos()
-        print('[%d s]Photos were loaded...\n' % (clock() - start))
-
-        print('Information about %s was successfully loaded\n' % (self._user_name + ' ' + self._user_surname))
-
-        date = time.now().timetuple()
-        info['date'] = {
-            'year': date[0],
-            'month': date[1],
-            'day': date[2],
-            'hour': date[3],
-            'minutes': date[4]
+    def get_all_info(self) -> dict:
+        date = datetime.now().timetuple()
+        info = {
+            'main_info': self.get_main_info(),
+            'friends': self.get_friends(),
+            'followers': self.get_followers(),
+            'groups': self.get_groups(),
+            'wall': self.get_wall(),
+            'photos': self.get_photos(),
+            'date': {
+                'year': date[0],
+                'month': date[1],
+                'day': date[2],
+                'hour': date[3],
+                'minutes': date[4]
+            }
         }
-
         return info
 
-    def add_user_to_DBs(self, mdb_host, mdb_port, neo_url, neo_user, neo_pass):
-        """
-        Add user to Mongo db and Neo5j db
-        :param mongo_host:
-        :param mongo_port:
-        :param url:
-        :param user:
-        :param password:
-        :return: json with vk user info
-        """
-        info = self.get_all_info()
 
-        VKMongoDB(host=mdb_host, port=mdb_port).add_user(info)
-        GraphDB(url=neo_url, user=neo_user, password=neo_pass).add_user(info)
+class VKUserActivity(VKUser):
 
-        return info
+    def check_user_activity(self):
+        user = self._session.users.get(user_ids=self._domain, fields='last_seen,online', v='5.103')[0]
+
+        is_online = user['online']
+        last_seen_timestamp = user['last_seen']['time']
+        last_seen_platform = user['last_seen']['platform'] - 1
+
+        # self.load_activity(last_seen_timestamp, is_online, last_seen_platform)
+
+    def get_activity(self):
+        def parse_info(start_monitoring_timestamp, activity_list):
+            # strtime = time.strftime('%Y-%m-%d %H:%M:%S')
+            platform_dict = {
+                1: 'm.vk.com',
+                2: 'iPhone app',
+                3: 'iPad app',
+                4: 'Android app',
+                5: 'Windows Phone app',
+                6: 'Windows 8 app',
+                7: 'web (vk.com)',
+                8: 'VK Mobile'
+            }
+
+            activity = []
+            for info in activity_list:
+                delta = (info & 0b111111111111111111111111111)
+                online = (info >> 31)
+                platform = (info >> 28 & 0b111) + 1
+                timestamp = start_monitoring_timestamp + delta
+                last_seen_time = datetime.fromtimestamp(timestamp)
+                """
+                activity.append({
+                    'online':   online,
+                    'platform': platform_dict[platform],
+                    'minute':   last_seen_time.minute,
+                    'hour':     last_seen_time.hour,
+                    'day':      last_seen_time.day,
+                    'month':    last_seen_time.month,
+                    'year':     last_seen_time.year
+                })
+                """
+                activity.append({
+                    'online':   online,
+                    'platform': platform_dict[platform],
+                    'time': last_seen_time.strftime('%Y-%m-%d %H:%M:%S')
+                })
+            return activity
+
+        #with open(CONFIG_FILE, 'r') as file:
+        #    config = json.load(file)
+        #    mdb = VKActivityMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+        #    activity = parse_info(*mdb.get_activity(self._id))
+        #return activity
+

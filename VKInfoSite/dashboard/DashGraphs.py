@@ -1,13 +1,10 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import plotly.offline as plot_offline
 import plotly.graph_objs as go
 import pandas as pd
 import json
-from VK_UserInfo import *
 from datetime import datetime as dt
-from config import *
 
 
 class GenderPieChart:
@@ -407,8 +404,8 @@ class FriendsActivityGraph:
                     fullname = profiles[id]
                     df.loc[id] = [0, 1, fullname, 0]
 
-        token = json.load(open(CONFIG_FILE, 'r'))['vk_token']
-        session = vk.API(vk.Session(access_token=token))
+        token = {}  # json.load(open(CONFIG_FILE, 'r'))['vk_token']
+        # session = vk.API(vk.Session(access_token=token))
         code = """
                     var friends = {friends};
                     var res = [];

@@ -1,17 +1,15 @@
-import traceback
 import ast
-
+import vk
+import json
+import time
 from django.shortcuts import render
-from requests.exceptions import ConnectionError
-from MongoDB import *
-from SQLiteDB import *
+from .mongodb import VKSearchFiltersStorage
 from django.conf import settings
 
 
 def vk_api(method, **kwargs):
     with open(settings.CONFIG, 'r') as file:
         token = json.load(file)['vk_token']
-
     session = vk.API(vk.Session(access_token=token))
     return eval('session.' + method)(v=5.102, **kwargs)
 
@@ -19,7 +17,11 @@ def vk_api(method, **kwargs):
 def get_search_params(request):
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
-    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    mdb = VKSearchFiltersStorage.connect_to_mongodb(
+        host=config['mdb_host'],
+        port=config['mdb_port'],
+        db_name='vk'
+    )
     info = {
         'filters': mdb.get_all_philters_names()
     }
@@ -64,7 +66,11 @@ def get_search_result(request):
 
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
-    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    mdb = VKSearchFiltersStorage.connect_to_mongodb(
+        host=config['mdb_host'],
+        port=config['mdb_port'],
+        db_name='vk'
+    )
     filter = mdb.get_filter(filter_name)
 
     kwargs = {
@@ -116,7 +122,7 @@ def get_search_result(request):
                     }}
                     return res;
             """.format(**kwargs).replace('\n', '').replace('  ', '')
-            sleep(0.34)
+            time.sleep(0.34)
             result.append(vk_api('execute', code=search_by_universities_and_cities))
         result = get_result_for_groups(result)
 
@@ -151,7 +157,7 @@ def get_search_result(request):
                 }}
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
-        sleep(0.34)
+        time.sleep(0.34)
         result += vk_api('execute', code=search_by_universities_and_cities)
         result = get_result(result)
 
@@ -183,7 +189,7 @@ def get_search_result(request):
                     }}
                     return res;
             """.format(**kwargs).replace('\n', '').replace('  ', '')
-            sleep(0.34)
+            time.sleep(0.34)
             result.append(vk_api('execute', code=search_by_cities))
         result = get_result_for_groups(result)
 
@@ -215,7 +221,7 @@ def get_search_result(request):
                     }}
                     return res;
             """.format(**kwargs).replace('\n', '').replace('  ', '')
-            sleep(0.34)
+            time.sleep(0.34)
             result.append(vk_api('execute', code=search_by_universities))
         result = get_result_for_groups(result)
 
@@ -245,7 +251,7 @@ def get_search_result(request):
                 }}
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
-        sleep(0.34)
+        time.sleep(0.34)
         result += vk_api('execute', code=search_by_groups)
 
     if 'groups_selected' not in request.POST \
@@ -273,7 +279,7 @@ def get_search_result(request):
                 }}
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
-        sleep(0.34)
+        time.sleep(0.34)
         result += vk_api('execute', code=search_by_cities)
         result = get_result(result)
 
@@ -302,7 +308,7 @@ def get_search_result(request):
                 }}
                 return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
-        sleep(0.34)
+        time.sleep(0.34)
 
         result += vk_api('execute', code=search_by_universities)
         result = get_result(result)
@@ -366,12 +372,6 @@ def get_search_result(request):
         'count': len(persons),
         'persons': persons,
     }
-    info['result'] = json.dumps(result, indent=2)
-    info['result_ids'] = [len(item) for item in result_ids]
-    info['unique_ids'] = unique_ids
-    info['request'] = request.POST
-    info['filter'] = filter
-    info['res_len'] = len(result)
     return render(request, 'vksearch/search/resultPage.html', info)
 
 
@@ -528,7 +528,7 @@ def get_new_filter_name(request):
                     'error': 'user account with domain %s is closed.' % request.POST[key]
                 }
                 return render(request, 'vksearch/error.html', info)
-            sleep(0.34)
+            time.sleep(0.34)
             friends_ids.append(friend['id'])
 
     info['friends'] = str(friends_ids)
@@ -543,7 +543,7 @@ def get_new_filter_name(request):
                     'error': 'group with screen name %s not found.' % request.POST[key]
                 }
                 return render(request, 'vksearch/error.html', info)
-            sleep(0.34)
+            time.sleep(0.34)
             groups_screen_names.append(id)
 
     info['groups'] = str(groups_screen_names)
@@ -565,9 +565,12 @@ def add_new_filter(request):
 
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
-    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    mdb = VKSearchFiltersStorage.connect_to_mongodb(
+        host=config['mdb_host'],
+        port=config['mdb_port'],
+        db_name='vk'
+    )
     mdb.load_philter(filter)
-
     info = {
         'filter_name': filter_name
     }
@@ -577,7 +580,11 @@ def add_new_filter(request):
 def delete_filter(request):
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
-    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    mdb = VKSearchFiltersStorage.connect_to_mongodb(
+        host=config['mdb_host'],
+        port=config['mdb_port'],
+        db_name='vk'
+    )
     info = {
         'filters': mdb.get_all_philters_names()
     }
@@ -589,9 +596,12 @@ def delete_filter_result(request):
 
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
-    mdb = VKSearchFilterMongoDB(host=config['mdb_host'], port=config['mdb_port'])
+    mdb = VKSearchFiltersStorage.connect_to_mongodb(
+        host=config['mdb_host'],
+        port=config['mdb_port'],
+        db_name='vk'
+    )
     mdb.delete_philter(filter_name)
-
     info = {
         'filter_name': request.POST['filter']
     }

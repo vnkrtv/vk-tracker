@@ -1,9 +1,6 @@
 venv/
 .idea/
-docker/VKInfoSite
-docker/requirements.txt
-VKInfoSite/config/default_config.json
+VKInfoSite/VKInfoSite/config/config.json
+VKInfoSite/VKInfoSite/config/default_config.json
 *.pyc
-db/db.logs
-db/VKDatabase.db
-db/*
+VKInfoSite/db.sqlite3

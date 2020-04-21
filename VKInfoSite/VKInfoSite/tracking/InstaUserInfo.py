@@ -1,6 +1,7 @@
 import os
 import json
 
+
 class InstUserInfo:
 
     def __init__(self, username):
@@ -27,7 +28,3 @@ class InstUserInfo:
         os.popen('rm ./{}.json'.format(self._user))
 
         return data
-
-
-if __name__ == '__main__':
-    #  print(InstUserInfo(username='van4ester__').get_info())

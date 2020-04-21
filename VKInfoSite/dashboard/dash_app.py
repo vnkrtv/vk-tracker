@@ -1,4 +1,3 @@
-from MongoDB import VKMongoDB
 from .DashGraphs import *
 
 
@@ -66,13 +65,13 @@ def _create_app(domain):
     def update_graph(graphs_list):
         graphs = []
         print(graphs_list)
-        config = json.load(open('config/config.json', 'r'))
+        config = {}  # json.load(open('config/config.json', 'r'))
         for i, class_name in enumerate(graphs_list):
             try:
-                user_info = VKMongoDB(
-                    host=config['mdb_host'],
-                    port=config['mdb_port']
-                ).load_user_info(domain=domain)
+                user_info = {}#VKMongoDB(
+                #    host=config['mdb_host'],
+                #    port=config['mdb_port']
+                #).load_user_info(domain=domain)
                 graph = eval(class_name)(user_info=user_info)
             except:
                 graphs.append(html.H3(

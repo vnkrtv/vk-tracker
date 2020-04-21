@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class MainConfig(AppConfig):
-    name = 'main'
+class VKSearchConfig(AppConfig):
+    name = 'vksearch'
