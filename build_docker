@@ -3,10 +3,10 @@
 cp "./requirements.txt" "./docker/requirements.txt"
 cp -r "./VKInfoSite" "./docker/VKInfoSite"
 TOKEN=$(cat ./VKInfoSite/config/config.json | cut -d '"' -f 22)
-CONFIG="{\"mdb_host\": \"mongo\", \"mdb_port\": 27017, \"neo_url\": \"bolt://neo4j:7687\", \"neo_user\": \"neo4j\", \"neo_pass\": \"neo4j\", \"vk_token\": \"${TOKEN}\"}"
+CONFIG="{\"mdb_host\": \"mongo\", \"mdb_port\": 27017, \"mdb_dbname\": "vkdata",\"neo_url\": \"bolt://neo4j:7687\", \"neo_user\": \"neo4j\", \"neo_pass\": \"neo4j\", \"vk_token\": \"${TOKEN}\"}"
 echo "${CONFIG}" > "./docker/VKInfoSite/config/config.json"
 echo "${CONFIG}" > "./docker/VKInfoSite/config/default_config.json"
-echo "====================================Start building VKUserInfo Docker image========================================"
+echo "====================================Start building VKUserInfo docker image========================================"
 sudo docker build -t vkuserinfo docker
 rm "./docker/requirements.txt"
 rm -r "./docker/VKInfoSite"

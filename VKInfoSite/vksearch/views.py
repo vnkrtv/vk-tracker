@@ -2,9 +2,21 @@ import ast
 import vk
 import json
 import time
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .mongodb import VKSearchFiltersStorage
 from django.conf import settings
+
+
+def unauthenticated_user(view_func):
+    """
+    Checked if user is authorized
+    """
+    def wrapper_func(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return view_func(request, *args, **kwargs)
+        else:
+            return redirect('/')
+    return wrapper_func
 
 
 def vk_api(method, **kwargs):
@@ -14,6 +26,7 @@ def vk_api(method, **kwargs):
     return eval('session.' + method)(v=5.103, **kwargs)
 
 
+@unauthenticated_user
 def get_search_params(request):
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
@@ -28,6 +41,7 @@ def get_search_params(request):
     return render(request, 'vksearch/searchPage.html', info)
 
 
+@unauthenticated_user
 def get_search_result(request):
 
     def parse_response(response):
@@ -377,6 +391,7 @@ def get_search_result(request):
     return render(request, 'vksearch/searchResultPage.html', info)
 
 
+@unauthenticated_user
 def add_search_filter(request):
     kwargs = {
         'need_all': 1,
@@ -389,6 +404,7 @@ def add_search_filter(request):
     return render(request, 'vksearch/addFilter1.html', info)
 
 
+@unauthenticated_user
 def get_new_filter_2(request):
     country_id = request.POST['country_id']
     cities_ids, un_cities_ids, cities_titles = [], [], []
@@ -458,6 +474,7 @@ def get_new_filter_2(request):
     return render(request, 'vksearch/addFilter2.html', info)
 
 
+@unauthenticated_user
 def add_filter_result(request):
     country_id = int(request.POST['country_id'])
     cities_ids = request.POST['cities_ids']
@@ -528,6 +545,7 @@ def add_filter_result(request):
     return render(request, 'info.html', info)
 
 
+@unauthenticated_user
 def delete_filter(request):
     with open(settings.CONFIG, 'r') as file:
         config = json.load(file)
@@ -542,6 +560,7 @@ def delete_filter(request):
     return render(request, 'vksearch/deleteFilter.html', info)
 
 
+@unauthenticated_user
 def delete_filter_result(request):
     filter_name = request.POST['filter']
     with open(settings.CONFIG, 'r') as file:
@@ -557,4 +576,3 @@ def delete_filter_result(request):
         'message': f"Filter '{filter_name}' was successfully deleted."
     }
     return render(request, 'info.html', info)
-

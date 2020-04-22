@@ -1,0 +1,71 @@
+#!/bin/bash
+
+python3 -m venv venv
+echo "Created virtual environment..."
+. ./venv/bin/activate
+mkdir tmp
+cp -r VKInfoSite tmp/VKInfoSite
+rm -r VKInfoSite
+echo "===========================================Start loading requirements==========================================="
+pip install --no-cache-dir -r requirements.txt
+echo "=========================================Successfully loaded requirments======================================="
+django-admin startproject VKInfoSite
+SECRET_KEY=$(cat ./VKInfoSite/VKInfoSite/settings.py | grep SECRET_KEY | cut -d "'" -f 2)
+
+cd VKInfoSite
+python manage.py startapp main
+python manage.py startapp vksearch
+python manage.py startapp dashboard
+cd ..
+rm -r VKInfoSite
+cp -r tmp/VKInfoSite VKInfoSite
+
+OLD_SECRET_KEY=$(cat ./VKInfoSite/VKInfoSite/settings.py | grep SECRET_KEY | cut -d "'" -f 2)
+NEW_SETTINGS="$(echo "$(cat ./VKInfoSite/VKInfoSite/settings.py)" | sed "s/${OLD_SECRET_KEY}/${SECRET_KEY}/")"
+echo "${NEW_SETTINGS}" > ./VKInfoSite/VKInfoSite/settings.py
+
+rm -r tmp
+echo "===========================================Initialized django app==============================================="
+echo "===========================================Enter configuration data:============================================"
+read -p "Vk token: " TOKEN
+
+read -r -p "MongoDB host (default: localhost) " MDB_HOST
+if [ "${MDB_HOST}" == "" ]
+then
+  MDB_HOST="localhost"
+fi
+
+read -r -p "MongoDB port (default: 27017): " MDB_PORT
+if [ "${MDB_PORT}" == "" ]
+then
+  MDB_PORT=27017
+fi
+
+read -r -p "MongoDB database name (default: 'vkdata'): " MDB_DBNAME
+if [ "${MDB_DBNAME}" == "" ]
+then
+  MDB_DBNAME="vkdata"
+fi
+
+read -r -p "Neo4j URL (default: 'bolt://localhost:7687'): " NEO4J_URL
+if [ "${NEO4J_URL}" == "" ]
+then
+  NEO4J_URL="bolt://localhost:7687"
+fi
+
+read -r -p "Neo4j user (default: 'neo4j'): " NEO4J_USER
+if [ "${NEO4J_USER}" == "" ]
+then
+  NEO4J_USER="neo4j"
+fi
+
+read -r -p "Neo4j password (default: 'pass'): " NEO4J_PASS
+if [ "${NEO4J_PASS}" == "" ]
+then
+  NEO4J_PASS="pass"
+fi
+
+CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"mdb_dbname\": ${MDB_DBNAME}, \"neo_url\": \"${NEO4J_URL}\", \"neo_user\": \"${NEO4J_USER}\", \"neo_pass\": \"${NEO4J_PASS}\", \"vk_token\": \"${TOKEN}\"}"
+echo "${CONFIG}" > ./VKInfoSite/config/config.json
+echo "${CONFIG}" > ./VKInfoSite/config/default_config.json
+echo "==========================================Initialized configuration============================================="

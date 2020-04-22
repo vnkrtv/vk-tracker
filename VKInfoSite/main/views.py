@@ -28,7 +28,7 @@ def unauthenticated_user(view_func):
 def login_page(request):
     logout(request)
     if 'username' not in request.POST or 'password' not in request.POST:
-        return render(request, 'main/login.html')
+        return render(request, 'login.html')
     user = authenticate(
         username=request.POST['username'],
         password=request.POST['password']
@@ -38,9 +38,9 @@ def login_page(request):
             login(request, user)
             return redirect('/add_user/')
         else:
-            return render(request, 'main/login.html', {'error': 'Error: user account is disabled!'})
+            return render(request, 'login.html', {'error': 'Error: user account is disabled!'})
     else:
-        return render(request, 'main/login.html', {'error': 'Error: username and password are incorrect!'})
+        return render(request, 'login.html', {'error': 'Error: username and password are incorrect!'})
 
 
 @unauthenticated_user
