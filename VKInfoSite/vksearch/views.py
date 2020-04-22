@@ -430,10 +430,11 @@ def get_new_filter_2(request):
                 return render(request, 'info.html', info)
             un_cities_ids.append(req['items'][0]['id'])
 
+    un_filter = request.POST['universities_filter']
     universities = []
     for city in un_cities_ids:
         kwargs = {
-            'universities_filter': request.POST['universities_filter'].split(','),
+            'universities_filter': un_filter.split(','),
             'country_id': request.POST['country_id'],
             'city_id': city,
             'count': 1000
@@ -459,7 +460,7 @@ def get_new_filter_2(request):
         time.sleep(0.35)
         for search_by_q in req:
             universities += [item for item in search_by_q['items']]
-    if not universities:
+    if not universities and un_filter:
         info = {
             'title': 'Error',
             'message': 'Universities not found.'

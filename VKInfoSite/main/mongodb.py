@@ -1,6 +1,4 @@
-import vk
-import json
-from time import sleep
+# pylint: disable=too-few-public-methods, invalid-name
 from pymongo import MongoClient
 
 
@@ -35,6 +33,10 @@ class MongoDB:
 
 
 class VKInfoStorage(MongoDB):
+    """
+    Class for working with vk users
+    information stored in MongoDB
+    """
 
     @staticmethod
     def connect_to_mongodb(host: str, port, db_name: str):
@@ -84,8 +86,7 @@ class VKInfoStorage(MongoDB):
         if self.check_domain(domain):
             info = self._col.find_one({'domain': domain})['main_info']
             return info['first_name'] + ' ' + info['last_name']
-        else:
-            return ''
+        return ''
 
     def get_user(self, _id: int = 0, domain: str = '', date: str = '') -> dict:
         """
@@ -116,7 +117,7 @@ class VKInfoStorage(MongoDB):
         :return: list of dates when vk user information was collected
         """
         info_list = []
-        if id != 0:
+        if _id != 0:
             info_list = self._col.find({'id': _id})
         if domain != '':
             info_list = self._col.find({'domain': domain})
@@ -144,7 +145,7 @@ class VKOnlineInfoStorage(MongoDB):
         )
         return obj
 
-    def load_activity(self, _id: str, last_seen_timestamp: int, online: bool, platform: int) -> None:
+    def load_activity(self, _id: str, last_seen_timestamp: int, online: int, platform: int) -> None:
         info = 0b00000000000000000000000000000000
 
         # first bit - online info
@@ -155,7 +156,8 @@ class VKOnlineInfoStorage(MongoDB):
 
         if self._db.find_one({'id': id}):
             # 5 - 32 bits - info
-            info |= (last_seen_timestamp - self._db.find_one({'id': id})['start_monitoring_timestamp'])
+            time = last_seen_timestamp - self._db.find_one({'id': id})['start_monitoring_timestamp']
+            info |= time
             self._db.find_one_and_update({'id': id}, {'$push': {
                 'activity': info
             }})
@@ -169,11 +171,11 @@ class VKOnlineInfoStorage(MongoDB):
     def get_activity(self, _id: int) -> tuple:
         """
 
-        :param id:
-        :return: tuple of (start_monitoring_timestamp, activity info list) if user is tracked; None, None else
+        :param _id:
+        :return: tuple of (start_monitoring_timestamp, activity info list)
+                 if user is tracked; None, None else
         """
         data = self._db.find_one({'user_id': _id})
         if data:
             return data['start_monitoring_timestamp'], data['activity']
-        else:
-            return None, None
+        return None, None

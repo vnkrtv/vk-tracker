@@ -20,8 +20,7 @@ def unauthenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.user.is_authenticated:
             return view_func(request, *args, **kwargs)
-        else:
-            return redirect('/')
+        return redirect('/')
     return wrapper_func
 
 
@@ -39,8 +38,7 @@ def login_page(request):
             return redirect('/add_user/')
         else:
             return render(request, 'login.html', {'error': 'Error: user account is disabled!'})
-    else:
-        return render(request, 'login.html', {'error': 'Error: username and password are incorrect!'})
+    return render(request, 'login.html', {'error': 'Error: username and password are incorrect!'})
 
 
 @unauthenticated_user
@@ -113,8 +111,8 @@ def add_user_result(request):
         }
     except ConnectionError:
         error = 'No connection to the internet.'
-    except VkAPIError:
-        error = 'User with input domain not found.'
+    except VkAPIError as e:
+        error = str(e).split('. ')[1] + '.'
     except ServerSelectionTimeoutError:
         error = 'MongoDB is not connected.'
     except ServiceUnavailable:
