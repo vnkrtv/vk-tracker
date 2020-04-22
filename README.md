@@ -1,6 +1,6 @@
 # VKUserInfo  
 
-#### Description
+### Description
 Web application for tracking VK users and searching users by specified filters.  
 Implemented on django, data is stored in MongoDB and Neo4j.  
 System features:
@@ -25,13 +25,13 @@ System features:
 Requirements:
 - vk token with all permissions
 
-#### Installation
+### Installation
 - ```git clone https://github.com/LeadNess/VKUserInfo.git```
 - ```cd VKUserInfo```
 - ```./build_for_linux``` - build application 
 - ```./build_docker``` - create docker container
 
-#### Usage
+### Usage
 
 You can run application using docker-compose:  
 - ```git clone https://github.com/LeadNess/VKUserInfo.git```
@@ -54,7 +54,7 @@ There two types of users in system:
 
 Both types of users can use all system features.
 
-#### Testing
+### Testing
 
 Coming soon...
   
