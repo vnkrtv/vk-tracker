@@ -69,3 +69,5 @@ CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"mdb_dbname\
 echo "${CONFIG}" > ./VKInfoSite/config/config.json
 echo "${CONFIG}" > ./VKInfoSite/config/default_config.json
 echo "==========================================Initialized configuration============================================="
+echo "===========================================Enter superuser info==============================================="
+python VKInfoSite/manage.py createsuperuser
