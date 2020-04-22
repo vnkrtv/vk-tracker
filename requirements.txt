@@ -9,7 +9,7 @@ dash-daq==0.1.0
 dash-html-components==0.16.0
 dash-renderer==0.23.0
 dash-table==3.6.0
-Django==2.2.5
+Django==2.2.10
 Flask==1.1.1
 Flask-Compress==1.4.0
 idna==2.8
