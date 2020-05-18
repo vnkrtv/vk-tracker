@@ -3,7 +3,6 @@ import vk
 import time
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.conf import settings
 from django.views import View
 from . import mongo
 from .decorators import unauthenticated_user, post_method, check_token
