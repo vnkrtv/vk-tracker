@@ -28,7 +28,8 @@ def check_token(view_func):
             return view_func(request, *args, **kwargs)
         except VkAPIError as e:
             info = {
-                'title': 'Error',
+                'title': 'Error | VK Tracker',
+                'message_title': 'Error',
                 'message': str(e).split('. ')[1] + '.'
             }
             return render(request, 'info.html', info)

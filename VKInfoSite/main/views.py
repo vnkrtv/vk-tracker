@@ -1,11 +1,9 @@
-import traceback
 import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.conf import settings
 from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
-from pymongo.errors import ServerSelectionTimeoutError
 from . import mongo
 from .neo4j import Neo4jStorage
 from .vk_models import VKInfo
@@ -38,7 +36,10 @@ def login_page(request):
 def change_settings(request):
     if not request.user.is_superuser:
         return redirect('/add_user/')
-    info = json.load(open(settings.CONFIG, 'r'))
+    info = {
+        'title': 'Settings | VK Tracker',
+        **json.load(open(settings.CONFIG, 'r'))
+    }
     return render(request, 'main/settings/changeSettings.html', info)
 
 
@@ -63,7 +64,8 @@ def change_settings_result(request):
         # {% endкостыль %}
 
     info = {
-        'title': 'Change result',
+        'title': 'Settings | VK Tracker',
+        'message_title': 'Change result',
         'message': 'Settings have been successfully changed.'
     }
     return render(request, 'info.html', info)
@@ -71,7 +73,10 @@ def change_settings_result(request):
 
 @unauthenticated_user
 def add_user(request):
-    return render(request, 'main/add_user/getDomain.html')
+    info = {
+        'title': 'Add user | VK Tracker',
+    }
+    return render(request, 'main/add_user/getDomain.html', info)
 
 
 @check_token
@@ -97,6 +102,7 @@ def add_user_result(request):
         storage.add_user(user_info)
 
         info = {
+            'title': 'User was added | VK Tracker',
             'first_name': user_info['main_info']['first_name'],
             'last_name': user_info['main_info']['last_name'],
             'domain': user_info['main_info']['domain']
@@ -108,7 +114,8 @@ def add_user_result(request):
 
     if error:
         info = {
-            'title': 'Error',
+            'title': 'Error | VK Tracker',
+            'message_title': 'Error',
             'message': error
         }
         return render(request, 'info.html', info)
@@ -118,7 +125,10 @@ def add_user_result(request):
 
 @unauthenticated_user
 def user_info(request):
-    return render(request, 'main/user_info/getDomain.html')
+    info = {
+        'title': 'User information | VK Tracker',
+    }
+    return render(request, 'main/user_info/getDomain.html', info)
 
 
 @post_method
@@ -128,6 +138,7 @@ def get_user_info(request):
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
 
     info = {
+        'title': 'User information | VK Tracker',
         'info': storage.get_user(domain=domain),
         'fullname': storage.get_fullname(domain=domain),
         'domain': domain
@@ -139,7 +150,10 @@ def get_user_info(request):
 
 @unauthenticated_user
 def get_changes(request):
-    return render(request, 'main/user_changes/getDomain.html')
+    info = {
+        'title': 'Account changes | VK Tracker',
+    }
+    return render(request, 'main/user_changes/getDomain.html', info)
 
 
 @post_method
@@ -150,12 +164,14 @@ def get_dates(request):
 
     if not storage.check_domain(domain):
         info = {
-            'title': 'Error',
+            'title': 'Error | VK Tracker',
+            'message_title': 'Error',
             'message': 'user with input domain not found in database'
         }
         return render(request, 'info.html', info)
 
     info = {
+        'title': 'Account changes | VK Tracker',
         'dates': storage.get_user_info_dates(domain=domain),
         'domain': domain
     }
@@ -175,6 +191,7 @@ def get_user_changes(request):
         date=request.POST['date2'])
     cmp_info = VKAnalizer(new_info=new_info, old_info=old_info).get_changes()
     info = {
+        'title': 'Account changes | VK Tracker',
         'domain': domain,
         'id':     cmp_info['id'],
         **cmp_info
@@ -184,7 +201,10 @@ def get_user_changes(request):
 
 @unauthenticated_user
 def get_mutual_activity(request):
-    return render(request, 'main/users_relations/getDomains.html')
+    info = {
+        'title': 'Mutual activity | VK Tracker'
+    }
+    return render(request, 'main/users_relations/getDomains.html', info)
 
 
 @post_method
@@ -200,6 +220,7 @@ def get_users_dates(request):
     if not storage.check_domain(second_domain):
         error = 'user with second domain not found in database'
     info = {
+        'title': 'Mutual activity | VK Tracker',
         'first_domain':  first_domain,
         'second_domain': second_domain,
         'first_user':    storage.get_fullname(domain=first_domain),
@@ -210,7 +231,8 @@ def get_users_dates(request):
 
     if error:
         info = {
-            'title': 'Error',
+            'title': 'Error | VK Tracker',
+            'message_title': 'Error',
             'message': error
         }
         return render(request, 'info.html', info)
@@ -228,5 +250,8 @@ def get_relations(request):
     user2_info = storage.get_user(
         domain=request.POST['second_domain'],
         date=request.POST['date2'])
-    info = VKRelation(user1_info=user1_info, user2_info=user2_info).get_mutual_activity()
+    info = {
+        'title': 'Mutual activity | VK Tracker',
+        **VKRelation(user1_info=user1_info, user2_info=user2_info).get_mutual_activity()
+    }
     return render(request, 'main/users_relations/getRelations.html', info)

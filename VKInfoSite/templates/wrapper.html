@@ -3,9 +3,14 @@
   <head>
   	
 	<!-- Leadness, 2019-2020 -->
-	<!-- https://github.com/LeadNess/VKUserInfo -->
+	<!-- https://github.com/LeadNess/vk-tracker -->
 
-  	<title>VKUserInfo</title>
+	{% if title %}
+	<title>{{ title }}</title>    
+	{% else %}
+	<title>VK Tracker</title>
+	{% endif %}
+  	
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -25,7 +30,7 @@
   <body>
 	<div class="sidebar-container">
 	  <div class="sidebar-logo" href='/'>
-	    VKUserInfo <img src="{% static 'images/favicon-96x96.png' %}" width="25">
+	    VK Tracker<img src="{% static 'images/favicon-96x96.png' %}" width="25">
 	  </div>
 	  <ul class="sidebar-navigation">
 	  	<li class="header">User</li>
