@@ -1,35 +1,57 @@
 # pylint: disable=too-few-public-methods, invalid-name
-from pymongo import MongoClient
+import pymongo
+from django.conf import settings
+
+_db_conn: pymongo.database.Database = None
+
+
+def set_conn(host: str, port: int, db_name: str) -> None:
+    """
+    Establish user connection to MongoDB database 'db_name'
+
+    :param host: MongoDB host
+    :param port: MongoDB port
+    :param db_name: MongoDB database name
+    """
+    global _db_conn
+    _db_conn = pymongo.MongoClient(host, port)[db_name]
+
+
+def get_conn() -> pymongo.database.Database:
+    """
+    Get user connection to MongoDB database 'db_name'
+
+    :return: Database - connection to database
+    """
+    global _db_conn
+    if not _db_conn:
+        set_conn(
+            host=settings.DATABASES['default']['HOST'],
+            port=settings.DATABASES['default']['PORT'],
+            db_name=settings.DATABASES['default']['NAME'])
+    return _db_conn
 
 
 class MongoDB:
     """
-    Class for getting connection to MongoDB
+    Base class for classes working with MongoDB
 
-    _client: MongoClient() object
-    _db: MongoDB database
-    _col: MongoDB collection
+    _db:     MongoDB database
+    _col:    MongoDB collection
     """
 
-    _client = None
-    _db = None
-    _col = None
+    _db: pymongo.database.Database
+    _col: pymongo.collection.Collection
 
-    @staticmethod
-    def get_connection(host: str, port, db_name: str, collection_name: str) -> tuple:
+    def set_collection(self, db: pymongo.database.Database, collection_name: str) -> None:
         """
-        Establish connection to mongodb database 'db_name', collection 'questions'
+        Get connection to MongoDB database and connect to current collection 'collection_name'
 
-        :param host: MongoDB host
-        :param port: MongoDB port
-        :param db_name: database name
-        :param collection_name: collection name
-        :return: tuple of (MongoClient, db, collection)
+        :param db: MongoDB Database
+        :param collection_name: name of database collection
         """
-        client = MongoClient(host, int(port))
-        db = client[db_name]
-        col = db[collection_name]
-        return client, db, col
+        self._db = db
+        self._col = db[collection_name]
 
 
 class VKInfoStorage(MongoDB):
@@ -39,23 +61,18 @@ class VKInfoStorage(MongoDB):
     """
 
     @staticmethod
-    def connect_to_mongodb(host: str, port, db_name: str):
+    def connect(db: pymongo.database.Database):
         """
-        Establish connection to mongodb database 'db_name', collection 'info'
+        Establish connection to database collection 'info'
 
-        :param host: MongoDB host
-        :param port: MongoDB port
-        :param db_name: MongoDB name
+        :param db: Database - connection to MongoDB database
         :return: VKInfoStorage object
         """
-        obj = VKInfoStorage()
-        obj._client, obj._db, obj._col = MongoDB.get_connection(
-            host=host,
-            port=port,
-            db_name=db_name,
-            collection_name='info'
-        )
-        return obj
+        storage = VKInfoStorage()
+        storage.set_collection(
+            db=db,
+            collection_name='info')
+        return storage
 
     def add_user(self, user) -> None:
         """
@@ -127,23 +144,18 @@ class VKInfoStorage(MongoDB):
 class VKOnlineInfoStorage(MongoDB):
 
     @staticmethod
-    def connect_to_mongodb(host: str, port, db_name: str):
+    def connect(db: pymongo.database.Database):
         """
-        Establish connection to mongodb database 'db_name', collection 'online_info'
+        Establish connection to database collection 'online_info'
 
-        :param host: MongoDB host
-        :param port: MongoDB port
-        :param db_name: MongoDB name
+        :param db: Database - connection to MongoDB database
         :return: VKOnlineInfoStorage object
         """
-        obj = VKOnlineInfoStorage()
-        obj._client, obj._db, obj._col = MongoDB.get_connection(
-            host=host,
-            port=port,
-            db_name=db_name,
-            collection_name='online_info'
-        )
-        return obj
+        storage = VKOnlineInfoStorage()
+        storage.set_collection(
+            db=db,
+            collection_name='info')
+        return storage
 
     def load_activity(self, _id: str, last_seen_timestamp: int, online: int, platform: int) -> None:
         info = 0b00000000000000000000000000000000

@@ -1,56 +1,73 @@
-from pymongo import MongoClient
+import pymongo
+from django.conf import settings
+
+_db_conn: pymongo.database.Database = None
+
+
+def set_conn(host: str, port: int, db_name: str) -> None:
+    """
+    Establish user connection to MongoDB database 'db_name'
+
+    :param host: MongoDB host
+    :param port: MongoDB port
+    :param db_name: MongoDB database name
+    """
+    global _db_conn
+    _db_conn = pymongo.MongoClient(host, port)[db_name]
+
+
+def get_conn() -> pymongo.database.Database:
+    """
+    Get user connection to MongoDB database 'db_name'
+
+    :return: Database - connection to database
+    """
+    global _db_conn
+    if not _db_conn:
+        set_conn(
+            host=settings.DATABASES['default']['HOST'],
+            port=settings.DATABASES['default']['PORT'],
+            db_name=settings.DATABASES['default']['NAME'])
+    return _db_conn
 
 
 class MongoDB:
     """
-    Class for getting connection to MongoDB
+    Base class for classes working with MongoDB
 
-    _client: MongoClient() object
-    _db: MongoDB database
-    _col: MongoDB collection
+    _db:     MongoDB database
+    _col:    MongoDB collection
     """
 
-    _client = None
-    _db = None
-    _col = None
+    _db: pymongo.database.Database
+    _col: pymongo.collection.Collection
 
-    @staticmethod
-    def get_connection(host: str, port, db_name: str, collection_name: str) -> tuple:
+    def set_collection(self, db: pymongo.database.Database, collection_name: str) -> None:
         """
-        Establish connection to mongodb database 'db_name', collection 'questions'
+        Get connection to MongoDB database and connect to current collection 'collection_name'
 
-        :param host: MongoDB host
-        :param port: MongoDB port
-        :param db_name: database name
-        :param collection_name: collection name
-        :return: tuple of (MongoClient, db, collection)
+        :param db: MongoDB Database
+        :param collection_name: name of database collection
         """
-        client = MongoClient(host, int(port))
-        db = client[db_name]
-        col = db[collection_name]
-        return client, db, col
+        self._db = db
+        self._col = db[collection_name]
 
 
 class VKSearchFiltersStorage(MongoDB):
 
     @staticmethod
-    def connect_to_mongodb(host: str, port, db_name: str):
+    def connect(db: pymongo.database.Database):
         """
-        Establish connection to mongodb database 'db_name', collection 'search_filters'
+        Establish connection to database collection 'filters'
 
-        :param host: MongoDB host
-        :param port: MongoDB port
-        :param db_name: MongoDB name
+        :param db: Database - connection to MongoDB database
         :return: VKSearchFiltersStorage object
         """
-        obj = VKSearchFiltersStorage()
-        obj._client, obj._db, obj._col = MongoDB.get_connection(
-            host=host,
-            port=port,
-            db_name=db_name,
-            collection_name='filters'
-        )
-        return obj
+        storage = VKSearchFiltersStorage()
+        storage.set_collection(
+            db=db,
+            collection_name='filters')
+        return storage
 
     def add_filter(self, _filter: dict) -> None:
         """

@@ -6,7 +6,7 @@ from django.conf import settings
 from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
-from .mongodb import VKInfoStorage
+from . import mongo
 from .neo4j import Neo4jStorage
 from .vk_models import VKInfo
 from .vk_analitics import VKAnalizer, VKRelation
@@ -24,6 +24,10 @@ def login_page(request):
     if user is not None:
         if user.is_active:
             login(request, user)
+            mongo.set_conn(
+                host=settings.DATABASES['default']['HOST'],
+                port=settings.DATABASES['default']['PORT'],
+                db_name=settings.DATABASES['default']['NAME'])
             return redirect('/add_user/')
         else:
             return render(request, 'login.html', {'error': 'Error: user account is disabled!'})
@@ -38,6 +42,7 @@ def change_settings(request):
     return render(request, 'main/settings/changeSettings.html', info)
 
 
+@post_method
 @unauthenticated_user
 def change_settings_result(request):
     default = request.POST.get('default', '')
@@ -70,6 +75,7 @@ def add_user(request):
 
 
 @check_token
+@post_method
 @unauthenticated_user
 def add_user_result(request):
     config = json.load(open(settings.CONFIG, 'r'))
@@ -80,19 +86,15 @@ def add_user_result(request):
         config.pop('vk_token')
         user_info = vk_user.get_all_info()
 
-        neodb = Neo4jStorage.connect(
+        storage = Neo4jStorage.connect(
             url=config['neo_url'],
             user=config['neo_user'],
             password=config['neo_pass']
         )
-        neodb.add_user(user_info)
+        storage.add_user(user_info)
 
-        mdb = VKInfoStorage.connect_to_mongodb(
-            host=config['mdb_host'],
-            port=config['mdb_port'],
-            db_name=config['mdb_dbname']
-        )
-        mdb.add_user(user_info)
+        storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+        storage.add_user(user_info)
 
         info = {
             'first_name': user_info['main_info']['first_name'],
@@ -101,8 +103,6 @@ def add_user_result(request):
         }
     except ConnectionError:
         error = 'No connection to the internet.'
-    except ServerSelectionTimeoutError:
-        error = 'MongoDB is not connected.'
     except ServiceUnavailable:
         error = 'Neo4j is not connected.'
 
@@ -112,6 +112,7 @@ def add_user_result(request):
             'message': error
         }
         return render(request, 'info.html', info)
+
     return render(request, 'main/add_user/addResult.html', info)
 
 
@@ -120,27 +121,18 @@ def user_info(request):
     return render(request, 'main/user_info/getDomain.html')
 
 
+@post_method
 @unauthenticated_user
 def get_user_info(request):
-    config = json.load(open(settings.CONFIG, 'r'))
-
     domain = request.POST['domain']
-    info = {}
+    storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
 
-    try:
-        mdb = VKInfoStorage.connect_to_mongodb(
-            host=config['mdb_host'],
-            port=config['mdb_port'],
-            db_name=config['mdb_dbname']
-        )
-
-        info['info'] = mdb.get_user(domain=domain)
-        info['fullname'] = mdb.get_fullname(domain=domain)
-        info['id'] = info['info']['main_info']['id']
-        info['domain'] = domain
-
-    except ServerSelectionTimeoutError:
-        info['error'] = 'MongoDB is not connected'
+    info = {
+        'info': storage.get_user(domain=domain),
+        'fullname': storage.get_fullname(domain=domain),
+        'domain': domain
+    }
+    info['id'] = info['info']['main_info']['id']
 
     return render(request, 'main/user_info/userInfo.html', info)
 
@@ -150,56 +142,37 @@ def get_changes(request):
     return render(request, 'main/user_changes/getDomain.html')
 
 
+@post_method
 @unauthenticated_user
 def get_dates(request):
-    config = json.load(open(settings.CONFIG, 'r'))
     domain = request.POST['domain']
-    error = ''
+    storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
 
-    try:
-        mdb = VKInfoStorage.connect_to_mongodb(
-            host=config['mdb_host'],
-            port=config['mdb_port'],
-            db_name=config['mdb_dbname']
-        )
-
-        if not mdb.check_domain(domain):
-            error = 'user with input domain not found in database'
-        info = {
-            'dates': mdb.get_user_info_dates(domain=domain),
-            'domain': domain
-        }
-
-    except ServerSelectionTimeoutError:
-        error = 'MongoDB is not connected'
-
-    if error:
+    if not storage.check_domain(domain):
         info = {
             'title': 'Error',
-            'message': error
+            'message': 'user with input domain not found in database'
         }
         return render(request, 'info.html', info)
 
+    info = {
+        'dates': storage.get_user_info_dates(domain=domain),
+        'domain': domain
+    }
     return render(request, 'main/user_changes/getDates.html', info)
 
 
+@post_method
 @unauthenticated_user
 def get_user_changes(request):
-    config = json.load(open(settings.CONFIG, 'r'))
     domain = request.POST['domain']
-    mdb = VKInfoStorage.connect_to_mongodb(
-        host=config['mdb_host'],
-        port=config['mdb_port'],
-        db_name=config['mdb_dbname']
-    )
-    new_info = mdb.get_user(
+    storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+    new_info = storage.get_user(
         domain=domain,
-        date=request.POST['date1']
-    )
-    old_info = mdb.get_user(
+        date=request.POST['date1'])
+    old_info = storage.get_user(
         domain=domain,
-        date=request.POST['date2']
-    )
+        date=request.POST['date2'])
     cmp_info = VKAnalizer(new_info=new_info, old_info=old_info).get_changes()
     info = {
         'domain': domain,
@@ -214,33 +187,26 @@ def get_mutual_activity(request):
     return render(request, 'main/users_relations/getDomains.html')
 
 
+@post_method
 @unauthenticated_user
 def get_users_dates(request):
-    config = json.load(open(settings.CONFIG, 'r'))
     first_domain = request.POST['first_domain']
     second_domain = request.POST['second_domain']
     error = ''
 
-    try:
-        mdb = VKInfoStorage.connect_to_mongodb(
-            host=config['mdb_host'],
-            port=config['mdb_port'],
-            db_name=config['mdb_dbname']
-        )
-        if not mdb.check_domain(first_domain):
-            error = 'user with first domain not found in database'
-        if not mdb.check_domain(second_domain):
-            error = 'user with second domain not found in database'
-        info = {
-            'first_domain':  first_domain,
-            'second_domain': second_domain,
-            'first_user':    mdb.get_fullname(domain=first_domain),
-            'second_user':   mdb.get_fullname(domain=second_domain),
-            'first_dates':   mdb.get_user_info_dates(domain=first_domain),
-            'second_dates':  mdb.get_user_info_dates(domain=second_domain)
-        }
-    except ServerSelectionTimeoutError:
-        error = 'MongoDB is not connected'
+    storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+    if not storage.check_domain(first_domain):
+        error = 'user with first domain not found in database'
+    if not storage.check_domain(second_domain):
+        error = 'user with second domain not found in database'
+    info = {
+        'first_domain':  first_domain,
+        'second_domain': second_domain,
+        'first_user':    storage.get_fullname(domain=first_domain),
+        'second_user':   storage.get_fullname(domain=second_domain),
+        'first_dates':   storage.get_user_info_dates(domain=first_domain),
+        'second_dates':  storage.get_user_info_dates(domain=second_domain)
+    }
 
     if error:
         info = {
@@ -252,24 +218,15 @@ def get_users_dates(request):
     return render(request, 'main/users_relations/getUsersDates.html', info)
 
 
+@post_method
 @unauthenticated_user
 def get_relations(request):
-    config = json.load(open(settings.CONFIG, 'r'))
-    try:
-        mdb = VKInfoStorage.connect_to_mongodb(
-            host=config['mdb_host'],
-            port=config['mdb_port'],
-            db_name=config['mdb_dbname']
-        )
-        user1_info = mdb.get_user(
-            domain=request.POST['first_domain'],
-            date=request.POST['date1']
-        )
-        user2_info = mdb.get_user(
-            domain=request.POST['second_domain'],
-            date=request.POST['date2']
-        )
-        info = VKRelation(user1_info=user1_info, user2_info=user2_info).get_mutual_activity()
-    except Exception:
-        info = {'error': traceback.format_exc()}
+    storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+    user1_info = storage.get_user(
+        domain=request.POST['first_domain'],
+        date=request.POST['date1'])
+    user2_info = storage.get_user(
+        domain=request.POST['second_domain'],
+        date=request.POST['date2'])
+    info = VKRelation(user1_info=user1_info, user2_info=user2_info).get_mutual_activity()
     return render(request, 'main/users_relations/getRelations.html', info)
