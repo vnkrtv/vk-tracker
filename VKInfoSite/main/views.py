@@ -6,22 +6,11 @@ from django.conf import settings
 from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from pymongo.errors import ServerSelectionTimeoutError
-from vk.exceptions import VkAPIError
 from .mongodb import VKInfoStorage
 from .neo4j import Neo4jStorage
 from .vk_models import VKInfo
 from .vk_analitics import VKAnalizer, VKRelation
-
-
-def unauthenticated_user(view_func):
-    """
-    Checked if user is authorized
-    """
-    def wrapper_func(request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return view_func(request, *args, **kwargs)
-        return redirect('/')
-    return wrapper_func
+from .decorators import unauthenticated_user, post_method, check_token
 
 
 def login_page(request):
@@ -80,6 +69,7 @@ def add_user(request):
     return render(request, 'main/add_user/getDomain.html')
 
 
+@check_token
 @unauthenticated_user
 def add_user_result(request):
     config = json.load(open(settings.CONFIG, 'r'))
@@ -111,14 +101,11 @@ def add_user_result(request):
         }
     except ConnectionError:
         error = 'No connection to the internet.'
-    except VkAPIError as e:
-        error = str(e).split('. ')[1] + '.'
     except ServerSelectionTimeoutError:
         error = 'MongoDB is not connected.'
     except ServiceUnavailable:
         error = 'Neo4j is not connected.'
-    except Exception:
-        error = traceback.format_exc()
+
     if error:
         info = {
             'title': 'Error',
@@ -154,8 +141,6 @@ def get_user_info(request):
 
     except ServerSelectionTimeoutError:
         info['error'] = 'MongoDB is not connected'
-    except Exception:
-        info['error'] = traceback.format_exc()
 
     return render(request, 'main/user_info/userInfo.html', info)
 
@@ -184,12 +169,9 @@ def get_dates(request):
             'dates': mdb.get_user_info_dates(domain=domain),
             'domain': domain
         }
-        print(info)
 
     except ServerSelectionTimeoutError:
         error = 'MongoDB is not connected'
-    except Exception:
-        error = traceback.format_exc()
 
     if error:
         info = {
@@ -259,8 +241,6 @@ def get_users_dates(request):
         }
     except ServerSelectionTimeoutError:
         error = 'MongoDB is not connected'
-    except Exception:
-        error = traceback.format_exc()
 
     if error:
         info = {

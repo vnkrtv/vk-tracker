@@ -61,7 +61,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(PROJECT_ROOT, 'templates')
+            os.path.join(BASE_DIR, 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -83,8 +83,22 @@ WSGI_APPLICATION = 'VKInfoSite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'djongo',
+        'NAME': 'vkdata',
+        'HOST': 'localhost',
+        'PORT': 27017,
+        'USER': '',
+        'PASSWORD': '',
+        'TEST': {
+            'NAME': 'test_vkdata'
+        }
+    },
+    'neo4j': {
+        'NAME': 'vkdata',
+        'HOST': 'localhost',
+        'PORT': 7687,
+        'USER': 'neo4j',
+        'PASSWORD': 'pass'
     }
 }
 
@@ -128,10 +142,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = ''
 STATICFILES_DIRS = [
-    os.path.join(PROJECT_ROOT, 'static')
+    os.path.join(BASE_DIR, 'static')
 ]
 
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 CONFIG_ROOT = os.path.join(PROJECT_ROOT, 'config')

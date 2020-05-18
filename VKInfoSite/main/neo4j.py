@@ -8,7 +8,7 @@ class Neo4jStorage:
     _graph: Graph() object
     """
 
-    _graph = None
+    _graph: Graph
 
     @staticmethod
     def connect(url: str = 'bolt://localhost:11001', user: str = 'neo4j', password: str = 'admin'):
@@ -21,9 +21,6 @@ class Neo4jStorage:
         obj = Neo4jStorage()
         obj._graph = Graph(url, user=user, password=password)
         return obj
-
-    def get_graph(self):
-        return self._graph
 
     def add_user(self, user) -> dict:
         """

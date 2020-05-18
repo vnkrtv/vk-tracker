@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .dash_app import *
 
 
-def dash(request, **kwargs):
+def dash(request):
     # domain = request.POST['domain']
     domain = 'ivan_nikitinn'
     return HttpResponse(dispatcher(request, domain))

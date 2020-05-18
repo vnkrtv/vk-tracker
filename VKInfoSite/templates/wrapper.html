@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	{% load static %}
+	{% load main_extras %}
 	<link rel="stylesheet" href="{% static 'main/css/sidebar.css' %}">
 	<link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
   </head>
@@ -76,7 +77,7 @@
 	    {% endif %}
 	    <li class="header">Neo4j</li>
 	    <li>
-	      <a href="http://localhost:7474">
+	      <a href="{% neo4j_url %}">
 	        <i class="fa fa-home" aria-hidden="true"></i> Neo4j browser
 	      </a>
 	    </li>

@@ -3,20 +3,9 @@ import vk
 import json
 import time
 from django.shortcuts import render, redirect
-from .mongodb import VKSearchFiltersStorage
 from django.conf import settings
-
-
-def unauthenticated_user(view_func):
-    """
-    Checked if user is authorized
-    """
-    def wrapper_func(request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return view_func(request, *args, **kwargs)
-        else:
-            return redirect('/')
-    return wrapper_func
+from .mongodb import VKSearchFiltersStorage
+from .decorators import unauthenticated_user, post_method, check_token
 
 
 def vk_api(method, **kwargs):
@@ -41,6 +30,7 @@ def get_search_params(request):
     return render(request, 'vksearch/searchPage.html', info)
 
 
+@check_token
 @unauthenticated_user
 def get_search_result(request):
 
@@ -391,6 +381,7 @@ def get_search_result(request):
     return render(request, 'vksearch/searchResultPage.html', info)
 
 
+@check_token
 @unauthenticated_user
 def add_search_filter(request):
     kwargs = {
@@ -404,6 +395,7 @@ def add_search_filter(request):
     return render(request, 'vksearch/addFilter1.html', info)
 
 
+@post_method
 @unauthenticated_user
 def get_new_filter_2(request):
     country_id = request.POST['country_id']
@@ -475,6 +467,7 @@ def get_new_filter_2(request):
     return render(request, 'vksearch/addFilter2.html', info)
 
 
+@post_method
 @unauthenticated_user
 def add_filter_result(request):
     country_id = int(request.POST['country_id'])
@@ -561,6 +554,7 @@ def delete_filter(request):
     return render(request, 'vksearch/deleteFilter.html', info)
 
 
+@post_method
 @unauthenticated_user
 def delete_filter_result(request):
     filter_name = request.POST['filter']
