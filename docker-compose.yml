@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  vk-neo4j:
+    image: neo4j:latest
+    container_name: vk-neo4j
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    environment:
+      - NEO4J_AUTH=NEO4J_USERNAME/NEO4J_PASSWORD
+
+  vk-mongo:
+    image: mongo:latest
+    container_name: vk-mongo
+    ports:
+      - "27017:27017"
+
+  vk-tracker:
+    build:
+        context: docker
+        dockerfile: Dockerfile
+    image: vk-tracker
+    command: ["python3", "/app/VKInfiSite/manage.py", "runserver", "0.0.0.0:8000", " --noreload¶"]
+    container_name: vk-tracker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - vk-neo4j
+      - vk-mongo
+    links:
+      - vk-neo4j
+      - vk-mongo

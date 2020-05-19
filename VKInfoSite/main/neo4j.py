@@ -5,7 +5,7 @@ class Neo4jStorage:
     """
     Class for putting vk user info into neo4j database
 
-    _graph: Graph() object
+    _graph: Graph object
     """
 
     _graph: Graph
