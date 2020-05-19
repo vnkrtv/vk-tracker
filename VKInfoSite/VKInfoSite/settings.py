@@ -37,12 +37,15 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'dashboard.apps.DashboardConfig',
     'vksearch.apps.VKSearchConfig',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'dpd_static_support',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +56,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    'django_plotly_dash.middleware.ExternalRedirectionMiddleware',
+    'django_plotly_dash.middleware.BaseMiddleware',
 ]
 
 ROOT_URLCONF = 'VKInfoSite.urls'
@@ -96,7 +104,7 @@ DATABASES = {
     'neo4j': {
         'NAME': 'vkdata',
         'HOST': 'localhost',
-        'PORT': 7687,
+        'PORT': 7474,
         'USER': 'neo4j',
         'PASSWORD': 'pass'
     }
@@ -151,3 +159,53 @@ MEDIA_URL = '/media/'
 CONFIG_ROOT = os.path.join(PROJECT_ROOT, 'config')
 CONFIG = os.path.join(CONFIG_ROOT, 'config.json')
 DEFAULT_CONFIG = os.path.join(CONFIG_ROOT, 'default_config.json')
+
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+
+    'django_plotly_dash.finders.DashAssetFinder',
+    'django_plotly_dash.finders.DashComponentFinder',
+    'django_plotly_dash.finders.DashAppDirectoryFinder',
+]
+
+# Plotly components containing static content that should
+# be handled by the Django staticfiles infrastructure
+
+PLOTLY_COMPONENTS = [
+    'dash_core_components',
+    'dash_html_components',
+    #'dash_bootstrap_components',
+    'dash_renderer',
+    'dpd_components',
+    'dpd_static_support',
+]
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+PLOTLY_DASH = {
+    # Route used for the message pipe websocket connection
+    "ws_route" :   "dpd/ws/channel",
+
+    # Route used for direct http insertion of pipe messages
+    "http_route" : "dpd/views",
+
+    # Flag controlling existince of http poke endpoint
+    "http_poke_enabled" : True,
+
+    # Insert data for the demo when migrating
+    "insert_demo_migrations" : False,
+
+    # Timeout for caching of initial arguments in seconds
+    "cache_timeout_initial_arguments": 60,
+
+    # Name of view wrapping function
+    "view_decorator": None,
+
+    # Flag to control location of initial argument storage
+    "cache_arguments": True,
+
+    # Flag controlling local serving of assets
+    "serve_locally": True,
+}

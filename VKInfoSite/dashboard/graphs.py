@@ -4,8 +4,10 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
 import json
-from datetime import datetime as dt
-
+import time
+import vk
+from datetime import datetime
+from django.conf import settings
 
 class GenderPieChart:
     def __init__(self, user_info):
@@ -168,8 +170,8 @@ class ActivityGraph:
                     df.loc[id] = [1, 0, fullname]
 
             profiles = {
-                           item['id']: item['first_name'] + ' ' + item['last_name']
-                           for item in photo['comments']['profiles']
+               item['id']: item['first_name'] + ' ' + item['last_name']
+               for item in photo['comments']['profiles']
             }
             for item in photo['comments']['groups']:
                 profiles[item['id']] = 'Group'
@@ -324,7 +326,7 @@ class AgeDistributionGraph:
                 year = int(friend['bdate'].split('.')[-1])
                 if year < 1000:
                     raise Exception
-                age = dt.now().year - year
+                age = datetime.now().year - year
                 if age in self._df.index:
                     self._df.loc[age, 'Count'] = self._df.loc[age, 'Count'] + 1
                 else:
@@ -351,6 +353,8 @@ class AgeDistributionGraph:
 
 
 class FriendsActivityGraph:
+
+    _timeout: float = 0.35
 
     def __init__(self, user_info):
         df = pd.DataFrame({'Likes': [], 'Comments': [], 'Fullname': [], 'Mutual friends': []})
@@ -404,21 +408,21 @@ class FriendsActivityGraph:
                     fullname = profiles[id]
                     df.loc[id] = [0, 1, fullname, 0]
 
-        token = {}  # json.load(open(CONFIG_FILE, 'r'))['vk_token']
-        # session = vk.API(vk.Session(access_token=token))
+        token = json.load(open(settings.CONFIG, 'r'))['vk_token']
+        session = vk.API(vk.Session(access_token=token))
         code = """
-                    var friends = {friends};
-                    var res = [];
-                    var i = 0;
-                    while (i < friends.length) {{
-                        var mutual_friends = API.friends.getMutual({{
-                                "source_uid": {user_id},
-                                "target_uid": friends[i],
-                            }});
-                        res.push(mutual_friends);
-                        i = i + 1;
-                    }}
-                    return res;
+            var friends = {friends};
+            var res = [];
+            var i = 0;
+            while (i < friends.length) {{
+                var mutual_friends = API.friends.getMutual({{
+                        "source_uid": {user_id},
+                        "target_uid": friends[i],
+                    }});
+                res.push(mutual_friends);
+                i = i + 1;
+            }}
+            return res;
         """
 
         user_id = user_info['main_info']['id']
@@ -437,7 +441,7 @@ class FriendsActivityGraph:
             for friend_id, mutual_friends in zip(friends, session.execute(code=req_code, v=5.102)):
                 if friend_id in df.index:
                     df.loc[friend_id, 'Mutual friends'] = len(mutual_friends) if mutual_friends else 0
-            sleep(0.34)
+            time.sleep(self._timeout)
 
         self._df = df
 
@@ -456,7 +460,6 @@ class FriendsActivityGraph:
             Mutual friends: {mut_friends_count}
             """.format(**kwargs)
             return text
-
 
         graph = html.Div([
             html.H3('Friends activity', style={'text-align': 'center'}),

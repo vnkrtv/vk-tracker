@@ -1,10 +1,8 @@
-from django.urls import re_path
-from django.conf.urls import url, include
-from .views import dash, dash_ajax
+from django.urls import path
+from . import views
 
 app_name = 'dashboard'
 
 urlpatterns = [
-    re_path(r'_', dash_ajax),
-    re_path(r'', dash)
+    path('<domain>', views.dash, name='dash')
 ]

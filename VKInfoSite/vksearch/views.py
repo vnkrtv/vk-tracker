@@ -4,14 +4,15 @@ import time
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
-from . import mongo
+from main import mongo
+from .mongo import VKSearchFiltersStorage
 from .decorators import unauthenticated_user, post_method, check_token
 from .vkscripts import vk_api, VKSearchScripts
 
 
 @unauthenticated_user
 def get_search_params(request):
-    storage = mongo.VKSearchFiltersStorage.connect(db=mongo.get_conn())
+    storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     info = {
         'title': 'Search | VK Tracker',
         'filters': storage.get_all_philters_names()
@@ -71,7 +72,7 @@ class SearchView(View):
         filter_name = request.POST['filter']
         count = 1000
 
-        storage = mongo.VKSearchFiltersStorage.connect(db=mongo.get_conn())
+        storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
         _filter = storage.get_filter(filter_name)
 
         kwargs = {
@@ -319,7 +320,7 @@ def add_filter_result(request):
         'friends':       friends_ids,
         'groups':        groups_ids
     }
-    storage = mongo.VKSearchFiltersStorage.connect(db=mongo.get_conn())
+    storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.add_filter(_filter)
     info = {
         'title': 'New search filter was added | VK Tracker',
@@ -331,7 +332,7 @@ def add_filter_result(request):
 
 @unauthenticated_user
 def delete_filter(request):
-    storage = mongo.VKSearchFiltersStorage.connect(db=mongo.get_conn())
+    storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     info = {
         'title': 'Delete search filter | VK Tracker',
         'filters': storage.get_all_philters_names()
@@ -343,7 +344,7 @@ def delete_filter(request):
 @unauthenticated_user
 def delete_filter_result(request):
     filter_name = request.POST['filter']
-    storage = mongo.VKSearchFiltersStorage.connect(db=mongo.get_conn())
+    storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.delete_philter(filter_name)
     info = {
         'title': 'Search filter was deleted | VK Tracker',

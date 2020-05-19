@@ -6,14 +6,14 @@ import vk
 
 class VKUser:
 
-    _token = ''
-    _session = None
-    _timeout = 0.35
-    _api_version = '5.103'
-    _domain = ''
-    _id = ''
-    _first_name = ''
-    _last_name = ''
+    _token: str
+    _session: vk.API
+    _domain: str
+    _id: str
+    _first_name: str
+    _last_name: str
+    _timeout: float = 0.35
+    _api_version: str = '5.103'
 
     def open_session(self, token: str, domain: str):
         self._token = token
