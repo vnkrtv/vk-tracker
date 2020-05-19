@@ -1,4 +1,34 @@
+from django.conf import settings
 from py2neo import Graph, Node, Relationship
+
+_db_conn: Graph = None
+
+
+def set_conn(url: str, user: str, password: str) -> None:
+    """
+    Establish user connection to Neo4j database
+
+    :param url: Neo4j url
+    :param user: Neo4j user
+    :param password: Neo4j user password
+    """
+    global _db_conn
+    _db_conn = Graph(url, user=user, password=password)
+
+
+def get_conn() -> Graph:
+    """
+    Get user connection to Neo4j database
+
+    :return: Graph - connection to database
+    """
+    global _db_conn
+    if not _db_conn:
+        set_conn(
+            url=settings.DATABASES['neo4j']['URL'],
+            user=settings.DATABASES['neo4j']['USER'],
+            password=settings.DATABASES['neo4j']['PASSWORD'])
+    return _db_conn
 
 
 class Neo4jStorage:
@@ -11,15 +41,13 @@ class Neo4jStorage:
     _graph: Graph
 
     @staticmethod
-    def connect(url: str = 'bolt://localhost:11001', user: str = 'neo4j', password: str = 'admin'):
+    def connect(conn: Graph):
         """
 
-        :param url: Neo4j server url
-        :param user: username
-        :param password: password
+        :param conn: Neo4j connection
         """
         obj = Neo4jStorage()
-        obj._graph = Graph(url, user=user, password=password)
+        obj._graph = conn
         return obj
 
     def add_user(self, user) -> dict:
@@ -38,11 +66,16 @@ class Neo4jStorage:
         city = user['main_info'].get('city', None)
         city = city.get('title', '') if city else ''
 
+        print(user['main_info'].get('bdate', ''))
+
         bday = user['main_info'].get('bdate', '')
         bday_month = user['main_info'].get('bdate', ' . . ').split('.')[1]
         bday_day = user['main_info'].get('bdate', ' . . ').split('.')[0]
 
-        bday_year = user['main_info'].get('bdate', ' . . ').split('.')[2]
+        if len(bday.split('.')) == 2:
+            bday_year = ''
+        else:
+            bday_year = user['main_info'].get('bdate', ' . . ').split('.')[2]
 
         user_info = {
             'first_name': user['main_info']['first_name'],

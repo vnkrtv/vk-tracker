@@ -5,8 +5,8 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from main import mongo
+from main.decorators import unauthenticated_user, post_method, check_token
 from .mongo import VKSearchFiltersStorage
-from .decorators import unauthenticated_user, post_method, check_token
 from .vkscripts import vk_api, VKSearchScripts
 
 

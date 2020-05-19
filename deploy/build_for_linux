@@ -6,68 +6,75 @@ echo "Created virtual environment..."
 mkdir tmp
 cp -r VKInfoSite tmp/VKInfoSite
 rm -r VKInfoSite
+
 echo "===========================================Start loading requirements==========================================="
 pip install --no-cache-dir -r requirements.txt
 echo "=========================================Successfully loaded requirments======================================="
 django-admin startproject VKInfoSite
-SECRET_KEY=$(cat ./VKInfoSite/VKInfoSite/settings.py | grep SECRET_KEY | cut -d "'" -f 2)
+GENERATED_SECRET_KEY=$(cat ./VKInfoSite/VKInfoSite/settings.py | grep SECRET_KEY | cut -d "'" -f 2)
 
-cd VKInfoSite
-python manage.py startapp main
-python manage.py startapp vksearch
-python manage.py startapp dashboard
-cd ..
 rm -r VKInfoSite
 cp -r tmp/VKInfoSite VKInfoSite
-
-OLD_SECRET_KEY=$(cat ./VKInfoSite/VKInfoSite/settings.py | grep SECRET_KEY | cut -d "'" -f 2)
-NEW_SETTINGS="$(echo "$(cat ./VKInfoSite/VKInfoSite/settings.py)" | sed "s/${OLD_SECRET_KEY}/${SECRET_KEY}/")"
-echo "${NEW_SETTINGS}" > ./VKInfoSite/VKInfoSite/settings.py
-
 rm -r tmp
+
+SETTINGS="$(echo "$(cat ./deploy/settings)")"
+SETTINGS="${SETTINGS/GENERATED_SECRET_KEY/${GENERATED_SECRET_KEY}}"
+
 echo "===========================================Initialized django app==============================================="
-echo "===========================================Enter configuration data:============================================"
-read -p "Vk token: " TOKEN
-
-read -r -p "MongoDB host (default: localhost) " MDB_HOST
-if [ "${MDB_HOST}" == "" ]
+echo "==========================================Enter configuration data============================================="
+read -r -p "MongoDB host (default: localhost) " MONGO_HOST
+if [ "${MONGO_HOST}" == "" ]
 then
-  MDB_HOST="localhost"
+  MONGO_HOST="localhost"
 fi
+SETTINGS="${SETTINGS/MONGO_HOST/${MONGO_HOST}}"
 
-read -r -p "MongoDB port (default: 27017): " MDB_PORT
-if [ "${MDB_PORT}" == "" ]
+read -r -p "MongoDB port (default: 27017): " MONGO_PORT
+if [ "${MONGO_PORT}" == "" ]
 then
-  MDB_PORT=27017
+  MONGO_PORT="27017"
 fi
+SETTINGS="${SETTINGS/MONGO_PORT/${MONGO_PORT}}"
 
-read -r -p "MongoDB database name (default: 'vkdata'): " MDB_DBNAME
-if [ "${MDB_DBNAME}" == "" ]
+read -r -p "MongoDB database name (default: 'vktracker'): " MONGO_DBNAME
+if [ "${MONGO_DBNAME}" == "" ]
 then
-  MDB_DBNAME="vkdata"
+  MONGO_DBNAME="vktracker"
 fi
+SETTINGS="${SETTINGS/MONGO_DBNAME/${MONGO_DBNAME}}"
+SETTINGS="${SETTINGS/MONGO_TESTDBNAME/test_${MONGO_DBNAME}}"
 
-read -r -p "Neo4j URL (default: 'bolt://localhost:7687'): " NEO4J_URL
+read -r -p "Neo4j URL (default: 'http://localhost:7474'): " NEO4J_URL
 if [ "${NEO4J_URL}" == "" ]
 then
-  NEO4J_URL="bolt://localhost:7687"
+  NEO4J_URL="http://localhost:7474"
 fi
+SETTINGS="${SETTINGS/NEO4J_URL/${NEO4J_URL}}"
 
 read -r -p "Neo4j user (default: 'neo4j'): " NEO4J_USER
 if [ "${NEO4J_USER}" == "" ]
 then
   NEO4J_USER="neo4j"
 fi
+SETTINGS="${SETTINGS/NEO4J_USER/${NEO4J_USER}}"
 
-read -r -p "Neo4j password (default: 'pass'): " NEO4J_PASS
-if [ "${NEO4J_PASS}" == "" ]
+read -r -p "Neo4j password (default: 'neo4j'): " NEO4J_PASSWORD
+if [ "${NEO4J_PASSWORD}" == "" ]
 then
-  NEO4J_PASS="pass"
+  NEO4J_PASSWORD="neo4j"
 fi
+SETTINGS="${SETTINGS/NEO4J_PASSWORD/${NEO4J_PASSWORD}}"
 
-CONFIG="{\"mdb_host\": \"${MDB_HOST}\", \"mdb_port\": ${MDB_PORT}, \"mdb_dbname\": ${MDB_DBNAME}, \"neo_url\": \"${NEO4J_URL}\", \"neo_user\": \"${NEO4J_USER}\", \"neo_pass\": \"${NEO4J_PASS}\", \"vk_token\": \"${TOKEN}\"}"
-echo "${CONFIG}" > ./VKInfoSite/config/config.json
-echo "${CONFIG}" > ./VKInfoSite/config/default_config.json
+echo "${SETTINGS}" > ./VKInfoSite/VKInfoSite/settings.py
+
+
+read -r -p "VK token (default: ''): " TOKEN
+if [ "${TOKEN}" == "" ]
+then
+  TOKEN=""
+fi
+VK_TOKEN="{\"vk_token\": \"${TOKEN}\"}"
+echo "${VK_TOKEN}" > ./VKInfoSite/VKInfoSite/vk_token/vk_token.json
 echo "==========================================Initialized configuration============================================="
 echo "===========================================Enter superuser info==============================================="
 python VKInfoSite/manage.py createsuperuser

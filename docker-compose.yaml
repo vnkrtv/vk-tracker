@@ -21,7 +21,7 @@ services:
         context: docker
         dockerfile: Dockerfile
     image: vk-tracker
-    command: ["python3", "/app/VKInfiSite/manage.py", "runserver", "0.0.0.0:8000", " --noreload¶"]
+    command: ["python3", "/app/VKInfiSite/manage.py", "runserver", "0.0.0.0:8000", " --noreload"]
     container_name: vk-tracker
     ports:
       - "8080:8080"

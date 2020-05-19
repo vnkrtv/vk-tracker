@@ -1,6 +1,6 @@
 venv/
 .idea/
-VKInfoSite/VKInfoSite/config/config.json
-VKInfoSite/VKInfoSite/config/default_config.json
+VKInfoSite/VKInfoSite/vktoken/vktoken.json
+VKInfoSite/VKInfoSite/vktoken/default_config.json
 *.pyc
 VKInfoSite/db.sqlite3

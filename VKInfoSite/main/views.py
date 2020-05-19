@@ -5,7 +5,7 @@ from django.conf import settings
 from requests.exceptions import ConnectionError
 from neobolt.exceptions import ServiceUnavailable
 from . import mongo
-from .neo4j import Neo4jStorage
+from . import neo4j
 from .vk_models import VKInfo
 from .vk_analitics import VKAnalizer, VKRelation
 from .decorators import unauthenticated_user, post_method, check_token
@@ -21,15 +21,24 @@ def login_page(request):
     )
     if user is not None:
         if user.is_active:
-            login(request, user)
+
+            try:
+                neo4j.set_conn(
+                    url=settings.DATABASES['neo4j']['URL'],
+                    user=settings.DATABASES['neo4j']['USER'],
+                    password=settings.DATABASES['neo4j']['PASSWORD'])
+            except ServiceUnavailable:
+                render(request, 'login.html', {'error': 'Neo4j is not connected.'})
+
             mongo.set_conn(
                 host=settings.DATABASES['default']['HOST'],
                 port=settings.DATABASES['default']['PORT'],
                 db_name=settings.DATABASES['default']['NAME'])
+            login(request, user)
             return redirect('/add_user/')
         else:
-            return render(request, 'login.html', {'error': 'Error: user account is disabled!'})
-    return render(request, 'login.html', {'error': 'Error: username and password are incorrect!'})
+            return render(request, 'login.html', {'error': 'user account is disabled.'})
+    return render(request, 'login.html', {'error': 'username and password are incorrect.'})
 
 
 @unauthenticated_user
@@ -79,23 +88,17 @@ def add_user(request):
     return render(request, 'main/add_user/getDomain.html', info)
 
 
-@check_token
+#@check_token
 @post_method
 @unauthenticated_user
 def add_user_result(request):
-    config = json.load(open(settings.CONFIG, 'r'))
-    error = ''
+    token = json.load(open(settings.VK_TOKEN, 'r'))
 
     try:
-        vk_user = VKInfo.get_user(token=config['vk_token'], domain=request.POST['domain'])
-        config.pop('vk_token')
+        vk_user = VKInfo.get_user(token=token['vk_token'], domain=request.POST['domain'])
         user_info = vk_user.get_all_info()
 
-        storage = Neo4jStorage.connect(
-            url=config['neo_url'],
-            user=config['neo_user'],
-            password=config['neo_pass']
-        )
+        storage = neo4j.Neo4jStorage.connect(conn=neo4j.get_conn())
         storage.add_user(user_info)
 
         storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
@@ -108,15 +111,10 @@ def add_user_result(request):
             'domain': user_info['main_info']['domain']
         }
     except ConnectionError:
-        error = 'No connection to the internet.'
-    except ServiceUnavailable:
-        error = 'Neo4j is not connected.'
-
-    if error:
         info = {
             'title': 'Error | VK Tracker',
             'message_title': 'Error',
-            'message': error
+            'message': 'No connection to the internet.'
         }
         return render(request, 'info.html', info)
 

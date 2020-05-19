@@ -182,7 +182,7 @@ class VKInfo(VKUser):
             req_code = code.format(
                 photos=photos_list,
                 user_id=self._id
-            ).replace('\n', '').replace('  ', '')
+            ).replace('True', 'true').replace('False', 'false')
             photos['items'] += self._session.execute(code=req_code, v=self._api_version)
             time.sleep(self._timeout)
 
@@ -263,7 +263,7 @@ class VKInfo(VKUser):
             req_code = code.format(
                 posts=posts_list,
                 user_id=self._id
-            ).replace('\n', '').replace('  ', '')
+            ).replace('True', 'true').replace('False', 'false')
             wall['items'] += self._session.execute(code=req_code, v=self._api_version)
             time.sleep(self._timeout)
 
