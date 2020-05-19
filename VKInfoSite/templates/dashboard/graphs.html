@@ -4,5 +4,5 @@
 	<h2>Graphs</h2>
 	{% csrf_token %}
 	{% load plotly_dash %}
-    {% plotly_app name="Graphs" ratio=0.5 initial_arguments=data %}
+    {% plotly_app name="Graphs" ratio=0.5 initial_arguments=args %}
 {% endblock %}

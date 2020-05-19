@@ -9,6 +9,7 @@ import vk
 from datetime import datetime
 from django.conf import settings
 
+
 class GenderPieChart:
     def __init__(self, user_info):
         """
@@ -29,7 +30,13 @@ class GenderPieChart:
         labels = ['Female', 'Male']
         values = [counter['female'], counter['male']]
 
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+        fig = go.Figure(
+            layout=dict(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'
+            ),
+            data=[go.Pie(labels=labels, values=values)]
+        )
         fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
                           marker=dict(colors=['red', 'blue'], line=dict(color='blue', width=2)))
 
@@ -78,6 +85,8 @@ class PhotoLikesGraph:
                         xaxis={'type': 'log', 'title': 'Comments'},
                         yaxis={'title': 'Likes'},
                         margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
                         legend={'x': 0, 'y': 1},
                         hovermode='closest'
                     )
@@ -122,6 +131,8 @@ class PostsLikesGraph:
                     'layout': go.Layout(
                         xaxis={'type': 'log', 'title': 'Likes'},
                         yaxis={'title': 'Comments'},
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
                         margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
                         legend={'x': 0, 'y': 1},
                         hovermode='closest'
@@ -207,6 +218,8 @@ class ActivityGraph:
                     'layout': go.Layout(
                         xaxis={'type': 'log', 'title': 'Likes'},
                         yaxis={'title': 'Comments'},
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
                         margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
                         legend={'x': 0, 'y': 1},
                         hovermode='closest'
@@ -241,6 +254,10 @@ class UniversityDistributionGraph:
             dcc.Graph(
                 id='universities-distribution',
                 figure=go.Figure(
+                    layout=dict(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)'
+                    ),
                     data=[go.Pie(
                         labels=self._df['University'],
                         values=self._df['Count'])
@@ -274,6 +291,10 @@ class CitiesDistributionGraph:
             dcc.Graph(
                 id='cities-distribution',
                 figure=go.Figure(
+                    layout=dict(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)'
+                    ),
                     data=[go.Pie(
                         labels=self._df['City'],
                         values=self._df['Count'])
@@ -307,6 +328,10 @@ class CountriesDistributionGraph:
             dcc.Graph(
                 id='countries-distribution',
                 figure=go.Figure(
+                    layout=dict(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)'
+                    ),
                     data=[go.Pie(
                         labels=self._df['Country'],
                         values=self._df['Count'])
@@ -342,6 +367,10 @@ class AgeDistributionGraph:
             dcc.Graph(
                 id='countries-distribution',
                 figure=go.Figure(
+                    layout=dict(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)'
+                    ),
                     data=[go.Pie(
                         labels=self._df['Age'],
                         values=self._df['Count'])
@@ -489,7 +518,8 @@ class FriendsActivityGraph:
                     ],
                     'layout': go.Layout(
                         height=950,
-                        #  width=950,
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
                         scene=dict(
                             xaxis=dict(title="Likes"),
                             yaxis=dict(title="Comments"),
@@ -519,6 +549,10 @@ class OnlineGraph:
             dcc.Graph(
                 id='online-graph',
                 figure=go.Figure(
+                    layout=dict(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)'
+                    ),
                     data=[go.Scatter(
                         x=self._df['time'],
                         y=self._df['online'],

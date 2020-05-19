@@ -39,24 +39,30 @@ cached_graphs = {}
 def update_graph(graphs_list, domain):
     graphs = []
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+    user_info = storage.get_user(domain=domain)
 
     for i, class_name in enumerate(graphs_list):
         try:
-            user_info = storage.get_user(domain=domain)
-            graph = eval(class_name)(user_info=user_info)
+            if class_name not in cached_graphs:
+                graph = eval(class_name)(user_info=user_info)
+                cached_graphs[class_name] = graph.create_graph()
+            graphs.append(cached_graphs[class_name])
         except ValueError:
             graphs.append(html.H3(
                 '{} graph is not available'.format(class_name),
                 style={'marginTop': 20, 'marginBottom': 20}
             ))
-            continue
-
-        if class_name not in cached_graphs:
-            cached_graphs[class_name] = graph.create_graph()
-        graphs.append(cached_graphs[class_name])
 
     return graphs
 
 
 def dash(request, domain):
-    return render(request, 'dashboard/graphs.html', {'data': {'domain_id': {'value': domain}}})
+    info = {
+        'title': 'Dashboard | VK Tracker',
+        'args': {
+            'domain_id': {
+                'value': domain
+            }
+        }
+    }
+    return render(request, 'dashboard/graphs.html', info)
