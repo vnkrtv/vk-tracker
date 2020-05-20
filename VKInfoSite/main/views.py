@@ -132,7 +132,6 @@ def get_user_info(request):
         }
         return render(request, 'info.html', info)
 
-
     info = {
         'title': 'User information | VK Tracker',
         'info': user_info,
@@ -140,7 +139,6 @@ def get_user_info(request):
         'domain': domain,
         'id': user_info['main_info']['id']
     }
-
     return render(request, 'main/user_info/userInfo.html', info)
 
 

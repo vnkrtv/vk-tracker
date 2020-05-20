@@ -1,129 +1,14 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+
+{% load static %}
+{% load main_extras %}
+
+<style type="text/css">img { cursor: pointer; }</style>
+<script src="{% static 'main/js/main.js' %}"></script>
+
 <div class="jumbotron">
-    {% load main_extras %}
-    <style type="text/css">img { cursor: pointer; }</style>
-    <script type="text/javascript">
-    function tableSearch(input_id, table_id) {
-        var phrase = document.getElementById(input_id);
-        var table = document.getElementById(table_id);
-        var regPhrase = new RegExp(phrase.value, 'i');
-        var flag = false;
-        for (var i = 1; i < table.rows.length; i++) {
-            flag = false;
-            for (var j = table.rows[i].cells.length - 1; j >= 0; j--) {
-                flag = regPhrase.test(table.rows[i].cells[j].innerHTML);
-                if (flag) break;
-                }
-                if (flag) {
-                    table.rows[i].style.display = "";
-                } else {
-                    table.rows[i].style.display = "none";
-                }
-            }
-        }
-
-
-    function sortTableByNums(table_id, column_num, has_child) {
-      var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-      table = document.getElementById(table_id);
-      switching = true;
-      dir = "asc";
-
-      while (switching) {
-        switching = false;
-        rows = table.rows;
-
-        for (i = 1; i < (rows.length - 1); i++) {
-          shouldSwitch = false;
-
-          x = rows[i].getElementsByTagName("TD")[column_num];
-          if (has_child) {
-            x = x.firstChild;
-          }
-          y = rows[i + 1].getElementsByTagName("TD")[column_num];
-          if (has_child) {
-            y = y.firstChild;
-          }
-          if (dir == "asc") {
-            if (parseInt(x.innerHTML) > parseInt(y.innerHTML)) {
-              shouldSwitch = true;
-              break;
-            }
-          } else if (dir == "desc") {
-            if (parseInt(x.innerHTML) < parseInt(y.innerHTML)) {
-              shouldSwitch = true;
-              break;
-            }
-          }
-        }
-        if (shouldSwitch) {
-          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-          switching = true;
-          switchcount ++;
-        } else {
-          if (switchcount == 0 && dir == "asc") {
-            dir = "desc";
-            switching = true;
-          }
-        }
-      }
-    }
-
-    function sortTable(table_id, column_num) {
-      var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-      table = document.getElementById(table_id);
-      switching = true;
-      dir = "asc";
-
-      while (switching) {
-        switching = false;
-        rows = table.rows;
-
-        for (i = 1; i < (rows.length - 1); i++) {
-          shouldSwitch = false;
-
-          x = rows[i].getElementsByTagName("TD")[column_num];
-          y = rows[i + 1].getElementsByTagName("TD")[column_num];
-          if (dir == "asc") {
-            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-              shouldSwitch = true;
-              break;
-            }
-          } else if (dir == "desc") {
-            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-              shouldSwitch = true;
-              break;
-            }
-          }
-        }
-        if (shouldSwitch) {
-          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-          switching = true;
-          switchcount ++;
-        } else {
-          if (switchcount == 0 && dir == "asc") {
-            dir = "desc";
-            switching = true;
-          }
-        }
-      }
-    }
-
-    function hideTable(input_id, table_id) {
-        if (document.getElementById(input_id).style.display == "") {
-            document.getElementById(input_id).style.display = "none";
-        } else {
-            document.getElementById(input_id).style.display = "";
-        }
-        if (document.getElementById(table_id).style.display == "") {
-            document.getElementById(table_id).style.display = "none";
-        } else {
-            document.getElementById(table_id).style.display = "";
-        }
-    }
-    </script>
 
     <h2>Information about <a style="color: black" href="https://vk.com/{{ domain }}">{{ fullname }}</a></h2>
     <hr class="my-4">
@@ -133,7 +18,7 @@
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-main", "main-info-table")'> Main info</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-main" onkeyup='tableSearch("search-main", "main-info-table")'>
-    <table id="main-info-table" class="table table-hover display">
+    <table id="main-info-table" class="table table-hover">
         <tbody>
             <tr><td><strong>ID</strong></td><td>{{ info.main_info.id }}</td></tr>
             <tr><td><strong>First name</strong></td><td>{{ info.main_info.first_name }}</td></tr>
@@ -153,7 +38,7 @@
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-counters", "counters-table")'> Counters</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-counters" onkeyup='tableSearch("search-counters", "counters-table")'>
-    <table id="counters-table" class="table table-hover display">
+    <table id="counters-table" class="table table-hover">
         <tbody>
             <tr><td><strong>Friends</strong></td><td>{{ info.main_info.counters.friends }}</td></tr>
             <tr><td><strong>Followers</strong></td><td>{{ info.main_info.followers_count }}</td></tr>
@@ -250,7 +135,7 @@
         <thead>
              <tr class="table-active">
                 <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('photos-table', 0, true)"></th>
-                <th scope="col">Photo id</th>
+                <th scope="col">Photo ID</th>
                 <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('photos-table', 2, false)"></th>
        		    <th scope="col">Likes</th>
        		    <th scope="col">Comments</th>
@@ -291,7 +176,7 @@
         <thead>
              <tr class="table-active">
                 <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('wall-table', 0, true)"></th>
-   		        <th scope="col">Post id</th>
+   		        <th scope="col">Post ID</th>
    		        <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('wall-table', 2, false)"></th>
                 <th scope="col">Likes</th>
                 <th scope="col">Text</th>
@@ -326,15 +211,16 @@
         </tbody>
     </table>
 
-    <script type="text/javascript">
-        hideTable("search-main", "main-info-table");
-        hideTable("search-counters", "counters-table")
-        hideTable("search-friends", "friends-table");
-        hideTable("search-followers", "followers-table");
-        hideTable("search-groups", "groups-table");
-        hideTable("search-photos", "photos-table");
-        hideTable("search-wall", "wall-table");
-    </script>
-
 </div>
+
+<script type="text/javascript">
+    hideTable("search-main", "main-info-table");
+    hideTable("search-counters", "counters-table")
+    hideTable("search-friends", "friends-table");
+    hideTable("search-followers", "followers-table");
+    hideTable("search-groups", "groups-table");
+    hideTable("search-photos", "photos-table");
+    hideTable("search-wall", "wall-table");
+</script>
+
 {% endblock %}

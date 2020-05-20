@@ -1,14 +1,30 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'main/css/scroller.css' %}">
+<script type="text/javascript">
+	function showIcon() {
+		document.getElementById("scroller").style.display = "";
+		document.getElementById("br").style.display = "";
+	}
+</script>
+
 <div class="jumbotron">
 	<h2>Add user</h2>
     <form action="{% url 'main:add_user_result' %}" method="post">
 	    {% csrf_token %}
 	    <label for="domain">Enter user domain: </label>
 	    <input type="text" name="domain" id="domain"/><br/>
-	    <input type="submit" class="btn btn-dark" value="Add user">
+		<div id="scroller" class="lds-ring"><div></div><div></div><div></div><div></div></div><br id="br">
+	    <input type="submit" class="btn btn-dark" value="Add user" onclick="showIcon()">
     </form>
-    <br/>
 </div>
+
+<script type="text/javascript">
+	document.getElementById("scroller").style.display = "none";
+	document.getElementById("br").style.display = "none";
+</script>
 {% endblock %}

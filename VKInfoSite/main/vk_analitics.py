@@ -399,7 +399,7 @@ class VKRelation:
                 'items': []
             }
         }]
-        likes_count = comm_count = 0
+        likes_count, comm_count = 0, 0
 
         for post in user1_wall['items']:
             post_id = post['post_id']
@@ -422,7 +422,7 @@ class VKRelation:
         result[1]['likes']['counter'] = likes_count
         result[1]['comments']['counter'] = comm_count
 
-        likes_count = comm_count = 0
+        likes_count, comm_count = 0, 0
 
         for post in user2_wall['items']:
             post_id = post['post_id']
