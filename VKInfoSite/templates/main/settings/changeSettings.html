@@ -1,13 +1,15 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
-  <h2>Settings</h2><br>
-  <form action="{% url 'main:change_settings_result' %}" method="post">
-    {% csrf_token %}
-    <h4>VK token</h4>
-    <table>
-      <tr><td><input type="text" class="form-control" name="vk_token" value="{{ vk_token }}" size="95" required></td></tr>
-    </table><br>
-    <input type="submit" class="btn btn-dark" value="Change settings">
-  </form>
+<div class="jumbotron">
+	<h2>Settings</h2><br>
+	<form action="{% url 'main:change_settings_result' %}" method="post">
+	{% csrf_token %}
+	<h4>VK token</h4>
+	<table>
+	 	<tr><td><input type="text" class="form-control" name="vk_token" value="{{ vk_token }}" size="95" required></td></tr>
+	</table><br>
+	<input type="submit" class="btn btn-dark" value="Change settings">
+	</form>
+</div>
 {% endblock %}

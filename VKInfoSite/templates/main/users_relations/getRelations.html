@@ -1,325 +1,322 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
-    {% if not error %}
-        <span class="d-block p-2 bg-primary text-white">Users main info</span>
+<div class="jumbotron">
+    <span class="d-block p-2 bg-primary text-white">Users main info</span>
+    <table class="table table-striped table-dark">
+        <thead>
+       	     <tr>
+       		    <th scope="col">Info</th>
+       		    <th scope="col">First user</th>
+       		    <th scope="col">Second user</th>
+             </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Name</td>
+                <td><a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a></td>
+                <td><a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a></td>
+            </tr>
+            <tr>
+                <td>Domain</td>
+                <td>{{ user1_info.domain }}</td>
+                <td>{{ user2_info.domain}}</td>
+            </tr>
+            <tr>
+                <td>ID</td>
+                <td>{{ user1_info.id }}</td>
+                <td>{{ user2_info.id}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {% if mutual_friends.items %}
+        <span class="d-block p-2 bg-primary text-white">Mutual friends</span>
         <table class="table table-striped table-dark">
             <thead>
-           	     <tr>
-           		    <th scope="col">Info</th>
-           		    <th scope="col">First user</th>
-           		    <th scope="col">Second user</th>
-                 </tr>
+                <tr>
+                    <th scope="col">#</th>
+           		    <th scope="col">Fullname</th>
+           		    <th scope="col">id</th>
+           		    <th scope="col">domain</th>
+                </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Name</td>
-                    <td><a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a></td>
-                    <td><a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a></td>
-                </tr>
-                <tr>
-                    <td>Domain</td>
-                    <td>{{ user1_info.domain }}</td>
-                    <td>{{ user2_info.domain}}</td>
-                </tr>
-                <tr>
-                    <td>ID</td>
-                    <td>{{ user1_info.id }}</td>
-                    <td>{{ user2_info.id}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        {% if mutual_friends.items %}
-            <span class="d-block p-2 bg-primary text-white">Mutual friends</span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-               		    <th scope="col">Fullname</th>
-               		    <th scope="col">id</th>
-               		    <th scope="col">domain</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for friend in mutual_friends.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
-                            <td>{{ friend.id }}</td>
-                            <td>{{ friend.domain }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <span class="d-block p-2 bg-primary text-white">No mutual friends</span>
-        {% endif %}
-
-        {% if mutual_groups.items %}
-            <span class="d-block p-2 bg-primary text-white">Mutual groups</span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-           		        <th scope="col">Name</th>
-           		        <th scope="col">id</th>
-           		        <th scope="col">Screen name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for group in mutual_groups.items %}
+                {% for friend in mutual_friends.items %}
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
-                        <td>{{ group.id }}</td>
-                        <td>{{ group.screen_name }}</td>
+                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                        <td>{{ friend.id }}</td>
+                        <td>{{ friend.domain }}</td>
                     </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <span class="d-block p-2 bg-primary text-white">No mutual groups</span>
-        {% endif %}
-
-        {% if first_user2second_user.photos.likes.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                 likes on
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                's photos
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Photo id</th>
-                        </tr>
-                </thead>
-                <tbody>
-                    {% for like in first_user2second_user.photos.likes.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ like.photo_id }}%2Fphotos{{ user2_info.id }}">{{ like.photo_id }}</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-        {% if first_user2second_user.photos.comments.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                 comments on
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                's photos
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Photo id</th>
-                        <th scope="col">Comment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for comment in first_user2second_user.photos.comments.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user2_info.id }}">{{ comment.photo_id }}</a></td>
-                            <td>
-                                {% if 'attachments' in comment and not comment.text %}
-                                    <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                {% else %}
-                                    <p>{{ comment.text }}</p>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-
-        {% if second_user2first_user.photos.likes.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                 likes on
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                's photos
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Photo id</th>
-                        </tr>
-                </thead>
-                <tbody>
-                    {% for like in second_user2first_user.photos.likes.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?z=photo{{ user1_info.id }}_{{ like.photo_id }}%2Fphotos{{ user1_info.id }}">{{ like.photo_id }}</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-        {% if second_user2first_user.photos.comments.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                 comments on
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                's photos
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Photo id</th>
-                        <th scope="col">Comment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for comment in second_user2first_user.photos.comments.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?z=photo{{ user1_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user1_info.id }}">{{ comment.photo_id }}</a></td>
-                            <td>
-                                {% if 'attachments' in comment and not comment.text %}
-                                    <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                {% else %}
-                                    <p>{{ comment.text }}</p>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-
-
-
-        {% if first_user2second_user.wall.likes.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                 likes on
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                's wall
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Post id</th>
-                        </tr>
-                </thead>
-                <tbody>
-                    {% for like in first_user2second_user.wall.likes.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-        {% if first_user2second_user.wall.comments.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                 comments on
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                's wall
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Post id</th>
-                        <th scope="col">Comment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for comment in first_user2second_user.wall.comments.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
-                            <td>
-                                {% if 'attachments' in comment and not comment.text %}
-                                    <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                {% else %}
-                                    <p>{{ comment.text }}</p>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-
-        {% if second_user2first_user.wall.likes.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                 likes on
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                's wall
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Post id</th>
-                        </tr>
-                </thead>
-                <tbody>
-                    {% for like in second_user2first_user.wall.likes.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-        {% if second_user2first_user.wall.comments.items %}
-            <span class="d-block p-2 bg-primary text-white">
-                <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
-                 comments on
-                <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
-                's wall
-            </span>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Post id</th>
-                        <th scope="col">Comment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for comment in second_user2first_user.wall.comments.items %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
-                            <td>
-                                {% if 'attachments' in comment and not comment.text %}
-                                    <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                {% else %}
-                                    <p>{{ comment.text }}</p>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
-        <p>Error: {{ error }}</p>
+        <span class="d-block p-2 bg-primary text-white">No mutual friends</span>
     {% endif %}
+
+    {% if mutual_groups.items %}
+        <span class="d-block p-2 bg-primary text-white">Mutual groups</span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+       		        <th scope="col">Name</th>
+       		        <th scope="col">id</th>
+       		        <th scope="col">Screen name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in mutual_groups.items %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a style="color: white" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                    <td>{{ group.id }}</td>
+                    <td>{{ group.screen_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <span class="d-block p-2 bg-primary text-white">No mutual groups</span>
+    {% endif %}
+
+    {% if first_user2second_user.photos.likes.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+             likes on
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            's photos
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Photo id</th>
+                    </tr>
+            </thead>
+            <tbody>
+                {% for like in first_user2second_user.photos.likes.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ like.photo_id }}%2Fphotos{{ user2_info.id }}">{{ like.photo_id }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if first_user2second_user.photos.comments.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+             comments on
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            's photos
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Photo id</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in first_user2second_user.photos.comments.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user2_info.id }}">{{ comment.photo_id }}</a></td>
+                        <td>
+                            {% if 'attachments' in comment and not comment.text %}
+                                <p>Attachment: {{ comment.attachments.0.type }}</p>
+                            {% else %}
+                                <p>{{ comment.text }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+    {% if second_user2first_user.photos.likes.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+             likes on
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            's photos
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Photo id</th>
+                    </tr>
+            </thead>
+            <tbody>
+                {% for like in second_user2first_user.photos.likes.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?z=photo{{ user1_info.id }}_{{ like.photo_id }}%2Fphotos{{ user1_info.id }}">{{ like.photo_id }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if second_user2first_user.photos.comments.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+             comments on
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            's photos
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Photo id</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in second_user2first_user.photos.comments.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?z=photo{{ user1_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user1_info.id }}">{{ comment.photo_id }}</a></td>
+                        <td>
+                            {% if 'attachments' in comment and not comment.text %}
+                                <p>Attachment: {{ comment.attachments.0.type }}</p>
+                            {% else %}
+                                <p>{{ comment.text }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+
+
+    {% if first_user2second_user.wall.likes.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+             likes on
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            's wall
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Post id</th>
+                    </tr>
+            </thead>
+            <tbody>
+                {% for like in first_user2second_user.wall.likes.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if first_user2second_user.wall.comments.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+             comments on
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            's wall
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Post id</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in first_user2second_user.wall.comments.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
+                        <td>
+                            {% if 'attachments' in comment and not comment.text %}
+                                <p>Attachment: {{ comment.attachments.0.type }}</p>
+                            {% else %}
+                                <p>{{ comment.text }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+    {% if second_user2first_user.wall.likes.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+             likes on
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            's wall
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Post id</th>
+                    </tr>
+            </thead>
+            <tbody>
+                {% for like in second_user2first_user.wall.likes.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if second_user2first_user.wall.comments.items %}
+        <span class="d-block p-2 bg-primary text-white">
+            <a style="color: white" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+             comments on
+            <a style="color: white" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            's wall
+        </span>
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Post id</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in second_user2first_user.wall.comments.items %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a style="color: white" href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
+                        <td>
+                            {% if 'attachments' in comment and not comment.text %}
+                                <p>Attachment: {{ comment.attachments.0.type }}</p>
+                            {% else %}
+                                <p>{{ comment.text }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
 {% endblock %}

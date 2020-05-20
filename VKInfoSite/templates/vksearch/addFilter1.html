@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     <h2>Add new filter (1/2)</h2>
     <form action="{% url 'vksearch:get_new_filter_2' %}" method="post">
         {% csrf_token %}
@@ -75,4 +76,5 @@
             };
         };
     </script>
+</div>
 {% endblock %}

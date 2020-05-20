@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     <h2>Delete filter</h2>
     <form action="{% url 'vksearch:delete_filter_result' %}" method="post">
         {% csrf_token %}
@@ -13,4 +14,5 @@
         <input type="submit" class="btn btn-dark" value="Delete">
     </form>
     <br/>
+</div>
 {% endblock %}

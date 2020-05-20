@@ -1,12 +1,14 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
 	<h2>Add user</h2>
     <form action="{% url 'main:add_user_result' %}" method="post">
-        {% csrf_token %}
-        <label for="domain">Enter user domain: </label>
-        <input type="text" name="domain" id="domain"/><br/>
-        <input type="submit" class="btn btn-dark" value="Add user">
+	    {% csrf_token %}
+	    <label for="domain">Enter user domain: </label>
+	    <input type="text" name="domain" id="domain"/><br/>
+	    <input type="submit" class="btn btn-dark" value="Add user">
     </form>
     <br/>
+</div>
 {% endblock %}

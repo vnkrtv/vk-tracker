@@ -1,8 +1,11 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
-	<h2>Graphs</h2>
+
 	{% csrf_token %}
+
 	{% load plotly_dash %}
-    {% plotly_app name="Graphs" ratio=0.5 initial_arguments=args %}
+
+    {% plotly_app_bootstrap name="Graphs" aspect="16by9" initial_arguments=args %}
+
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     <span class="d-block p-2 bg-primary text-white">Search result: found {{ count }} persons</span>
     <table class="table table-striped table-dark">
         <thead>
@@ -32,4 +33,5 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 {% endblock %}

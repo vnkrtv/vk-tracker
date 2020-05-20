@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     <h2>Get dates</h2>
     <form action="{% url 'main:get_relations' %}" method="post">
         {% csrf_token %}
@@ -38,4 +39,5 @@
             <input type="hidden" id="second_domain" name="second_domain" value="{{ second_domain }}">
         </label>
     </form>
+</div>
 {% endblock %}

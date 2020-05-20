@@ -7,11 +7,10 @@ import json
 import time
 import vk
 from datetime import datetime
-from django.conf import settings
 
 
 class GenderPieChart:
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         """
         :param friends_list: list of friends JSONs
         """
@@ -53,7 +52,7 @@ class GenderPieChart:
 
 class PhotoLikesGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._data = user_info['photos']['items']
 
     def create_graph(self):
@@ -98,7 +97,7 @@ class PhotoLikesGraph:
 
 class PostsLikesGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._data = user_info['wall']['items']
 
     def create_graph(self):
@@ -145,7 +144,7 @@ class PostsLikesGraph:
 
 class ActivityGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._data = user_info
 
     def create_graph(self):
@@ -232,7 +231,7 @@ class ActivityGraph:
 
 class UniversityDistributionGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._df = pd.DataFrame({'University': [], 'Count': []})
 
         for friend in user_info['friends']['items']:
@@ -270,7 +269,7 @@ class UniversityDistributionGraph:
 
 class CitiesDistributionGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._df = pd.DataFrame({'City': [], 'Count': []})
 
         for friend in user_info['friends']['items']:
@@ -307,7 +306,7 @@ class CitiesDistributionGraph:
 
 class CountriesDistributionGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._df = pd.DataFrame({'Country': [], 'Count': []})
 
         for friend in user_info['friends']['items']:
@@ -344,7 +343,7 @@ class CountriesDistributionGraph:
 
 class AgeDistributionGraph:
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, **kwargs):
         self._df = pd.DataFrame({'Age': [], 'Count': []})
         for friend in user_info['friends']['items']:
             try:
@@ -383,9 +382,11 @@ class AgeDistributionGraph:
 
 class FriendsActivityGraph:
 
+    _token: str
     _timeout: float = 0.35
 
-    def __init__(self, user_info):
+    def __init__(self, user_info, token, **kwargs):
+        self._token = token
         df = pd.DataFrame({'Likes': [], 'Comments': [], 'Fullname': [], 'Mutual friends': []})
         for post in user_info['wall']['items']:
             for like in post['likes']['items']:
@@ -437,8 +438,7 @@ class FriendsActivityGraph:
                     fullname = profiles[id]
                     df.loc[id] = [0, 1, fullname, 0]
 
-        token = json.load(open(settings.VK_TOKEN, 'r'))['vk_token']
-        session = vk.API(vk.Session(access_token=token))
+        session = vk.API(vk.Session(access_token=self._token))
         code = """
             var friends = {friends};
             var res = [];
@@ -466,7 +466,6 @@ class FriendsActivityGraph:
             friends = list(friends_group)
             req_code = code.format(user_id=user_id, friends=friends).replace('\n', '').replace('  ', '')
 
-            mutual_friends_dict = {}
             for friend_id, mutual_friends in zip(friends, session.execute(code=req_code, v=5.102)):
                 if friend_id in df.index:
                     df.loc[friend_id, 'Mutual friends'] = len(mutual_friends) if mutual_friends else 0
@@ -536,7 +535,7 @@ class FriendsActivityGraph:
 
 class OnlineGraph:
 
-    def __init__(self, activity_list):
+    def __init__(self, activity_list, **kwargs):
         self._df = pd.DataFrame({
             'online':   [item['online'] for item in activity_list],
             'platform': [item['platform'] for item in activity_list],

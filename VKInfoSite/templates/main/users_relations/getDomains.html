@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     <h2>Get users domains</h2>
     <form action="{% url 'main:get_users_dates' %}" method="post">
         {% csrf_token %}
@@ -29,5 +30,5 @@
         </table>
         <input type="submit" class="btn btn-dark" value="Get mutual activity">
     </form>
-    <br/>
+</div>
 {% endblock %}

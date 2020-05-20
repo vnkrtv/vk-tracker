@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     {% if not error %}
         <span class="d-block p-2 bg-primary text-white">Information about <a style="color: white" href="https://vk.com/{{ domain }}">{{ fullname }}</a></span>
         <span class="d-block p-2 bg-primary text-white">
@@ -176,4 +177,5 @@
     {% else %}
         <p>Error: {{ error }}</p>
     {% endif %}
+</div>
 {% endblock %}

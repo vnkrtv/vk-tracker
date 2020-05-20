@@ -18,8 +18,7 @@ def login_page(request):
         return render(request, 'login.html')
     user = authenticate(
         username=request.POST['username'],
-        password=request.POST['password']
-    )
+        password=request.POST['password'])
     if user is not None:
         if user.is_active:
 
@@ -80,10 +79,11 @@ def add_user(request):
 @post_method
 @unauthenticated_user
 def add_user_result(request):
-    token = json.load(open(settings.VK_TOKEN, 'r'))
+    query = VKToken.objects.filter(user__id=request.user.id)
+    token = query[0].token if query else ''
 
     try:
-        vk_user = VKInfo.get_user(token=token['vk_token'], domain=request.POST['domain'])
+        vk_user = VKInfo.get_user(token=token, domain=request.POST['domain'])
         user_info = vk_user.get_all_info()
 
         storage = neo4j.Neo4jStorage.connect(conn=neo4j.get_conn())
@@ -122,14 +122,24 @@ def user_info(request):
 def get_user_info(request):
     domain = request.POST['domain']
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+    user_info = storage.get_user(domain=domain)
+
+    if not user_info:
+        info = {
+            'title': 'Error | VK Tracker',
+            'message_title': 'Error',
+            'message': "User's not found in base."
+        }
+        return render(request, 'info.html', info)
+
 
     info = {
         'title': 'User information | VK Tracker',
-        'info': storage.get_user(domain=domain),
+        'info': user_info,
         'fullname': storage.get_fullname(domain=domain),
-        'domain': domain
+        'domain': domain,
+        'id': user_info['main_info']['id']
     }
-    info['id'] = info['info']['main_info']['id']
 
     return render(request, 'main/user_info/userInfo.html', info)
 

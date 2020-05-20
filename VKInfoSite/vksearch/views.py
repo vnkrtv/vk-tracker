@@ -104,7 +104,7 @@ class SearchView(View):
             for group_id in _filter['groups']:
                 kwargs['group_id'] = group_id
                 code = self.search_by_groups_cities_universities.format(**kwargs)
-                response += vk_api('execute', code=code)
+                response += vk_api(request, 'execute', code=code)
                 time.sleep(0.34)
             result.append(SearchView.parse_response(response))
         else:
@@ -126,13 +126,13 @@ class SearchView(View):
             if universities_selected:
                 code = self.search_by_universities.format(**kwargs)
 
-            response = vk_api('execute', code=code)
+            response = vk_api(request, 'execute', code=code)
             time.sleep(0.34)
             result.append(SearchView.parse_response(response))
 
         if friends_selected:
             code = self.search_by_friends.format(friends=_filter['friends'])
-            result += vk_api('execute', code=code)
+            result += vk_api(request, 'execute', code=code)
 
         result_ids = []
         for search_res in result:
@@ -179,7 +179,7 @@ def add_search_filter(request):
         'need_all': 1,
         'count': 1000
     }
-    countries = vk_api('database.getCountries', **kwargs)
+    countries = vk_api(request, 'database.getCountries', **kwargs)
     info = {
         'countries': [item for item in countries['items'] if item['id'] < 5]
     }
@@ -193,9 +193,9 @@ def get_new_filter_2(request):
     cities_ids, un_cities_ids, cities_titles = [], [], []
     for key in request.POST:
         if key.startswith('city'):
-            req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
+            req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
-                country = vk_api('database.getCountriesById', country_ids=country_id)[0]['title']
+                country = vk_api(request, 'database.getCountriesById', country_ids=country_id)[0]['title']
                 info = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
@@ -205,7 +205,7 @@ def get_new_filter_2(request):
             cities_ids.append(req['items'][0]['id'])
             cities_titles.append(request.POST[key])
         if key.startswith('un_city'):
-            req = vk_api('database.getCities', q=request.POST[key], country_id=country_id)
+            req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
                 info = {
                     'title': 'Error | VK Tracker',
@@ -241,7 +241,7 @@ def get_new_filter_2(request):
             }}
             return res;
         """.format(**kwargs).replace('\n', '').replace('  ', '')
-        req = vk_api('execute', code=code)
+        req = vk_api(request, 'execute', code=code)
         time.sleep(0.35)
         for search_by_q in req:
             universities += [item for item in search_by_q['items']]
@@ -279,7 +279,7 @@ def add_filter_result(request):
     for key in request.POST:
         if 'friend_' in key:
             try:
-                friend = vk_api('users.get', user_ids=request.POST[key])[0]
+                friend = vk_api(request, 'users.get', user_ids=request.POST[key])[0]
             except vk.api.VkAPIError:
                 info = {
                     'title': 'Error | VK Tracker',
@@ -301,7 +301,7 @@ def add_filter_result(request):
     for key in request.POST:
         if 'group_' in key:
             try:
-                _id = vk_api('groups.getById', group_id=request.POST[key])[0]['id']
+                _id = vk_api(request, 'groups.getById', group_id=request.POST[key])[0]['id']
             except vk.api.VkAPIError:
                 info = {
                     'title': 'Error | VK Tracker',

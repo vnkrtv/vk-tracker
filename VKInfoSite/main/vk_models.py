@@ -18,18 +18,15 @@ class VKUser:
     def open_session(self, token: str, domain: str):
         self._token = token
         self._session = vk.API(vk.Session(access_token=token))
-        self._domain = self._session.users.get(
+        request = self._session.users.get(
             user_ids=domain,
             fields='domain',
             v=self._api_version
-        )[0]['domain']
+        )
         time.sleep(self._timeout)
 
-        if self._domain != domain:
+        if request[0]['domain'] != domain:
             raise vk.exceptions.VkAPIError('Incorrect domain')
-
-        request = self._session.users.get(user_ids=domain, v='5.65')
-        time.sleep(self._timeout)
 
         self._id = request[0]['id']
         self._first_name = request[0]['first_name']

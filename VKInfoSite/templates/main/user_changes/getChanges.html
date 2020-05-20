@@ -1,6 +1,7 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+<div class="jumbotron">
     <h2>User account changes</h2>
     {% if main_info %}
         <span class="d-block p-2 bg-primary text-white">Main info changes</span>
@@ -445,6 +446,5 @@
             </tbody>
         </table>
     {% endif %}
-
-
+</div>
 {% endblock %}
