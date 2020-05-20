@@ -66,8 +66,6 @@ class Neo4jStorage:
         city = user['main_info'].get('city', None)
         city = city.get('title', '') if city else ''
 
-        print(user['main_info'].get('bdate', ''))
-
         bday = user['main_info'].get('bdate', '')
         bday_month = user['main_info'].get('bdate', ' . . ').split('.')[1]
         bday_day = user['main_info'].get('bdate', ' . . ').split('.')[0]

@@ -40,7 +40,7 @@ class GenderPieChart:
                           marker=dict(colors=['red', 'blue'], line=dict(color='blue', width=2)))
 
         graph = html.Div([
-            html.H3('Gender', style={'text-align': 'center'}),
+            html.H4('Gender', style={'text-align': 'center'}),
             dcc.Graph(
                 id='gender-graph',
                 figure=fig
@@ -62,7 +62,7 @@ class PhotoLikesGraph:
 
         df = pd.DataFrame(self._data)
         graph = html.Div([
-            html.H3('Photos activity', style={'text-align': 'center'}),
+            html.H4('Photos activity', style={'text-align': 'center'}),
             dcc.Graph(
                 id='photos-likes',
                 figure={
@@ -109,7 +109,7 @@ class PostsLikesGraph:
         df = pd.DataFrame(self._data)
 
         graph = html.Div([
-            html.H3('Wall activity', style={'text-align': 'center'}),
+            html.H4('Wall activity', style={'text-align': 'center'}),
             dcc.Graph(
                 id='posts-likes',
                 figure={
@@ -196,7 +196,7 @@ class ActivityGraph:
                     df.loc[id] = [0, 1, fullname]
 
         graph = html.Div([
-            html.H3('Activity', style={'text-align': 'center'}),
+            html.H4('Activity', style={'text-align': 'center'}),
             dcc.Graph(
                 id='posts-likes',
                 figure={
@@ -249,7 +249,7 @@ class UniversityDistributionGraph:
 
     def create_graph(self):
         graph = html.Div([
-            html.H3('University distribution', style={'text-align': 'center'}),
+            html.H4('University distribution', style={'text-align': 'center'}),
             dcc.Graph(
                 id='universities-distribution',
                 figure=go.Figure(
@@ -286,7 +286,7 @@ class CitiesDistributionGraph:
 
     def create_graph(self):
         graph = html.Div([
-            html.H3('Cities distribution', style={'text-align': 'center'}),
+            html.H4('Cities distribution', style={'text-align': 'center'}),
             dcc.Graph(
                 id='cities-distribution',
                 figure=go.Figure(
@@ -323,7 +323,7 @@ class CountriesDistributionGraph:
 
     def create_graph(self):
         graph = html.Div([
-            html.H3('Countries distribution', style={'text-align': 'center'}),
+            html.H4('Countries distribution', style={'text-align': 'center'}),
             dcc.Graph(
                 id='countries-distribution',
                 figure=go.Figure(
@@ -362,7 +362,7 @@ class AgeDistributionGraph:
 
     def create_graph(self):
         graph = html.Div([
-            html.H3('Age distribution', style={'text-align': 'center'}),
+            html.H4('Age distribution', style={'text-align': 'center'}),
             dcc.Graph(
                 id='countries-distribution',
                 figure=go.Figure(
@@ -490,7 +490,7 @@ class FriendsActivityGraph:
             return text
 
         graph = html.Div([
-            html.H3('Friends activity', style={'text-align': 'center'}),
+            html.H4('Friends activity', style={'text-align': 'center'}),
             dcc.Graph(
                 id='activity-distribution',
                 figure={
@@ -544,7 +544,7 @@ class OnlineGraph:
 
     def create_graph(self):
         graph = html.Div([
-            html.H3('Online', style={'text-align': 'center'}),
+            html.H4('Online', style={'text-align': 'center'}),
             dcc.Graph(
                 id='online-graph',
                 figure=go.Figure(
