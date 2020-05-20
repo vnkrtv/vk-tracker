@@ -24,6 +24,53 @@
             }
         }
 
+
+    function sortTableByNums(table_id, column_num, has_child) {
+      var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+      table = document.getElementById(table_id);
+      switching = true;
+      dir = "asc";
+
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 1; i < (rows.length - 1); i++) {
+          shouldSwitch = false;
+
+          x = rows[i].getElementsByTagName("TD")[column_num];
+          if (has_child) {
+            x = x.firstChild;
+          }
+          y = rows[i + 1].getElementsByTagName("TD")[column_num];
+          if (has_child) {
+            y = y.firstChild;
+          }
+          if (dir == "asc") {
+            if (parseInt(x.innerHTML) > parseInt(y.innerHTML)) {
+              shouldSwitch = true;
+              break;
+            }
+          } else if (dir == "desc") {
+            if (parseInt(x.innerHTML) < parseInt(y.innerHTML)) {
+              shouldSwitch = true;
+              break;
+            }
+          }
+        }
+        if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+          switchcount ++;
+        } else {
+          if (switchcount == 0 && dir == "asc") {
+            dir = "desc";
+            switching = true;
+          }
+        }
+      }
+    }
+
     function sortTable(table_id, column_num) {
       var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
       table = document.getElementById(table_id);
@@ -77,6 +124,7 @@
         }
     }
     </script>
+
     <h2>Information about <a style="color: black" href="https://vk.com/{{ domain }}">{{ fullname }}</a></h2>
     <hr class="my-4">
 
@@ -84,35 +132,48 @@
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-main", "main-info-table")'> Main info</h4>
-    <input class="form-control" type="text" placeholder="Anything" id="search-main" onkeyup='tableSearch("search-main", "main-info-table")'>
+    <input class="form-control" type="text" placeholder="Search..." id="search-main" onkeyup='tableSearch("search-main", "main-info-table")'>
     <table id="main-info-table" class="table table-hover display">
-        <thead>
-       	     <tr class="table-active">
-       		    <th scope="col" onclick="">Field</th>
-       		    <th scope="col">Value</th>
-             </tr>
-        </thead>
         <tbody>
-        {% for name, value in info.main_info.items %}
-            {% if value %}
-            <tr>
-                <td>{{ name }}</td>
-                <td>{{ value }}</td>
-            </tr>
-            {% endif %}
-        {% endfor %}
+            <tr><td><strong>ID</strong></td><td>{{ info.main_info.id }}</td></tr>
+            <tr><td><strong>First name</strong></td><td>{{ info.main_info.first_name }}</td></tr>
+            <tr><td><strong>Last name</strong></td><td>{{ info.main_info.last_name }}</td></tr>
+            <tr><td><strong>Sex</strong></td><td>{% sex info.main_info.sex %}</td></tr>
+            <tr><td><strong>Domain</strong></td><td>{{ info.main_info.domain }}</td></tr>
+            <tr><td><strong>Bdate</strong></td><td>{{ info.main_info.bdate }}</td></tr>
+            <tr><td><strong>Country</strong></td><td>{{ info.main_info.country.title }}</td></tr>
+            <tr><td><strong>Status</strong></td><td>{{ info.main_info.status }}</td></tr>
+            <tr><td><strong>Occupation</strong></td><td>{{ info.main_info.occupation.name }} {{ info.main_info.occupation.type }}</td></tr>
+            <tr><td><strong>Schools</strong></td><td>{% schools info.main_info.schools %}</td></tr>
+            <tr><td><strong>Home town</strong></td><td>{{ info.main_info.home_town }}</td></tr>
+            <tr><td><strong>Languages</strong></td><td>{% languages info.main_info.personal.langs %}</td></tr>
+        </tbody>
+    </table>
+    <hr class="my-4">
+
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-counters", "counters-table")'> Counters</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-counters" onkeyup='tableSearch("search-counters", "counters-table")'>
+    <table id="counters-table" class="table table-hover display">
+        <tbody>
+            <tr><td><strong>Friends</strong></td><td>{{ info.main_info.counters.friends }}</td></tr>
+            <tr><td><strong>Followers</strong></td><td>{{ info.main_info.followers_count }}</td></tr>
+            <tr><td><strong>Groups</strong></td><td>{{ info.main_info.counters.groups }}</td></tr>
+            <tr><td><strong>Audios</strong></td><td>{{ info.main_info.counters.audios }}</td></tr>
+            <tr><td><strong>Photos</strong></td><td>{{ info.main_info.counters.photos }}</td></tr>
+            <tr><td><strong>Gifts</strong></td><td>{{ info.main_info.counters.gifts }}</td></tr>
+            <tr><td><strong>Videos</strong></td><td>{{ info.main_info.counters.videos }}</td></tr>
         </tbody>
     </table>
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-friends", "friends-table")'> Friends</h4>
-    <input class="form-control" type="text" placeholder="Anything" id="search-friends" onkeyup='tableSearch("search-friends", "friends-table")'>
+    <input class="form-control" type="text" placeholder="Search..." id="search-friends" onkeyup='tableSearch("search-friends", "friends-table")'>
     <table id="friends-table" class="table table-hover">
         <thead>
        	     <tr class="table-active">
-                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTable('friends-table', 0)"></th>
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('friends-table', 0, true)"></th>
        		    <th scope="col">Fullname <img height="20" src='{% sort_icon %}' onclick="sortTable('friends-table', 1)"></th>
-       		    <th scope="col">ID <img height="20" src='{% sort_icon %}' onclick="sortTable('friends-table', 2)"></th>
+       		    <th scope="col">ID</th>
        		    <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('friends-table', 3)"></th>
        		    <th scope="col">Bday <img height="20" src='{% sort_icon %}' onclick="sortTable('friends-table', 4)"></th>
              </tr>
@@ -132,21 +193,21 @@
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-followers", "followers-table")'> Followers</h4>
-    <input class="form-control" type="text" placeholder="Anything" id="search-followers" onkeyup='tableSearch("search-followers", "followers-table")'>
+    <input class="form-control" type="text" placeholder="Search..." id="search-followers" onkeyup='tableSearch("search-followers", "followers-table")'>
     <table id="followers-table" class="table table-hover">
         <thead>
        	     <tr class="table-active">
-                <th scope="col">#</th>
-       		    <th scope="col">Fullname</th>
-       		    <th scope="col">id</th>
-       		    <th scope="col">domain</th>
-       		    <th scope="col">bday</th>
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('followers-table', 0, true)"></th>
+       		    <th scope="col">Fullname <img height="20" src='{% sort_icon %}' onclick="sortTable('followers-table', 1)"></th>
+       		    <th scope="col">ID</th>
+       		    <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('followers-table', 3)"></th>
+       		    <th scope="col">Bday <img height="20" src='{% sort_icon %}' onclick="sortTable('followers-table', 4)"></th>
              </tr>
         </thead>
         <tbody>
             {% for follower in info.followers.items %}
             <tr>
-                <th scope="row">{{ forloop.counter }}</th>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ follower.domain }}">{{ follower.first_name}} {{ follower.last_name }}</a></td>
                 <td>{{ follower.id }}</td>
                 <td>{{ follower.domain }}</td>
@@ -159,20 +220,20 @@
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-groups", "groups-table")'> Groups</h4>
-    <input class="form-control" type="text" placeholder="Anything" id="search-groups" onkeyup='tableSearch("search-groups", "groups-table")'>
+    <input class="form-control" type="text" placeholder="Search..." id="search-groups" onkeyup='tableSearch("search-groups", "groups-table")'>
     <table id="groups-table" class="table table-hover">
         <thead>
              <tr class="table-active">
-                <th scope="col">#</th>
-       		    <th scope="col">Name</th>
-       		    <th scope="col">id</th>
-       		    <th scope="col">Screen name</th>
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('groups-table', 0, true)"></th>
+       		    <th scope="col">Name <img height="20" src='{% sort_icon %}' onclick="sortTable('groups-table', 1)"></th>
+       		    <th scope="col">ID</th>
+       		    <th scope="col">Screen name <img height="20" src='{% sort_icon %}' onclick="sortTable('groups-table', 3)"></th>
              </tr>
         </thead>
         <tbody>
             {% for group in info.groups.items %}
             <tr>
-                <th scope="row">{{ forloop.counter }}</th>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
                 <td>{{ group.id }}</td>
                 <td>{{ group.screen_name }}</td>
@@ -184,12 +245,13 @@
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-photos", "photos-table")'> Photos</h4>
-    <input class="form-control" type="text" placeholder="Anything" id="search-photos" onkeyup='tableSearch("search-photos", "photos-table")'>
+    <input class="form-control" type="text" placeholder="Search..." id="search-photos" onkeyup='tableSearch("search-photos", "photos-table")'>
     <table id="photos-table" class="table table-hover">
         <thead>
              <tr class="table-active">
-                <th scope="col">#</th>
-       		    <th scope="col">Photo id</th>
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('photos-table', 0, true)"></th>
+                <th scope="col">Photo id</th>
+                <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('photos-table', 2, false)"></th>
        		    <th scope="col">Likes</th>
        		    <th scope="col">Comments</th>
              </tr>
@@ -197,11 +259,12 @@
         <tbody>
             {% for photo in info.photos.items %}
             <tr>
-                <th scope="row">{{ forloop.counter }}</th>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
-                <td><p>Count: {{ photo.likes.count }}</p>
+                <td>{{ photo.likes.count }}</td>
+                <td>
                     {% for like in photo.likes.items %}
-                         <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                     {% endfor %}
                 </td>
                 <td>
@@ -223,35 +286,37 @@
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-wall", "wall-table")'> Wall</h4>
-    <input class="form-control" type="text" placeholder="Anything" id="search-wall" onkeyup='tableSearch("wall-photos", "wall-table")'>
+    <input class="form-control" type="text" placeholder="Search..." id="search-wall" onkeyup='tableSearch("wall-photos", "wall-table")'>
     <table id="wall-table" class="table table-hover">
         <thead>
              <tr class="table-active">
-                <th scope="col">#</th>
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('wall-table', 0, true)"></th>
    		        <th scope="col">Post id</th>
+   		        <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('wall-table', 2, false)"></th>
+                <th scope="col">Likes</th>
                 <th scope="col">Text</th>
-   		        <th scope="col">Likes</th>
    		        <th scope="col">Comments</th>
              </tr>
         </thead>
         <tbody>
             {% for post in info.wall.items %}
             <tr>
-                <th scope="row">{{ forloop.counter }}</th>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
-                <td>{{ post.text }}</td>
-                <td><p>Count: {{ post.likes.count }}</p>
+                <td>{{ post.likes.count }}</td>
+                <td>
                     {% for like in post.likes.items %}
-                         <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                     {% endfor %}
                 </td>
+                <td>{{ post.text }}</td>
                 <td>
                 {% for comment in post.comments.items %}
                     <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                     {% if 'attachments' in comment and not comment.text %}
-                         <p>Attachment: {{ comment.attachments.0.type }}</p>
+                    <p>Attachment: {{ comment.attachments.0.type }}</p>
                     {% else %}
-                        <p>Text: {{ comment.text }}</p>
+                    <p>Text: {{ comment.text }}</p>
                     {% endif %}
                     <br>
                 {% endfor %}
@@ -260,6 +325,16 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <script type="text/javascript">
+        hideTable("search-main", "main-info-table");
+        hideTable("search-counters", "counters-table")
+        hideTable("search-friends", "friends-table");
+        hideTable("search-followers", "followers-table");
+        hideTable("search-groups", "groups-table");
+        hideTable("search-photos", "photos-table");
+        hideTable("search-wall", "wall-table");
+    </script>
 
 </div>
 {% endblock %}
