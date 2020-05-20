@@ -437,7 +437,7 @@ class FriendsActivityGraph:
                     fullname = profiles[id]
                     df.loc[id] = [0, 1, fullname, 0]
 
-        token = json.load(open(settings.CONFIG, 'r'))['vk_token']
+        token = json.load(open(settings.VK_TOKEN, 'r'))['vk_token']
         session = vk.API(vk.Session(access_token=token))
         code = """
             var friends = {friends};

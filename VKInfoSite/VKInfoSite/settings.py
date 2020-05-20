@@ -153,10 +153,6 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-VK_TOKEN_ROOT = os.path.join(PROJECT_ROOT, 'vktoken')
-VK_TOKEN = os.path.join(VK_TOKEN_ROOT, 'vktoken.json')
-
-
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',

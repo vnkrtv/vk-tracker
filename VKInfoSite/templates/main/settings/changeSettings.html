@@ -4,78 +4,10 @@
   <h2>Settings</h2><br>
   <form action="{% url 'main:change_settings_result' %}" method="post">
     {% csrf_token %}
-    <h4>Mongo DB</h4>
+    <h4>VK token</h4>
     <table>
-      <tr>
-        <td>
-          Host:
-        </td>
-        <td>
-          <input type="text" class="form-control" id="mdb_host" name="mdb_host" value="{{ mdb_host }}" required="required">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Port:
-        </td>
-        <td>
-          <input type="number" class="form-control" id="mdb_port" name="mdb_port" value="{{ mdb_port }}" required="required">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Database name:
-        </td>
-        <td>
-          <input type="text" class="form-control" id="mdb_dbname" name="mdb_dbname" value="{{ mdb_dbname }}" required="required">
-        </td>
-      </tr>
+      <tr><td><input type="text" class="form-control" name="vk_token" value="{{ vk_token }}" size="95" required></td></tr>
     </table><br>
-
-    <h4>Neo4j DB</h4>
-    <table>
-      <tr>
-        <td>
-          Url:
-        </td>
-        <td>
-          <input type="text" class="form-control" id="neo_url" name="neo_url" value="{{ neo_url }}" required="required">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          User:
-        </td>
-        <td>
-          <input type="text" class="form-control" id="neo_user" name="neo_user" value="{{ neo_user }}" required="required">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Password:
-        </td>
-        <td>
-          <input type="text" class="form-control" id="neo_pass" name="neo_pass" value="{{ neo_pass }}" required="required">
-        </td>
-      </tr>
-    </table><br>
-
-    <h4>VK</h4>
-    <table>
-      <tr>
-        <td>
-          VK token:
-        </td>
-        <td>
-          <input type="text" class="form-control" id="vk_token" name="vk_token" value="{{ vk_token }}" size="95" maxlength="85" minlength="85" required="required">
-        </td>
-    </table><br>
-    <div class="form-row">
-      <div class="custom-control custom-checkbox my-1 mr-sm-2">
-        <input type="checkbox" class="custom-control-input" id="default" name="default">
-        <label class="custom-control-label" for="default">Use default settings</label>
-      </div>
-    </div><br>
     <input type="submit" class="btn btn-dark" value="Change settings">
   </form>
 {% endblock %}

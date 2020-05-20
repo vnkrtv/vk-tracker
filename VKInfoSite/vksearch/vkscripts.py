@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 def vk_api(method, **kwargs):
-    with open(settings.CONFIG, 'r') as file:
+    with open(settings.VK_TOKEN, 'r') as file:
         token = json.load(file)['vk_token']
     session = vk.API(vk.Session(access_token=token))
     return eval('vk.API(vk.Session(access_token=token)).' + method)(v=5.103, **kwargs)

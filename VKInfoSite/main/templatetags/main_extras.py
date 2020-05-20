@@ -6,6 +6,4 @@ register = template.Library()
 
 @register.simple_tag
 def neo4j_url():
-    return "http://{}:{}/".format(
-        settings.DATABASES['neo4j']['HOST'], settings.DATABASES['neo4j']['PORT']
-    )
+    return settings.DATABASES['neo4j']['URL']

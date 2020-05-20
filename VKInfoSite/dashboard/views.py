@@ -47,7 +47,7 @@ def update_graph(graphs_list, domain):
                 graph = eval(class_name)(user_info=user_info)
                 cached_graphs[class_name] = graph.create_graph()
             graphs.append(cached_graphs[class_name])
-        except ValueError:
+        except:
             graphs.append(html.H3(
                 '{} graph is not available'.format(class_name),
                 style={'marginTop': 20, 'marginBottom': 20}

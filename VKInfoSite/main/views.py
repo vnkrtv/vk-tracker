@@ -8,6 +8,7 @@ from . import mongo
 from . import neo4j
 from .vk_models import VKInfo
 from .vk_analitics import VKAnalizer, VKRelation
+from .models import VKToken
 from .decorators import unauthenticated_user, post_method, check_token
 
 
@@ -43,11 +44,11 @@ def login_page(request):
 
 @unauthenticated_user
 def change_settings(request):
-    if not request.user.is_superuser:
-        return redirect('/add_user/')
+    query = VKToken.objects.filter(user__id=request.user.id)
+    token = query[0].token if query else ''
     info = {
         'title': 'Settings | VK Tracker',
-        **json.load(open(settings.CONFIG, 'r'))
+        'vk_token': token
     }
     return render(request, 'main/settings/changeSettings.html', info)
 
@@ -55,23 +56,10 @@ def change_settings(request):
 @post_method
 @unauthenticated_user
 def change_settings_result(request):
-    default = request.POST.get('default', '')
-
-    if default:
-        new_config = json.load(open(settings.CONFIG, 'r'))
-        json.dump(new_config, open(settings.CONFIG, 'w'))
-    else:
-        # {% костыль %}
-        json.dump(request.POST, open(settings.CONFIG, 'w'))
-        new_config = json.load(open(settings.CONFIG, 'r'))
-        try:
-            new_config.pop('csrfmiddlewaretoken')
-        except:
-            pass
-        new_config['mdb_port'] = int(new_config['mdb_port'])
-        json.dump(new_config, open(settings.CONFIG, 'w'))
-        # {% endкостыль %}
-
+    token = VKToken(
+        user=request.user,
+        token=request.POST['vk_token'])
+    token.save()
     info = {
         'title': 'Settings | VK Tracker',
         'message_title': 'Change result',
@@ -88,7 +76,7 @@ def add_user(request):
     return render(request, 'main/add_user/getDomain.html', info)
 
 
-#@check_token
+@check_token
 @post_method
 @unauthenticated_user
 def add_user_result(request):

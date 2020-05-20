@@ -28,11 +28,15 @@
 
   </head>
   <body>
+
 	<div class="sidebar-container">
+
 	  <div class="sidebar-logo" href='/'>
 	    VK Tracker<img src="{% static 'images/favicon-96x96.png' %}" width="25">
 	  </div>
+
 	  <ul class="sidebar-navigation">
+
 	  	<li class="header">User</li>
 	  	<li>
 	      <a href="#">
@@ -44,6 +48,7 @@
 	        <i class="fa fa-tachometer" aria-hidden="true"></i> Logout
 	      </a>
 	    </li>
+
 	    <li class="header">Tracking</li>
 	    <li>
 	      <a href="{% url 'main:add_user' %}">
@@ -65,6 +70,7 @@
 	        <i class="fa fa-tachometer" aria-hidden="true"></i> Get mutual activity
 	      </a>
 	    </li>
+
 	    <li class="header">Search</li>
 	    <li>
 	      <a href="{% url 'vksearch:get_search_params' %}">
@@ -81,14 +87,14 @@
 	        <i class="fa fa-tachometer" aria-hidden="true"></i> Delete search filter
 	      </a>
 	    </li>
-	    {% if request.user.is_superuser %}
-		    <li class="header">Settings</li>
-		    <li>
-		      <a href="{% url 'main:change_settings' %}">
-		        <i class="fa fa-home" aria-hidden="true"></i> Change
-		      </a>
-		    </li>
-	    {% endif %}
+
+	    <li class="header">Settings</li>
+	    <li>
+	      <a href="{% url 'main:change_settings' %}">
+	        <i class="fa fa-home" aria-hidden="true"></i> Change token
+	      </a>
+	    </li>
+
 	    <li class="header">Neo4j</li>
 	    <li>
 	      <a href="{% neo4j_url %}">
@@ -96,14 +102,19 @@
 	      </a>
 	    </li>
 	  </ul>
+
 	</div>
+
 	<div class="content-container">
 	  <div class="container-fluid">
+
 	  	<div class="jumbotron">
 	  		{% block content %}
 			{% endblock %}
 	  	</div>
+
 	  </div>
 	</div>
+
   </body>
 </html>
