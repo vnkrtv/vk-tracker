@@ -231,7 +231,7 @@ class VKAnalizer:
         for post in new_wall:
             _id = post['post_id']
 
-            text_dict[id] = [None, post['text']]
+            text_dict[_id] = [None, post['text']]
             new_wall_dict[_id] = [post['comments'], post['likes']]
 
         list_ids = []
@@ -304,7 +304,6 @@ class VKAnalizer:
 
                 change_comm_list.append(cmp_dict[key][0])
 
-
             old_likes = old_wall_dict[old][1]
             new_likes = new_wall_dict[new][1]
 
@@ -358,6 +357,7 @@ class VKAnalizer:
             'wall':      self.cmp_wall(),
             'domain':    self._new_info['main_info']['domain'],
             'id':        self._new_info['main_info']['id'],
+            'fullname':  self._new_info['main_info']['first_name'] + ' ' + self._new_info['main_info']['last_name']
         }
 
         return changes_dict

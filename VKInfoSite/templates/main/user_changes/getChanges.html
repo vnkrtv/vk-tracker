@@ -1,450 +1,483 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+
+{% load static %}
+{% load main_extras %}
+
+<style type="text/css">img { cursor: pointer; }</style>
+<script src="{% static 'main/js/main.js' %}"></script>
+
 <div class="jumbotron">
-    <h2>User account changes</h2>
-    {% if main_info %}
-        <span class="d-block p-2 bg-primary text-white">Main info changes</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-           		    <th scope="col">Field</th>
-           		    <th scope="col">Old</th>
-           		    <th scope="col">New</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for name, field in main_info.items %}
-                   <tr>
-                        <td>{{ name }}</td>
-                        <td>{{ field.old }}</td>
-                        <td>{{ field.new }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
 
+    <h2><a style="color: black" href="https://vk.com/{{ domain }}">{{ fullname }}</a> account changes</h2>
+    <hr class="my-4">
 
-    {% if friends.new %}
-        <span class="d-block p-2 bg-primary text-white">New friends</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Fullname</th>
-           		    <th scope="col">id</th>
-           		    <th scope="col">domain</th>
-           		    <th scope="col">bday</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for friend in friends.new %}
-                   <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
-                        <td>{{ friend.id }}</td>
-                        <td>{{ friend.domain }}</td>
-                        <td>{{ friend.bdate }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-main-info", "main-info-table")'> Main info</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-main-info" onkeyup='tableSearch("search-main-info", "main-info-table")'>
+    <table id="main-info-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col">Field</th>
+                <th scope="col">Old</th>
+                <th scope="col">New</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for name, field in main_info.items %}
+             <tr>
+                  <td><strong>{{ name }}</strong></td>
+                  <td>{{ field.old }}</td>
+                  <td>{{ field.new }}</td>
+              </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
-    {% if friends.deleted %}
-        <span class="d-block p-2 bg-primary text-white">Deleted friends</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Fullname</th>
-           		    <th scope="col">id</th>
-           		    <th scope="col">domain</th>
-           		    <th scope="col">bday</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for friend in friends.deleted %}
-                   <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
-                        <td>{{ friend.id }}</td>
-                        <td>{{ friend.domain }}</td>
-                        <td>{{ friend.bdate }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-nfriends", "nfriends-table")'> New friends</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-nfriends" onkeyup='tableSearch("search-nfriends", "nfriends-table")'>
+    <table id="nfriends-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                  <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('nfriends-table', 0, true)"></th>
+                  <th scope="col">Fullname <img height="20" src='{% sort_icon %}' onclick="sortTable('nfriends-table', 1)"></th>
+                  <th scope="col">ID</th>
+                  <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('nfriends-table', 3)"></th>
+                  <th scope="col">Bday <img height="20" src='{% sort_icon %}' onclick="sortTable('nfriends-table', 4)"></th>
+             </tr>
+        </thead>
+        <tbody>
+        {% for friend in friends.new %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                <td>{{ friend.id }}</td>
+                <td>{{ friend.domain }}</td>
+                <td>{{ friend.bdate }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
-
-    {% if followers.new %}
-        <span class="d-block p-2 bg-primary text-white">New followers</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Fullname</th>
-           		    <th scope="col">id</th>
-           		    <th scope="col">domain</th>
-           		    <th scope="col">bday</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for friend in followers.new %}
-                   <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
-                        <td>{{ friend.id }}</td>
-                        <td>{{ friend.domain }}</td>
-                        <td>{{ friend.bdate }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-    {% if followers.deleted %}
-        <span class="d-block p-2 bg-primary text-white">Deleted followers</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Fullname</th>
-           		    <th scope="col">id</th>
-           		    <th scope="col">domain</th>
-           		    <th scope="col">bday</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for friend in followers.deleted %}
-                   <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
-                        <td>{{ friend.id }}</td>
-                        <td>{{ friend.domain }}</td>
-                        <td>{{ friend.bdate }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-
-    {% if groups.new %}
-        <span class="d-block p-2 bg-primary text-white">New groups</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Name</th>
-           		    <th scope="col">id</th>
-           		    <th scope="col">Screen name</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for group in groups.new %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td><a style="color: white" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
-                    <td>{{ group.id }}</td>
-                    <td>{{ group.screen_name }}</td>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-dfriends", "dfriends-table")'> Deleted friends</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-dfriends" onkeyup='tableSearch("search-dfriends", "dfriends-table")'>
+    <table id="dfriends-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dfriends-table', 0, true)"></th>
+                <th scope="col">Fullname <img height="20" src='{% sort_icon %}' onclick="sortTable('dfriends-table', 1)"></th>
+                <th scope="col">ID</th>
+                <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('dfriends-table', 3)"></th>
+                <th scope="col">Bday <img height="20" src='{% sort_icon %}' onclick="sortTable('dfriends-table', 4)"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for friend in friends.deleted %}
+               <tr>
+                    <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td>{{ friend.id }}</td>
+                    <td>{{ friend.domain }}</td>
+                    <td>{{ friend.bdate }}</td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
-    {% if groups.deleted %}
-        <span class="d-block p-2 bg-primary text-white">Deleted groups</span>
-        <table class="table table-striped table-dark">
-            <thead>
-           	     <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Name</th>
-           		    <th scope="col">id</th>
-           		    <th scope="col">Screen name</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for group in groups.deleted %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td><a style="color: white" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
-                    <td>{{ group.id }}</td>
-                    <td>{{ group.screen_name }}</td>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-nfollowers", "nfollowers-table")'> New followers</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-nfollowers" onkeyup='tableSearch("search-nfollowers", "nfollowers-table")'>
+    <table id="nfollowers-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('nfollowers-table', 0, true)"></th>
+                <th scope="col">Fullname <img height="20" src='{% sort_icon %}' onclick="sortTable('nfollowers-table', 1)"></th>
+                <th scope="col">ID</th>
+                <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('nfollowers-table', 3)"></th>
+                <th scope="col">Bday <img height="20" src='{% sort_icon %}' onclick="sortTable('nfollowers-table', 4)"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for friend in followers.new %}
+               <tr>
+                    <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td>{{ friend.id }}</td>
+                    <td>{{ friend.domain }}</td>
+                    <td>{{ friend.bdate }}</td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-dfollowers", "dfollowers-table")'> Deleted followers</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-dfollowers" onkeyup='tableSearch("search-dfollowers", "dfollowers-table")'>
+    <table id="dfollowers-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dfollowers-table', 0, true)"></th>
+                <th scope="col">Fullname <img height="20" src='{% sort_icon %}' onclick="sortTable('dfollowers-table', 1)"></th>
+                <th scope="col">ID</th>
+                <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('dfollowers-table', 3)"></th>
+                <th scope="col">Bday <img height="20" src='{% sort_icon %}' onclick="sortTable('dfollowers-table', 4)"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for friend in followers.deleted %}
+               <tr>
+                    <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td>{{ friend.id }}</td>
+                    <td>{{ friend.domain }}</td>
+                    <td>{{ friend.bdate }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
-    {% if info.photos.new %}
-        <span class="d-block p-2 bg-primary text-white">New photos</span>
-        <table class="table table-striped table-dark">
-            <thead>
-       	         <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Photo id</th>
-           		    <th scope="col">Likes</th>
-           		    <th scope="col">Comments</th>
-                 </tr>
-            </thead>
-            <tbody>
-                {% for photo in info.photos.new %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
-                        <td><p>Count: {{ photo.likes.count }}</p>
-                            {% for like in photo.likes.items %}
-                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for comment in photo.comments.items %}
-                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-ngroups", "ngroups-table")'> New groups</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-ngroups" onkeyup='tableSearch("search-ngroups", "ngroups-table")'>
+    <table id="ngroups-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('ngroups-table', 0, true)"></th>
+                <th scope="col">Name <img height="20" src='{% sort_icon %}' onclick="sortTable('ngroups-table', 1)"></th>
+                <th scope="col">ID</th>
+                <th scope="col">Screen name <img height="20" src='{% sort_icon %}' onclick="sortTable('ngroups-table', 3)"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups.new %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                <td>{{ group.id }}</td>
+                <td>{{ group.screen_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
+
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-dgroups", "dgroups-table")'> Deleted groups</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-dgroups" onkeyup='tableSearch("search-dgroups", "dgroups-table")'>
+    <table id="dgroups-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dgroups-table', 0, true)"></th>
+                <th scope="col">Name <img height="20" src='{% sort_icon %}' onclick="sortTable('dgroups-table', 1)"></th>
+                <th scope="col">ID</th>
+                <th scope="col">Screen name <img height="20" src='{% sort_icon %}' onclick="sortTable('dgroups-table', 3)"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups.deleted %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                <td>{{ group.id }}</td>
+                <td>{{ group.screen_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
+
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-nphotos", "nphotos-table")'> New photos</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-nphotos" onkeyup='tableSearch("search-nphotos", "nphotos-table")'>
+    <table id="nphotos-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('nphotos-table', 0, true)"></th>
+                <th scope="col">Photo ID</th>
+                <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('nphotos-table', 2, false)"></th>
+                <th scope="col">Likes</th>
+                <th scope="col">Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for photo in info.photos.new %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                <td>{{ photo.likes.count }}</td>
+                <td>
+                    {% for like in photo.likes.items %}
+                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for comment in photo.comments.items %}
+                        <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                        {% if 'attachments' in comment and not comment.text %}
+                             <p>Attachment: {{ comment.attachments.0.type }}</p>
+                        {% else %}
+                             <p>Text: {{ comment.text }}</p>
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
+
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-dphotos", "dphotos-table")'> Deleted photos</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-dphotos" onkeyup='tableSearch("search-dphotos", "dphotos-table")'>
+    <table id="dphotos-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dphotos-table', 0, true)"></th>
+                <th scope="col">Photo ID</th>
+                <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dphotos-table', 2, false)"></th>
+                <th scope="col">Likes</th>
+                <th scope="col">Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for photo in info.photos.deleted %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                <td>{{ photo.likes.count }}</td>
+                <td>
+                    {% for like in photo.likes.items %}
+                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for comment in photo.comments.items %}
+                        <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                        {% if 'attachments' in comment and not comment.text %}
+                             <p>Attachment: {{ comment.attachments.0.type }}</p>
+                        {% else %}
+                             <p>Text: {{ comment.text }}</p>
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
+
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-cphotos", "cphotos-table")'> Photos changes</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-cphotos" onkeyup='tableSearch("search-cphotos", "cphotos-table")'>
+    <table id="cphotos-table" class="table table-hover">
+        <thead>
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('cphotos-table', 0, true)"></th>
+                <th scope="col">Photo ID</th>
+                <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('cphotos-table', 2, false)"></th>
+                <th scope="col">Likes</th>
+                <th scope="col">Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for photo in info.photos.items %}
+                <tr>
+                    <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                    <td>{{ photo.likes.count }}</td>
+                    <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                    <td>
+                        {% for like in photo.likes %}
+                            {% if like.status %}
+                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
+                            {% else %}
+                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for comment in photo.comments %}
+                            {% if comment.status %}
+                                <p>[NEW]</p>
+                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
                                      <p>Text: {{ comment.text }}</p>
                                 {% endif %}
-                                <br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-
-    {% if info.photos.deleted %}
-        <span class="d-block p-2 bg-primary text-white">Deleted photos</span>
-        <table class="table table-striped table-dark">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Photo id</th>
-           		    <th scope="col">Likes</th>
-           		    <th scope="col">Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for photo in info.photos.deleted %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
-                        <td><p>Count: {{ photo.likes.count }}</p>
-                            {% for like in photo.likes.items %}
-                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for comment in photo.comments.items %}
-                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                            {% else %}
+                                <p>[DELETED]</p>
+                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
                                      <p>Text: {{ comment.text }}</p>
                                 {% endif %}
-                                <br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-    {% if info.photos.items %}
-        <span class="d-block p-2 bg-primary text-white">Photos changes</span>
-        <table class="table table-striped table-dark">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-           		    <th scope="col">Photo id</th>
-           		    <th scope="col">Likes</th>
-           		    <th scope="col">Comments</th>
+                            {% endif %}
+                            <br>
+                        {% endfor %}
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for photo in info.photos.items %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
-                        <td>
-                            {% for like in photo.likes %}
-                                {% if like.status %}
-                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
-                                {% else %}
-                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for comment in photo.comments %}
-                                {% if comment.status %}
-                                    <p>[NEW]</p>
-                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                                    {% if 'attachments' in comment and not comment.text %}
-                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                    {% else %}
-                                         <p>Text: {{ comment.text }}</p>
-                                    {% endif %}
-                                {% else %}
-                                    <p>[DELETED]</p>
-                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                                    {% if 'attachments' in comment and not comment.text %}
-                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                    {% else %}
-                                         <p>Text: {{ comment.text }}</p>
-                                    {% endif %}
-                                {% endif %}
-                                <br>
-                            {% endfor %}
-                        </td>
-                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
+
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-nwall", "nwall-table")'> New posts</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-nwall" onkeyup='tableSearch("nwall-photos", "nwall-table")'>
+    <table id="nwall-table" class="table table-hover">
+        <thead>
+             <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('nwall-table', 0, true)"></th>
+              <th scope="col">Post ID</th>
+              <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('nwall-table', 2, false)"></th>
+                <th scope="col">Likes</th>
+                <th scope="col">Text</th>
+              <th scope="col">Comments</th>
+             </tr>
+        </thead>
+        <tbody>
+            {% for post in info.wall.new %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                <td>{{ post.likes.count }}</td>
+                <td>
+                    {% for like in post.likes.items %}
+                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    {% endfor %}
+                </td>
+                <td>{{ post.text }}</td>
+                <td>
+                {% for comment in post.comments.items %}
+                    <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                    {% if 'attachments' in comment and not comment.text %}
+                    <p>Attachment: {{ comment.attachments.0.type }}</p>
+                    {% else %}
+                    <p>Text: {{ comment.text }}</p>
+                    {% endif %}
+                    <br>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-dwall", "dwall-table")'> Deleted posts</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-dwall" onkeyup='tableSearch("dwall-photos", "dwall-table")'>
+    <table id="dwall-table" class="table table-hover">
+        <thead>
+             <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dwall-table', 0, true)"></th>
+              <th scope="col">Post ID</th>
+              <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('dwall-table', 2, false)"></th>
+                <th scope="col">Likes</th>
+                <th scope="col">Text</th>
+              <th scope="col">Comments</th>
+             </tr>
+        </thead>
+        <tbody>
+            {% for post in info.wall.deleted %}
+            <tr>
+                <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                <td>{{ post.likes.count }}</td>
+                <td>
+                    {% for like in post.likes.items %}
+                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    {% endfor %}
+                </td>
+                <td>{{ post.text }}</td>
+                <td>
+                {% for comment in post.comments.items %}
+                    <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                    {% if 'attachments' in comment and not comment.text %}
+                    <p>Attachment: {{ comment.attachments.0.type }}</p>
+                    {% else %}
+                    <p>Text: {{ comment.text }}</p>
+                    {% endif %}
+                    <br>
+                {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr class="my-4">
 
-    {% if info.wall.new %}
-        <span class="d-block p-2 bg-primary text-white">New posts</span>
-        <table class="table table-striped table-dark">
-            <thead>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-cwall", "cwall-table")'> Wall changes</h4>
+    <input class="form-control" type="text" placeholder="Search..." id="search-cwall" onkeyup='tableSearch("cwall-photos", "cwall-table")'>
+    <table id="cwall-table" class="table table-hover">
+        <thead>
+             <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('cwall-table', 0, true)"></th>
+              <th scope="col">Post ID</th>
+              <th scope="col">Likes count <img height="20" src='{% sort_icon %}' onclick="sortTableByNums('cwall-table', 2, false)"></th>
+                <th scope="col">Likes</th>
+                <th scope="col">Text</th>
+              <th scope="col">Comments</th>
+             </tr>
+        </thead>
+        <tbody>
+            {% for post in info.wall.items %}
                 <tr>
-                <th scope="col">#</th>
-          	        <th scope="col">Post id</th>
-                    <th scope="col">Text</th>
-                    <th scope="col">Likes</th>
-           	        <th scope="col">Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in info.wall.new %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
-                        <td>{{ post.text }}</td>
-                        <td><p>Count: {{ post.likes.count }}</p>
-                            {% for like in post.likes %}
-                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for comment in post.comments %}
-                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                    <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                    <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                    <td>{{ post.likes.count }}</td>
+                    <td>{{ post.text }}</td>
+                    <td>
+                        {% for like in post.likes %}
+                            {% if like.status %}
+                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
+                            {% else %}
+                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for comment in post.comments %}
+                            {% if comment.status %}
+                                <p>[NEW]</p>
+                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
-                                    <p>Text: {{ comment.text }}</p>
+                                     <p>Text: {{ comment.text }}</p>
                                 {% endif %}
-                                <br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-    {% if info.wall.deleted %}
-        <span class="d-block p-2 bg-primary text-white">Deleted posts</span>
-        <table class="table table-striped table-dark">
-            <thead>
-                <tr>
-                <th scope="col">#</th>
-          	        <th scope="col">Post id</th>
-                    <th scope="col">Text</th>
-                    <th scope="col">Likes</th>
-           	        <th scope="col">Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in info.wall.deleted %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
-                        <td>{{ post.text }}</td>
-                        <td><p>Count: {{ post.likes.count }}</p>
-                            {% for like in post.likes %}
-                                 <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for comment in post.comments %}
-                                <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                            {% else %}
+                                <p>[DELETED]</p>
+                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
-                                    <p>Text: {{ comment.text }}</p>
+                                     <p>Text: {{ comment.text }}</p>
                                 {% endif %}
-                                <br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-    {% if info.wall.items %}
-        <span class="d-block p-2 bg-primary text-white">Posts changes</span>
-        <table class="table table-striped table-dark">
-            <thead>
-                <tr>
-                <th scope="col">#</th>
-          	        <th scope="col">Post id</th>
-                    <th scope="col">Text</th>
-                    <th scope="col">Likes</th>
-           	        <th scope="col">Comments</th>
+                            {% endif %}
+                            <br>
+                        {% endfor %}
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for post in info.wall.items %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
-                        <td>{{ post.text }}</td>
-                        <td>
-                            {% for like in post.likes %}
-                                {% if like.status %}
-                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
-                                {% else %}
-                                    <p><a style="color: white" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for comment in post.comments %}
-                                {% if comment.status %}
-                                    <p>[NEW]</p>
-                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                                    {% if 'attachments' in comment and not comment.text %}
-                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                    {% else %}
-                                         <p>Text: {{ comment.text }}</p>
-                                    {% endif %}
-                                {% else %}
-                                    <p>[DELETED]</p>
-                                    <p><a style="color: white" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
-                                    {% if 'attachments' in comment and not comment.text %}
-                                         <p>Attachment: {{ comment.attachments.0.type }}</p>
-                                    {% else %}
-                                         <p>Text: {{ comment.text }}</p>
-                                    {% endif %}
-                                {% endif %}
-                                <br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
 </div>
+
+<script type="text/javascript">
+    hideTable("search-main-info", "main-info-table");
+    hideTable("search-nfriends", "nfriends-table")
+    hideTable("search-dfriends", "dfriends-table");
+    hideTable("search-nfollowers", "nfollowers-table")
+    hideTable("search-dfollowers", "dfollowers-table");
+    hideTable("search-ngroups", "ngroups-table")
+    hideTable("search-dgroups", "dgroups-table");
+    hideTable("search-nphotos", "nphotos-table")
+    hideTable("search-dphotos", "dphotos-table");
+    hideTable("search-cphotos", "cphotos-table")
+    hideTable("search-nwall", "nwall-table")
+    hideTable("search-dwall", "dwall-table");
+    hideTable("search-cwall", "cwall-table")
+</script>
+
 {% endblock %}
