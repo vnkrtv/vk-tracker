@@ -26,13 +26,22 @@ class VKAnalizer:
         old_main = self._old_info['main_info']
         new_main = self._new_info['main_info']
         cmp_dict = {}
-        for (old, new) in zip(old_main, new_main):
-            if old_main[old] != new_main[new]:
-                if type(old_main[old]) is not dict:
-                    cmp_dict[old] = {
-                        'old': old_main[old],
-                        'new': new_main[new]
-                    }
+        for old_key in old_main:
+            if new_main.get(old_key):
+                if old_main[old_key] != new_main[old_key]:
+                    if isinstance(old_main[old_key], dict) and isinstance(new_main[old_key], dict):
+                        for key in old_main[old_key]:
+                            if new_main[old_key].get(key):
+                                if not isinstance(old_main[old_key], dict) and not isinstance(new_main[old_key], dict):
+                                    cmp_dict[old_main[old_key][key]] = {
+                                        'old': old_main[old_key][key],
+                                        'new': new_main[old_key][key]
+                                    }
+                    else:
+                        cmp_dict[old_key] = {
+                            'old': old_main[old_key],
+                            'new': new_main[old_key]
+                        }
         return cmp_dict
 
     def cmp_friends(self):

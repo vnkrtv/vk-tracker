@@ -65,7 +65,7 @@ def update_graph(graphs_list, domain, token):
 def dash(request, domain):
     query = VKToken.objects.filter(user__id=request.user.id)
     token = query[0].token if query else ''
-    info = {
+    context = {
         'title': 'Dashboard | VK Tracker',
         'args': {
             'domain_id': {
@@ -76,4 +76,4 @@ def dash(request, domain):
             }
         }
     }
-    return render(request, 'dashboard/graphs.html', info)
+    return render(request, 'dashboard/graphs.html', context)

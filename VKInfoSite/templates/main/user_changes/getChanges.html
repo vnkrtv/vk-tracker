@@ -5,12 +5,12 @@
 {% load static %}
 {% load main_extras %}
 
-<style type="text/css">img { cursor: pointer; }</style>
+<style type="text/css"> a { color: black; } img { cursor: pointer; }</style>
 <script src="{% static 'main/js/main.js' %}"></script>
 
 <div class="jumbotron">
 
-    <h2><a style="color: black" href="https://vk.com/{{ domain }}">{{ fullname }}</a> account changes</h2>
+    <h2><a href="https://vk.com/{{ domain }}">{{ fullname }}</a> account changes</h2>
     <hr class="my-4">
 
     <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-main-info", "main-info-table")'> Main info</h4>
@@ -25,11 +25,11 @@
         </thead>
         <tbody>
         {% for name, field in main_info.items %}
-             <tr>
-                  <td><strong>{{ name }}</strong></td>
-                  <td>{{ field.old }}</td>
-                  <td>{{ field.new }}</td>
-              </tr>
+            <tr>
+                <td><strong>{% main_info_name name %}</strong></td>
+                <td>{{ field.old }}</td>
+                <td>{{ field.new }}</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
@@ -51,7 +51,7 @@
         {% for friend in friends.new %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                <td><a href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
                 <td>{{ friend.id }}</td>
                 <td>{{ friend.domain }}</td>
                 <td>{{ friend.bdate }}</td>
@@ -77,7 +77,7 @@
             {% for friend in friends.deleted %}
                <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td><a href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
                     <td>{{ friend.id }}</td>
                     <td>{{ friend.domain }}</td>
                     <td>{{ friend.bdate }}</td>
@@ -103,7 +103,7 @@
             {% for friend in followers.new %}
                <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td><a href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
                     <td>{{ friend.id }}</td>
                     <td>{{ friend.domain }}</td>
                     <td>{{ friend.bdate }}</td>
@@ -129,7 +129,7 @@
             {% for friend in followers.deleted %}
                <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td><a href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
                     <td>{{ friend.id }}</td>
                     <td>{{ friend.domain }}</td>
                     <td>{{ friend.bdate }}</td>
@@ -154,7 +154,7 @@
             {% for group in groups.new %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                <td><a href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
                 <td>{{ group.id }}</td>
                 <td>{{ group.screen_name }}</td>
             </tr>
@@ -178,7 +178,7 @@
             {% for group in groups.deleted %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                <td><a href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
                 <td>{{ group.id }}</td>
                 <td>{{ group.screen_name }}</td>
             </tr>
@@ -203,16 +203,16 @@
             {% for photo in photos.new %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                <td><a href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
                 <td>{{ photo.likes.count }}</td>
                 <td>
                     {% for like in photo.likes.items %}
-                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                     {% endfor %}
                 </td>
                 <td>
                     {% for comment in photo.comments.items %}
-                        <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                        <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                         {% if 'attachments' in comment and not comment.text %}
                              <p>Attachment: {{ comment.attachments.0.type }}</p>
                         {% else %}
@@ -243,16 +243,16 @@
             {% for photo in photos.deleted %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                <td><a href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
                 <td>{{ photo.likes.count }}</td>
                 <td>
                     {% for like in photo.likes.items %}
-                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                     {% endfor %}
                 </td>
                 <td>
                     {% for comment in photo.comments.items %}
-                        <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                        <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                         {% if 'attachments' in comment and not comment.text %}
                              <p>Attachment: {{ comment.attachments.0.type }}</p>
                         {% else %}
@@ -284,13 +284,13 @@
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                     <td>{{ photo.likes.count }}</td>
-                    <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
+                    <td><a href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
                     <td>
                         {% for like in photo.likes %}
                             {% if like.status %}
-                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
+                                <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
                             {% else %}
-                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
+                                <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
                             {% endif %}
                         {% endfor %}
                     </td>
@@ -298,7 +298,7 @@
                         {% for comment in photo.comments %}
                             {% if comment.status %}
                                 <p>[NEW]</p>
-                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
@@ -306,7 +306,7 @@
                                 {% endif %}
                             {% else %}
                                 <p>[DELETED]</p>
-                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
@@ -339,17 +339,17 @@
             {% for post in wall.new %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                <td><a href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
                 <td>{{ post.likes.count }}</td>
                 <td>
                     {% for like in post.likes.items %}
-                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                     {% endfor %}
                 </td>
                 <td>{{ post.text }}</td>
                 <td>
                 {% for comment in post.comments.items %}
-                    <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                    <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                     {% if 'attachments' in comment and not comment.text %}
                     <p>Attachment: {{ comment.attachments.0.type }}</p>
                     {% else %}
@@ -381,17 +381,17 @@
             {% for post in wall.deleted %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                <td><a href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
                 <td>{{ post.likes.count }}</td>
                 <td>
                     {% for like in post.likes.items %}
-                    <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
+                    <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a></p>
                     {% endfor %}
                 </td>
                 <td>{{ post.text }}</td>
                 <td>
                 {% for comment in post.comments.items %}
-                    <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                    <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                     {% if 'attachments' in comment and not comment.text %}
                     <p>Attachment: {{ comment.attachments.0.type }}</p>
                     {% else %}
@@ -423,15 +423,15 @@
             {% for post in wall.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
+                    <td><a href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
                     <td>{{ post.likes.count }}</td>
                     <td>{{ post.text }}</td>
                     <td>
                         {% for like in post.likes %}
                             {% if like.status %}
-                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
+                                <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
                             {% else %}
-                                <p><a style="color: black" href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
+                                <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[DELETED]</p>
                             {% endif %}
                         {% endfor %}
                     </td>
@@ -439,7 +439,7 @@
                         {% for comment in post.comments %}
                             {% if comment.status %}
                                 <p>[NEW]</p>
-                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}
@@ -447,7 +447,7 @@
                                 {% endif %}
                             {% else %}
                                 <p>[DELETED]</p>
-                                <p><a style="color: black" href="https://vk.com/id{{ comment.from_id }}">From</a></p>
+                                <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>
                                 {% if 'attachments' in comment and not comment.text %}
                                      <p>Attachment: {{ comment.attachments.0.type }}</p>
                                 {% else %}

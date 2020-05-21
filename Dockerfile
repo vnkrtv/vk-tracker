@@ -9,6 +9,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt /
   && python3 /app/manage.py migrate /
   && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'admin')" | python3 /app/VKInfoSite/manage.py shell
 
-EXPOSE 8000
+EXPOSE 80
 
 ENTRYPOINT ["python3", "/app/VKInfoSite/manage.py", "runserver", "0.0.0.0:80", "--noreload"]

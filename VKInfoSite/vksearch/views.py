@@ -13,11 +13,11 @@ from .vkscripts import vk_api, VKSearchScripts
 @unauthenticated_user
 def get_search_params(request):
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
-    info = {
+    context = {
         'title': 'Search | VK Tracker',
         'filters': storage.get_all_philters_names()
     }
-    return render(request, 'vksearch/searchPage.html', info)
+    return render(request, 'vksearch/searchPage.html', context)
 
 
 class SearchView(View):
@@ -63,11 +63,11 @@ class SearchView(View):
                 and 'cities_selected' not in request.POST \
                 and 'universities_selected' not in request.POST \
                 and 'friends_selected' not in request.POST:
-            info = {
+            context = {
                 'title': 'Error',
                 'message': 'You must specify at least 1 search parameter'
             }
-            return render(request, 'info.html', info)
+            return render(request, 'info.html', context)
 
         filter_name = request.POST['filter']
         count = 1000
@@ -140,12 +140,12 @@ class SearchView(View):
             result_ids.append(ids)
 
         if not result_ids:
-            info = {
+            context = {
                 'title': 'Error | VK Tracker',
                 'message_title': 'Error',
                 'message': '0 persons were found.'
             }
-            return render(request, 'info.html', info)
+            return render(request, 'info.html', context)
 
         unique_ids = result_ids[0].copy()
         for ids in result_ids:
@@ -163,12 +163,12 @@ class SearchView(View):
                             person['relation'] = self.relation_options[0]
                         persons.append(person)
                         unique_ids.remove(person['id'])
-        info = {
+        context = {
             'title': self.title,
             'count': len(persons),
             'persons': persons,
         }
-        return render(request, self.template_name, info)
+        return render(request, self.template_name, context)
 
 
 @check_token
@@ -180,10 +180,10 @@ def add_search_filter(request):
         'count': 1000
     }
     countries = vk_api(request, 'database.getCountries', **kwargs)
-    info = {
+    context = {
         'countries': [item for item in countries['items'] if item['id'] < 5]
     }
-    return render(request, 'vksearch/addFilter1.html', info)
+    return render(request, 'vksearch/addFilter1.html', context)
 
 
 @post_method
@@ -196,23 +196,23 @@ def get_new_filter_2(request):
             req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
                 country = vk_api(request, 'database.getCountriesById', country_ids=country_id)[0]['title']
-                info = {
+                context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
                     'message': "City '%s' not found in %s." % (request.POST[key], country)
                 }
-                return render(request, 'info.html', info)
+                return render(request, 'info.html', context)
             cities_ids.append(req['items'][0]['id'])
             cities_titles.append(request.POST[key])
         if key.startswith('un_city'):
             req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
-                info = {
+                context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
                     'message': "City '%s' not found." % request.POST[key]
                 }
-                return render(request, 'info.html', info)
+                return render(request, 'info.html', context)
             un_cities_ids.append(req['items'][0]['id'])
 
     un_filter = request.POST['universities_filter']
@@ -246,20 +246,20 @@ def get_new_filter_2(request):
         for search_by_q in req:
             universities += [item for item in search_by_q['items']]
     if not universities and un_filter:
-        info = {
+        context = {
             'title': 'Error | VK Tracker',
             'message_title': 'Error',
             'message': 'Universities not found.'
         }
-        return render(request, 'info.html', info)
-    info = {
+        return render(request, 'info.html', context)
+    context = {
         'title': 'Add search filter | VK Tracker',
         'universities': universities,
         'country_id': country_id,
         'cities_ids': cities_ids,
         'cities_titles': cities_titles
     }
-    return render(request, 'vksearch/addFilter2.html', info)
+    return render(request, 'vksearch/addFilter2.html', context)
 
 
 @post_method
@@ -281,19 +281,19 @@ def add_filter_result(request):
             try:
                 friend = vk_api(request, 'users.get', user_ids=request.POST[key])[0]
             except vk.api.VkAPIError:
-                info = {
+                context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
                     'message': "User with domain '%s' not found." % request.POST[key]
                 }
-                return render(request, 'info.html', info)
+                return render(request, 'info.html', context)
             if friend['is_closed']:
-                info = {
+                context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
                     'message': "User account with domain '%s' is closed." % request.POST[key]
                 }
-                return render(request, 'info.html', info)
+                return render(request, 'info.html', context)
             time.sleep(0.34)
             friends_ids.append(friend['id'])
 
@@ -303,12 +303,12 @@ def add_filter_result(request):
             try:
                 _id = vk_api(request, 'groups.getById', group_id=request.POST[key])[0]['id']
             except vk.api.VkAPIError:
-                info = {
+                context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
                     'message': "Group with screen name '%s' not found." % request.POST[key]
                 }
-                return render(request, 'info.html', info)
+                return render(request, 'info.html', context)
             time.sleep(0.34)
             groups_ids.append(_id)
     _filter = {
@@ -322,22 +322,22 @@ def add_filter_result(request):
     }
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.add_filter(_filter)
-    info = {
+    context = {
         'title': 'New search filter was added | VK Tracker',
         'message_title': 'Adding result',
         'message': f"Filter '{filter_name}' was successfully added to base."
     }
-    return render(request, 'info.html', info)
+    return render(request, 'info.html', context)
 
 
 @unauthenticated_user
 def delete_filter(request):
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
-    info = {
+    context = {
         'title': 'Delete search filter | VK Tracker',
         'filters': storage.get_all_philters_names()
     }
-    return render(request, 'vksearch/deleteFilter.html', info)
+    return render(request, 'vksearch/deleteFilter.html', context)
 
 
 @post_method
@@ -346,9 +346,9 @@ def delete_filter_result(request):
     filter_name = request.POST['filter']
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.delete_philter(filter_name)
-    info = {
+    context = {
         'title': 'Search filter was deleted | VK Tracker',
         'message_title': 'Deleting result',
         'message': f"Filter '{filter_name}' was successfully deleted."
     }
-    return render(request, 'info.html', info)
+    return render(request, 'info.html', context)

@@ -5,7 +5,7 @@
 {% load static %}
 {% load main_extras %}
 
-<style type="text/css">img { cursor: pointer; }</style>
+<style type="text/css"> a { color: black; } img { cursor: pointer; }</style>
 <script src="{% static 'main/js/main.js' %}"></script>
 
 <div class="jumbotron">
@@ -26,8 +26,8 @@
         <tbody>
             <tr>
                 <td><strong>Fullname</strong></td>
-                <td><a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a></td>
-                <td><a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a></td>
+                <td><a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a></td>
+                <td><a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a></td>
             </tr>
             <tr>
                 <td><strong>Domain</strong></td>
@@ -59,7 +59,7 @@
             {% for friend in mutual_friends.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
+                    <td><a href="https://vk.com/{{ friend.domain }}">{{ friend.first_name}} {{ friend.last_name }}</a></td>
                     <td>{{ friend.id }}</td>
                     <td>{{ friend.domain }}</td>
                 </tr>
@@ -83,7 +83,7 @@
             {% for group in mutual_groups.items %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                <td><a style="color: black" href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
+                <td><a href="https://vk.com/{{ group.screen_name }}">{{ group.name }}</a></td>
                 <td>{{ group.id }}</td>
                 <td>{{ group.screen_name }}</td>
             </tr>
@@ -92,9 +92,9 @@
     </table>
     <hr class="my-4">
 
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-ph", "first_user2second_user-ph-table")'> <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-ph", "first_user2second_user-ph-table")'> <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
              likes on
-            <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
             's photos</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-first_user2second_user-ph" onkeyup='tableSearch("search-first_user2second_user-ph", "first_user2second_user-ph-table")'>
     <table id="first_user2second_user-ph-table" class="table table-hover">
@@ -108,16 +108,16 @@
             {% for like in first_user2second_user.photos.likes.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ like.photo_id }}%2Fphotos{{ user2_info.id }}">{{ like.photo_id }}</a></td>
+                    <td><a href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ like.photo_id }}%2Fphotos{{ user2_info.id }}">{{ like.photo_id }}</a></td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
     <hr class="my-4">
 
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-img", "first_user2second_user-img-table")'> <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-img", "first_user2second_user-img-table")'> <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
              comments on
-            <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
             's photos</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-first_user2second_user-img" onkeyup='tableSearch("search-first_user2second_user-img", "first_user2second_user-img-table")'>
     <table id="first_user2second_user-img-table" class="table table-hover">
@@ -132,7 +132,7 @@
             {% for comment in first_user2second_user.photos.comments.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user2_info.id }}">{{ comment.photo_id }}</a></td>
+                    <td><a href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user2_info.id }}">{{ comment.photo_id }}</a></td>
                     <td>
                         {% if 'attachments' in comment and not comment.text %}
                             <p>Attachment: {{ comment.attachments.0.type }}</p>
@@ -146,9 +146,9 @@
     </table>
     <hr class="my-4">
 
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-ph", "second_user2first_user-ph-table")'> <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-ph", "second_user2first_user-ph-table")'> <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
              likes on
-            <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
             's photos</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-second_user2first_user-ph" onkeyup='tableSearch("search-second_user2first_user-ph", "second_user2first_user-ph-table")'>
     <table id="second_user2first_user-ph-table" class="table table-hover">
@@ -162,16 +162,16 @@
             {% for like in second_user2first_user.photos.likes.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ like.photo_id }}%2Fphotos{{ user2_info.id }}">{{ like.photo_id }}</a></td>
+                    <td><a href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ like.photo_id }}%2Fphotos{{ user2_info.id }}">{{ like.photo_id }}</a></td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
     <hr class="my-4">
 
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-img", "second_user2first_user-img-table")'> <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-img", "second_user2first_user-img-table")'> <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
              comments on
-            <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
             's photos</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-second_user2first_user-img" onkeyup='tableSearch("search-second_user2first_user-img", "second_user2first_user-img-table")'>
     <table id="second_user2first_user-img-table" class="table table-hover">
@@ -186,7 +186,7 @@
             {% for comment in second_user2first_user.photos.comments.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
-                    <td><a style="color: black" href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user2_info.id }}">{{ comment.photo_id }}</a></td>
+                    <td><a href="https://vk.com/{{ user2_info.domain }}?z=photo{{ user2_info.id }}_{{ comment.photo_id }}%2Fphotos{{ user2_info.id }}">{{ comment.photo_id }}</a></td>
                     <td>
                         {% if 'attachments' in comment and not comment.text %}
                             <p>Attachment: {{ comment.attachments.0.type }}</p>
@@ -200,9 +200,9 @@
     </table>
     <hr class="my-4">
     
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-wl", "first_user2second_user-wl-table")'> <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-wl", "first_user2second_user-wl-table")'> <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
              likes on
-            <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
             's wall</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-first_user2second_user-wl" onkeyup='tableSearch("search-first_user2second_user-wl", "first_user2second_user-wl-table")'>
     <table id="first_user2second_user-wl-table" class="table table-hover">
@@ -216,16 +216,16 @@
             {% for like in first_user2second_user.wall.likes.items %}
                 <tr>
                     <th scope="row"><strong>{{ forloop.counter }}</strong></th>
-                    <td><a style="color: black" href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
+                    <td><a href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
     <hr class="my-4">
     
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-wc", "first_user2second_user-wc-table")'> <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-first_user2second_user-wc", "first_user2second_user-wc-table")'> <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
              comments on
-            <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
             's wall</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-first_user2second_user-wc" onkeyup='tableSearch("search-first_user2second_user-wc", "first_user2second_user-wc-table")'>
     <table id="first_user2second_user-wc-table" class="table table-hover">
@@ -240,7 +240,7 @@
         {% for comment in first_user2second_user.wall.comments.items %}
             <tr>
                 <th scope="row"><strong>{{ forloop.counter }}</strong></th>
-                <td><a style="color: black" href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
+                <td><a href="https://vk.com/{{ user2_info.domain }}?w=wall{{ user2_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
                 <td>
                 {% if 'attachments' in comment and not comment.text %}
                     <p>Attachment: {{ comment.attachments.0.type }}</p>
@@ -254,9 +254,9 @@
     </table>
     <hr class="my-4">
     
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-wl", "second_user2first_user-wl-table")'> <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-wl", "second_user2first_user-wl-table")'> <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
              likes on
-            <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
             's wall</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-second_user2first_user-wl" onkeyup='tableSearch("search-second_user2first_user-wl", "second_user2first_user-wl-table")'>
     <table id="second_user2first_user-wl-table" class="table table-hover">
@@ -270,16 +270,16 @@
         {% for like in second_user2first_user.wall.likes.items %}
             <tr>
                 <th scope="row"><strong>{{ forloop.counter }}</strong></th>
-                <td><a style="color: black" href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
+                <td><a href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ like.post_id }}</a></td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <hr class="my-4">
     
-    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-wc", "second_user2first_user-wc-table")'> <a style="color: black" href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
+    <h4><img height="20" src='{% eye_icon %}' onclick='hideTable("search-second_user2first_user-wc", "second_user2first_user-wc-table")'> <a href="https://vk.com/id{{ user2_info.id }}">{{ user2_info.first_name}} {{ user2_info.last_name }}</a>
              comments on
-            <a style="color: black" href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
+            <a href="https://vk.com/id{{ user1_info.id }}">{{ user1_info.first_name}} {{ user1_info.last_name }}</a>
             's wall</h4>
     <input class="form-control" type="text" placeholder="Search..." id="search-second_user2first_user-wc" onkeyup='tableSearch("search-second_user2first_user-wc", "second_user2first_user-wc-table")'>
     <table id="second_user2first_user-wc-table" class="table table-hover">
@@ -294,7 +294,7 @@
         {% for comment in second_user2first_user.wall.comments.items %}
         <tr>
             <th scope="row"><strong>{{ forloop.counter }}</strong></th>
-            <td><a style="color: black" href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
+            <td><a href="https://vk.com/{{ user1_info.domain }}?w=wall{{ user1_info.id }}_{{ comment.post_id }}%2Fall">{{ comment.post_id }}</a></td>
             <td>
             {% if 'attachments' in comment and not comment.text %}
                 <p>Attachment: {{ comment.attachments.0.type }}</p>

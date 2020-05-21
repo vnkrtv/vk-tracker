@@ -34,6 +34,16 @@ def schools(schools_list):
 
 
 @register.simple_tag
+def main_info_name(name):
+    if name == 'photo_id':
+        name = 'Avatar Photo ID'
+        return name
+    else:
+        name = ' '.join([s.capitalize() for s in name.split('_')])
+        return name
+
+
+@register.simple_tag
 def sort_icon():
     return '/static/main/images/sort.svg'
 
