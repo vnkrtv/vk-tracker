@@ -200,7 +200,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for photo in info.photos.new %}
+            {% for photo in photos.new %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
@@ -240,7 +240,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for photo in info.photos.deleted %}
+            {% for photo in photos.deleted %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ domain }}?z=photo{{ id }}_{{ photo.photo_id }}%2Fphotos{{ id }}">{{ photo.photo_id }}</a></td>
@@ -280,7 +280,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for photo in info.photos.items %}
+            {% for photo in photos.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                     <td>{{ photo.likes.count }}</td>
@@ -336,7 +336,7 @@
              </tr>
         </thead>
         <tbody>
-            {% for post in info.wall.new %}
+            {% for post in wall.new %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
@@ -378,7 +378,7 @@
              </tr>
         </thead>
         <tbody>
-            {% for post in info.wall.deleted %}
+            {% for post in wall.deleted %}
             <tr>
                 <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
@@ -420,7 +420,7 @@
              </tr>
         </thead>
         <tbody>
-            {% for post in info.wall.items %}
+            {% for post in wall.items %}
                 <tr>
                     <td scope="row"><strong>{{ forloop.counter }}</strong></td>
                     <td><a style="color: black" href="https://vk.com/{{ domain }}?w=wall{{ id }}_{{ post.post_id }}%2Fall">{{ post.post_id }}</a></td>
