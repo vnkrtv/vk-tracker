@@ -67,14 +67,6 @@ SETTINGS="${SETTINGS/NEO4J_PASSWORD/${NEO4J_PASSWORD}}"
 
 echo "${SETTINGS}" > ./VKInfoSite/VKInfoSite/settings.py
 
-
-read -r -p "VK token (default: ''): " TOKEN
-if [ "${TOKEN}" == "" ]
-then
-  TOKEN=""
-fi
-VK_TOKEN="{\"vk_token\": \"${TOKEN}\"}"
-echo "${VK_TOKEN}" > ./VKInfoSite/VKInfoSite/vk_token/vk_token.json
 echo "==========================================Initialized configuration============================================="
 echo "===========================================Enter superuser info==============================================="
 python VKInfoSite/manage.py createsuperuser

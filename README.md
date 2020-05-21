@@ -1,4 +1,4 @@
-# VKUserInfo  
+# vk-tracker  
 
 ### Description
 Web application for tracking VK users and searching users by specified filters.  
