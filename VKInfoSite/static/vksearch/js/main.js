@@ -81,8 +81,6 @@ function getUniversitySelect(i) {
 }
 
 function AddFilter2Page() {
-    const universities = JSON.parse('{{ universities }}'.replace(/&#39;/gi, '"'));
-    const all_universities_count = parseInt('{{ universities|length }}');
     const universities_container = document.getElementById("universities_container");
 
     const universities_num = document.getElementById("universities_num");

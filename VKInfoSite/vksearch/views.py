@@ -126,9 +126,10 @@ class SearchView(View):
             if universities_selected:
                 code = self.search_by_universities.format(**kwargs)
 
-            response = vk_api(request, 'execute', code=code)
-            time.sleep(0.34)
-            result.append(SearchView.parse_response(response))
+            if groups_selected or cities_selected or universities_selected:
+                response = vk_api(request, 'execute', code=code)
+                time.sleep(0.34)
+                result.append(SearchView.parse_response(response))
 
         if friends_selected:
             code = self.search_by_friends.format(friends=_filter['friends'])

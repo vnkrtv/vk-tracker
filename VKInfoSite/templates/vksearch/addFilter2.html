@@ -49,6 +49,8 @@
         {% endif %}
     </form>
     <script type="text/javascript">
+        const universities = JSON.parse('{{ universities }}'.replace(/&#39;/gi, '"'));
+        const all_universities_count = parseInt('{{ universities|length }}');
         AddFilter2Page();
     </script>
 </div>

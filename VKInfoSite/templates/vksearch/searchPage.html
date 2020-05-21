@@ -1,12 +1,16 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+
 <div class="jumbotron">
+
     <h2>Search</h2>
+
     <form action="{% url 'vksearch:get_search_result' %}" method="post">
         {% csrf_token %}
         <div class="form-row">
             <div class="col-md-4 mb-3">
+                
                 <table>
                     <tr>
                         <td>Query string:</td>
@@ -51,6 +55,7 @@
                         </td>
                     </tr>
                 </table>
+
                 <br>Search by the following filter settings:<br>
                 <div class="custom-control custom-checkbox my-1 mr-sm-2">
                     <input type="checkbox" class="custom-control-input" id="cities_selected" name="cities_selected">
@@ -68,10 +73,12 @@
                     <input type="checkbox" class="custom-control-input" id="groups_selected" name="groups_selected">
                     <label class="custom-control-label" for="groups_selected">Groups</label>
                 </div>
+
             </div>
         </div>
+
         <input type="submit" class="btn btn-dark" value="Search">
     </form>
-    <br/>
+    
 </div>
 {% endblock %}

@@ -1,34 +1,38 @@
 {% extends "wrapper.html" %}
 
 {% block content %}
+
+{% load static %}
+{% load main_extras %}
+
+<style type="text/css"> a { color: black; } img { cursor: pointer; }</style>
+<script src="{% static 'main/js/main.js' %}"></script>
+
 <div class="jumbotron">
-    <span class="d-block p-2 bg-primary text-white">Search result: found {{ count }} persons</span>
-    <table class="table table-striped table-dark">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
+
+    <h2>Search result: found {{ count }} persons</h2>
+    <input class="form-control" type="text" placeholder="Search..." id="search-table" onkeyup='tableSearch("search-table", "table")'>
+    <table id="table" class="table table-hover">
+            <tr class="table-active">
+                <th scope="col"><img height="20" src='{% sort_icon %}' onclick="sortTableByNums('table', 0, true)"></th>
+                <th scope="col">Name <img height="20" src='{% sort_icon %}' onclick="sortTable('table', 1)"></th>
+                <th scope="col">ID</th>
+                <th scope="col">Domain <img height="20" src='{% sort_icon %}' onclick="sortTable('table', 2)"></th>
+                <th scope="col">Relation <img height="20" src='{% sort_icon %}' onclick="sortTable('table', 3)"></th>
+                <th scope="col">Is closed <img height="20" src='{% sort_icon %}' onclick="sortTable('table', 4)"></th>
                 <th scope="col">Photo</th>
             </tr>
         </thead>
         <tbody>
             {% for person in persons %}
                     <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td><a style="color: white" href="https://vk.com/id{{ person.id }}">{{ person.first_name }} {{ person.last_name }}</a><br><br>
-                        Profile: 
-                        {% if person.is_closed %}
-                            closed
-                        {% else %}
-                            opened                        
-                        {% endif %}
-                        <br>
-                        ID: {{ person.id }}<br>
-                        Domain: {{ person.domain }}<br>
-                        Relation: {{ person.relation }}
-                        </td>
-                        <td><img 
-     src={{ person.photo_400_orig }}></td>
+                        <td scope="row"><strong>{{ forloop.counter }}</strong></td>
+                        <td><a href="https://vk.com/id{{ person.id }}">{{ person.first_name }} {{ person.last_name }}</a></td>
+                        <td>{{ person.id }}</td>
+                        <td>{{ person.domain }}</td>
+                        <td>{{ person.relation }}</td>
+                        <td>{{ person.is_closed }}</td>
+                        <td><img src={{ person.photo_400_orig }}></td>
                     </tr>
             {% endfor %}
         </tbody>
