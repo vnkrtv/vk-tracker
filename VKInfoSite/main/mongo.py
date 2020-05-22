@@ -1,5 +1,6 @@
 # pylint: disable=too-few-public-methods, invalid-name
 import pymongo
+from urllib.parse import quote_plus
 from django.conf import settings
 
 _db_conn: pymongo.database.Database = None
@@ -14,7 +15,15 @@ def set_conn(host: str, port: int, db_name: str) -> None:
     :param db_name: MongoDB database name
     """
     global _db_conn
-    _db_conn = pymongo.MongoClient(host, port)[db_name]
+    if settings.DATABASES['default']['USER']:
+        _db_conn = pymongo.MongoClient('mongodb://{user}:{pwd}@{host}:{port}'.format(
+            user=quote_plus(settings.DATABASES['default']['USER']),
+            pwd=quote_plus(settings.DATABASES['default']['PASSWORD']),
+            host=host,
+            port=port
+        ))[db_name]
+    else:
+        _db_conn = pymongo.MongoClient(host, port)[db_name]
 
 
 def get_conn() -> pymongo.database.Database:

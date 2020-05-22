@@ -1,15 +1,23 @@
-FROM python:3.6.8-alpine
+FROM amancevice/pandas:latest
 MAINTAINER LeadNess
+
+RUN apt-get update \
+ && apt-get install -y libc-dev \
+ && apt-get install -y build-essential python3 \
+ && apt-get install -y python3-setuptools \
+ && apt-get install -y python3-pip
+ && python3 -m pip install --upgrade pip
+
+RUN file="$(echo "$(cat /usr/local/lib/python3.7/site-packages/pymongo/mongo_client.py)")" \
+ && echo "${file}" | sed 's/HOST = "localhost"/HOST = "mongo"/' > /usr/local/lib/python3.7/site-packages/pymongo/mongo_client.py
 
 COPY requirements.txt /app/requirements.txt
 COPY VKInfoSite /app/VKInfoSite
 COPY deploy/container_settings /app/VKInfoSite/VKInfoSite/settings.py
 
 RUN pip3 install --no-cache-dir -r /app/requirements.txt \
-  && python3 /app/manage.py makemigrations \
-  && python3 /app/manage.py migrate \
-  && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'admin')" | python3 /app/VKInfoSite/manage.py shell
+ && file="$(echo "$(cat /usr/local/lib/python3.7/site-packages/pymongo/mongo_client.py)")" \
+ && echo "${file}" | sed 's/HOST = "mongo"/HOST = "localhost"/' > text
 
-EXPOSE 80
-
-ENTRYPOINT ["python3", "/app/VKInfoSite/manage.py", "runserver", "0.0.0.0:80", "--noreload"]
+COPY deploy/entrypoint /entrypoint
+ENTRYPOINT ["/entrypoint"]

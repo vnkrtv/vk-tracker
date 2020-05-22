@@ -75,7 +75,7 @@ DATABASES = {
         'HOST': 'MONGO_HOST',
         'PORT': MONGO_PORT,
         'USER': 'MONGO_USER',
-        'PASSWORD': 'MONGO_PASSWORD',
+        'PASSWORD': 'MONGO_PWD',
         'TEST': {
             'NAME': 'MONGO_TESTDBNAME'
         }
@@ -83,7 +83,7 @@ DATABASES = {
     'neo4j': {
         'URL': 'NEO4J_URL',
         'USER': 'NEO4J_USER',
-        'PASSWORD': 'NEO4J_PASSWORD'
+        'PASSWORD': 'NEO4J_PWD'
     }
 }
 
