@@ -4,17 +4,28 @@ services:
   neo4j:
     image: neo4j:latest
     container_name: vk-neo4j
+    restart: unless-stopped
     ports:
       - "7687:7687"
       - "7474:7474"
     environment:
       - NEO4J_AUTH=neo4j/neo4j
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_max__size=1G
     networks:
       - backend
 
   mongo:
     image: mongo:latest
     container_name: vk-mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=MONGO_DBNAME
+      - MONGO_INITDB_ROOT_USERNAME=MONGO_USER
+      - MONGO_INITDB_ROOT_PASSWORD=MONGO_PWD
+    volumes:
+      - ./deploy/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     ports:
       - "27017:27017"
     networks:
@@ -27,6 +38,7 @@ services:
     image: leadness/vk-tracker
     command: python3 /app/VKInfiSite/manage.py runserver 0.0.0.0:8080 --noreload
     container_name: vk-tracker
+    restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:

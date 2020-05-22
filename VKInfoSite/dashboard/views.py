@@ -63,6 +63,8 @@ def update_graph(graphs_list, domain, token):
 
 
 def dash(request, domain):
+    global cached_graphs
+    cached_graphs = {}
     query = VKToken.objects.filter(user__id=request.user.id)
     token = query[0].token if query else ''
     context = {
