@@ -74,8 +74,8 @@ DATABASES = {
         'NAME': 'MONGO_DBNAME',
         'HOST': 'MONGO_HOST',
         'PORT': MONGO_PORT,
-        'USER': 'MONGO_USER',
-        'PASSWORD': 'MONGO_PWD',
+        'USER': '',
+        'PASSWORD': '',
         'TEST': {
             'NAME': 'MONGO_TESTDBNAME'
         }

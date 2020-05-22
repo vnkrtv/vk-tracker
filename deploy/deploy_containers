@@ -7,27 +7,22 @@ then
   exit 1
 fi
 
-read -r -p "Project secret key: " GENERATED_SECRET_KEY
-if [ "${GENERATED_SECRET_KEY}" == "" ]
-then
-  echo "Error: secret key must be specify"
-  exit 1
-fi
+# MongoDB auth as user with pass - not supported yet cause of djongo
 
-read -r -p "MongoDB user (default: $USER: " MONGO_USER
-if [ "${MONGO_USER}" == "" ]
-then
-  MONGO_USER=$USER
-fi
+# read -r -p "MongoDB user (default: $USER): " MONGO_USER
+# if [ "${MONGO_USER}" == "" ]
+# then
+#   MONGO_USER=$USER
+# fi
 
-read -r -p "MongoDB password (default: password: " MONGO_PWD
-if [ "${MONGO_PWD}" == "" ]
-then
-  MONGO_PWD=password
-fi
+# read -r -p "MongoDB password (default: password): " MONGO_PWD
+# if [ "${MONGO_PWD}" == "" ]
+# then
+#  MONGO_PWD=password
+# fi
 
 echo "Neo4j user (default): neo4j"
-read -r -p "Neo4f password (default: password: " NEO4J_PWD
+read -r -p "Neo4f password (default: password): " NEO4J_PWD
 if [ "${NEO4J_PWD}" == "" ]
 then
   NEO4J_PWD=password
@@ -35,8 +30,8 @@ fi
 
 SETTINGS="$(echo "$(cat ./deploy/settings)")"
 SETTINGS="${SETTINGS/GENERATED_SECRET_KEY/${GENERATED_SECRET_KEY}}"
-SETTINGS="${SETTINGS/MONGO_USER/${MONGO_USER}}"
-SETTINGS="${SETTINGS/MONGO_PWD/${MONGO_PWD}}"
+# SETTINGS="${SETTINGS/MONGO_USER/${MONGO_USER}}"
+# SETTINGS="${SETTINGS/MONGO_PWD/${MONGO_PWD}}"
 SETTINGS="${SETTINGS/MONGO_HOST/mongo}"
 SETTINGS="${SETTINGS/MONGO_PORT/27017}"
 SETTINGS="${SETTINGS/MONGO_DBNAME/vktracker}"
@@ -49,19 +44,21 @@ echo "${SETTINGS}" > ./deploy/container_settings
 DOCKER_COMPOSE="$(echo "$(cat ./docker-compose.yml)")"
 DOCKER_COMPOSE="${DOCKER_COMPOSE/NEO4J_PWD/${NEO4J_PWD}}"
 DOCKER_COMPOSE="${DOCKER_COMPOSE/MONGO_DBNAME/vktracker}"
-DOCKER_COMPOSE="${DOCKER_COMPOSE/MONGO_USER/${MONGO_USER}}"
-DOCKER_COMPOSE="${DOCKER_COMPOSE/MONGO_PWD/${MONGO_PWD}}"
+# DOCKER_COMPOSE="${DOCKER_COMPOSE/MONGO_USER/${MONGO_USER}}"
+# DOCKER_COMPOSE="${DOCKER_COMPOSE/MONGO_PWD/${MONGO_PWD}}"
 echo "${DOCKER_COMPOSE}" > ./docker-compose.yml
 
-INIT_MONGO="$(echo "$(cat ./deploy/init-mongo.js)")"
-INIT_MONGO="${INIT_MONGO/MONGO_DBNAME/vktracker}"
-INIT_MONGO="${INIT_MONGO/MONGO_USER/${MONGO_USER}}"
-INIT_MONGO="${INIT_MONGO/MONGO_PWD/${MONGO_PWD}}"
-echo "${INIT_MONGO}" > ./deploy/init-mongo.js
+# INIT_MONGO="$(echo "$(cat ./deploy/init-mongo.js)")"
+# INIT_MONGO="${INIT_MONGO/MONGO_DBNAME/vktracker}"
+# INIT_MONGO="${INIT_MONGO/MONGO_USER/${MONGO_USER}}"
+# INIT_MONGO="${INIT_MONGO/MONGO_PWD/${MONGO_PWD}}"
+# echo "${INIT_MONGO}" > ./deploy/init-mongo.js
 
 read -r -p "Add vk-tracker as unit in systemd? [y/n]" ANSWER
-if [ "${ANSWER}" -ne "y" ]
+if [ "${ANSWER}" == "y" ]
 then
+  echo
+else
   echo "Settings for docker-compose are configured. Run app by entering: docker-compose up"
   exit 0
 fi
