@@ -3,7 +3,6 @@
 {% block content %}
 
 {% load static %}
-<script src="{% static 'vksearch/js/main.js' %}"></script>
 
 <div class="jumbotron">
     <h2>Add new filter (1/2)</h2>
@@ -39,8 +38,11 @@
         </div>
         <input type="submit" class="btn btn-dark" value="Next">
     </form>
-    <script type="text/javascript">
-        addFilter1Page();
-    </script>
 </div>
+
+<script src="{% static 'vksearch/js/addFilterFirstPage.js' %}"></script>
+<script type="text/javascript">
+    main();
+</script>
+
 {% endblock %}

@@ -1,4 +1,5 @@
 import ast
+import json
 import vk
 import time
 from django.shortcuts import render, redirect
@@ -208,10 +209,11 @@ def get_new_filter_2(request):
         if key.startswith('un_city'):
             req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
             if req['count'] == 0:
+                country = vk_api(request, 'database.getCountriesById', country_ids=country_id)[0]['title']
                 context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
-                    'message': "City '%s' not found." % request.POST[key]
+                    'message': "City '%s' not found in %s." % (request.POST[key], country)
                 }
                 return render(request, 'info.html', context)
             un_cities_ids.append(req['items'][0]['id'])
@@ -255,7 +257,7 @@ def get_new_filter_2(request):
         return render(request, 'info.html', context)
     context = {
         'title': 'Add search filter | VK Tracker',
-        'universities': universities,
+        'universities': json.dumps(universities),
         'country_id': country_id,
         'cities_ids': cities_ids,
         'cities_titles': cities_titles

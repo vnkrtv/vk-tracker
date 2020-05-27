@@ -3,7 +3,6 @@
 {% block content %}
 
 {% load static %}
-<script src="{% static 'vksearch/js/main.js' %}"></script>
 
 <div class="jumbotron">
     <h2>Add new filter(2/2)</h2>
@@ -48,10 +47,13 @@
             <input type="hidden" id="universities_num" value="0" size="2" min="0" max="5" style="width:50px" required>
         {% endif %}
     </form>
-    <script type="text/javascript">
-        const universities = JSON.parse('{{ universities }}'.replace(/&#39;/gi, '"'));
-        const all_universities_count = parseInt('{{ universities|length }}');
-        AddFilter2Page();
-    </script>
 </div>
+
+<script src="{% static 'vksearch/js/addFilterSecondPage.js' %}"></script>
+<script type="text/javascript">
+    var universities = JSON.parse('{{ universities }}'.replace(/&quot;/gi, '"'));
+    var all_universities_count = universities.length;
+    main();
+</script>
+
 {% endblock %}
