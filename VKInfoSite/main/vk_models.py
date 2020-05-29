@@ -25,8 +25,8 @@ class VKUser:
         )
         time.sleep(self._timeout)
 
-        if request[0]['domain'] != domain:
-            raise vk.exceptions.VkAPIError('Incorrect domain')
+        if not request or request[0]['domain'] != domain:
+            raise vk.exceptions.VkException('Incorrect domain.')
 
         self._id = request[0]['id']
         self._first_name = request[0]['first_name']

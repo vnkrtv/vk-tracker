@@ -86,11 +86,11 @@ def add_user_result(request):
         vk_user = VKInfo.get_user(token=token, domain=request.POST['domain'])
         user_info = vk_user.get_all_info()
 
-        storage = neo4j.Neo4jStorage.connect(conn=neo4j.get_conn())
-        storage.add_user(user_info)
+        neo4j_storage = neo4j.Neo4jStorage.connect(conn=neo4j.get_conn())
+        neo4j_storage.add_user(user_info)
 
-        storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
-        storage.add_user(user_info)
+        mongo_storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+        mongo_storage.add_user(user_info)
 
         context = {
             'title': 'User was added | VK Tracker',

@@ -4,7 +4,7 @@ Decorators for differentiate user rights
 """
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from vk.exceptions import VkAPIError
+from vk.exceptions import VkAPIError, VkException
 
 
 def unauthenticated_user(view_func):
@@ -27,12 +27,20 @@ def check_token(view_func):
         try:
             return view_func(request, *args, **kwargs)
         except VkAPIError as e:
-            info = {
+            context = {
                 'title': 'Error | VK Tracker',
                 'message_title': 'Error',
                 'message': str(e).split('. ')[1] + '.'
             }
-            return render(request, 'info.html', info)
+            return render(request, 'info.html', context)
+        except VkException as e:
+            context = {
+                'title': 'Error | VK Tracker',
+                'message_title': 'Error',
+                'message': e
+            }
+            return render(request, 'info.html', context)
+
     return wrapper_func
 
 

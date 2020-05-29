@@ -5,12 +5,14 @@
 {% load static %}
 
 <link rel="stylesheet" href="{% static 'main/css/scroller.css' %}">
-<script type="text/javascript">
-	function showIcon() {
-		document.getElementById("scroller").style.display = "";
-		document.getElementById("br").style.display = "";
-	}
-</script>
+
+<div id="loading-container">
+	<div id="loading-div">
+		<h4>Loading...</h4>
+		<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+	</div>
+	<div id="overlay"></div>
+</div>
 
 <div class="jumbotron">
 	<h2>Add user</h2>
@@ -18,13 +20,11 @@
 	    {% csrf_token %}
 	    <label for="domain">Enter user domain: </label>
 	    <input type="text" name="domain" id="domain"/><br/>
-		<div id="scroller" class="lds-ring"><div></div><div></div><div></div><div></div></div><br id="br">
-	    <input type="submit" class="btn btn-dark" value="Add user" onclick="showIcon()">
+	    <input type="submit" class="btn btn-dark" value="Add user" onclick="document.getElementById('loading-container').style.display =''">
     </form>
 </div>
 
 <script type="text/javascript">
-	document.getElementById("scroller").style.display = "none";
-	document.getElementById("br").style.display = "none";
+	document.getElementById("loading-container").style.display = "none";
 </script>
 {% endblock %}
