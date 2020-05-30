@@ -11,6 +11,290 @@ from .vk_models import VKInfo
 from .vk_analytics import VKAnalyzer, VKRelation
 from . import mongo
 
+FIRST_USER = {
+    "domain": "id1234567",
+    "followers": {
+      "count": 1,
+      "items": [
+        {
+          "id": 2776995,
+          "first_name": "FollowerName",
+          "last_name": "FollowerSurname",
+          "sex": 2,
+          "domain": "id2776777",
+          "bdate": "19.6",
+          "city": {
+            "id": 1,
+            "title": "Москва"
+          }
+        }
+      ]
+    },
+    "friends": {
+      "count": 2,
+      "items": [
+        {
+          "id": 726666,
+          "first_name": "FirstFriendName",
+          "last_name": "FirstFriendSurname",
+          "is_closed": True,
+          "can_access_closed": False,
+          "sex": 2,
+          "domain": "friend1",
+          "city": {
+            "id": 1,
+            "title": "Москва"
+          },
+          "country": {
+            "id": 1,
+            "title": "Россия"
+          },
+          "track_code": "708c102aX4WsYM3deGhjj7vgetw4_LUSeUySFcV-h90VzQU_9WI-5pRVnt19Z2OLvQC3USyLoWAQ"
+        },
+        {
+          "id": 771335,
+          "first_name": "SecondFriendName",
+          "last_name": "SecondFriendSurname",
+          "is_closed": False,
+          "can_access_closed": True,
+          "sex": 2,
+          "domain": "friend2",
+          "bdate": "16.1.1964",
+          "city": {
+            "id": 1,
+            "title": "Москва"
+          },
+          "country": {
+            "id": 1,
+            "title": "Россия"
+          },
+          "home_phone": "",
+          "track_code": "b4ff0437q6yrvkLit2d4VhBKKcfJrsS-Gu856RM6pJvV_GMBDL_Kz8jcTbOxbClTF6rkSt3Z0Mxz"
+        }
+      ]
+    },
+    "groups": {
+      "count": 2,
+      "items": [
+        {
+          "id": 29905644,
+          "name": "First Group",
+          "screen_name": "group1",
+          "is_closed": 0,
+          "type": "page",
+          "is_admin": 0,
+          "is_member": 0,
+          "is_advertiser": 0
+        },
+        {
+          "id": 183488077,
+          "name": "Second Group",
+          "screen_name": "group2",
+          "is_closed": 0,
+          "type": "page",
+          "is_admin": 0,
+          "is_member": 0,
+          "is_advertiser": 0
+        }
+      ]
+    },
+    "id": 1234567,
+    "main_info": {
+      "id": 1234567,
+      "first_name": "First",
+      "last_name": "User",
+      "is_closed": False,
+      "can_access_closed": True,
+      "sex": 2,
+      "domain": "id1234567",
+      "bdate": "22.3",
+      "photo_id": "1432599_323470242",
+      "mobile_phone": "",
+      "home_phone": "",
+      "site": "",
+      "status": "",
+      "verified": 0,
+      "followers_count": 1,
+      "counters": {
+        "albums": 1,
+        "videos": 14,
+        "audios": 0,
+        "photos": 2,
+        "friends": 2,
+        "mutual_friends": 0,
+        "followers": 1,
+        "subscriptions": 0,
+        "pages": 2
+      }
+    },
+    "photos": {
+      "count": 2,
+      "items": [
+        {
+          "photo_id": 323470247,
+          "likes": {
+            "count": 1,
+            "items": [
+              {
+                "type": "profile",
+                "id": 726666,
+                "first_name": "FirstFriendName",
+                "last_name": "FirstFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              }
+            ]
+          },
+          "comments": {
+            "count": 0,
+            "items": []
+          }
+        },
+        {
+          "photo_id": 288240728,
+          "likes": {
+            "count": 2,
+            "items": [
+              {
+                "type": "profile",
+                "id": 726666,
+                "first_name": "FirstFriendName",
+                "last_name": "FirstFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              },
+              {
+                "type": "profile",
+                "id": 771335,
+                "first_name": "SecondFriendName",
+                "last_name": "SecondFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              }
+            ]
+          },
+          "comments": {
+            "count": 0,
+            "items": []
+          }
+        }
+      ]
+    },
+    "wall": {
+      "count": 1,
+      "items": [
+        {
+          "post_id": 179,
+          "text": "",
+          "likes": {
+            "count": 0,
+            "items": []
+          },
+          "comments": {
+            "count": 0,
+            "items": []
+          }
+        }
+      ]
+    }
+}
+
+SECOND_USER = {
+    "domain": "id1234567",
+    "followers": {
+      "count": 1,
+      "items": [
+        {
+          "id": 2776995,
+          "first_name": "FollowerName",
+          "last_name": "FollowerSurname",
+          "sex": 2,
+          "domain": "id2776777",
+          "bdate": "19.6",
+          "city": {
+            "id": 1,
+            "title": "Москва"
+          }
+        }
+      ]
+    },
+    "friends": {
+      "count": 1,
+      "items": [
+        {
+          "id": 1234567,
+          "first_name": "First",
+          "last_name": "User",
+          "is_closed": True,
+          "can_access_closed": False,
+          "sex": 2,
+          "domain": "id1234567",
+          "city": {
+            "id": 1,
+            "title": "Москва"
+          },
+          "country": {
+            "id": 1,
+            "title": "Россия"
+          },
+          "track_code": "708c102aX4WsYM3deGhjj7vgetw4_LUSeUySFcV-h90VzQU_9WI-5pRVnt19Z2OLvQC3USyLoWAQ"
+        }
+      ]
+    },
+    "groups": {
+      "count": 1,
+      "items": [
+        {
+          "id": 183488077,
+          "name": "Second Group",
+          "screen_name": "group2",
+          "is_closed": 0,
+          "type": "page",
+          "is_admin": 0,
+          "is_member": 0,
+          "is_advertiser": 0
+        }
+      ]
+    },
+    "id": 726666,
+    "main_info": {
+      "id": 726666,
+      "first_name": "FirstFriendName",
+      "last_name": "FirstFriendSurname",
+      "is_closed": False,
+      "can_access_closed": True,
+      "sex": 2,
+      "domain": "friend1",
+      "bdate": "22.3",
+      "photo_id": "1432509_323470242",
+      "mobile_phone": "",
+      "home_phone": "",
+      "site": "",
+      "status": "",
+      "verified": 0,
+      "followers_count": 1,
+      "counters": {
+        "albums": 1,
+        "videos": 14,
+        "audios": 0,
+        "photos": 0,
+        "friends": 1,
+        "mutual_friends": 0,
+        "followers": 1,
+        "subscriptions": 0,
+        "pages": 1
+      }
+    },
+    "photos": {
+      "count": 0,
+      "items": []
+    },
+    "wall": {
+      "count": 1,
+      "items": []
+    }
+}
+
 
 class MainTest(TestCase):
     """
@@ -80,3 +364,4 @@ class RedirectTest(MainTest):
         response = client.post(reverse('main:add_user'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Login page')
+
