@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
-python3 /app/VKInfoSite/manage.py makemigrations
-python3 /app/VKInfoSite/manage.py migrate
-echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'admin')" | python3 /app/VKInfoSite/manage.py shell
+cd /usr/share/python3
+. /usr/share/python3/venv/bin/activate
+export DJANGO_SETTINGS_MODULE=VKInfoSite.settings
+python VKInfoSite/manage.py makemigrations
+python VKInfoSite/manage.py migrate
+echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'admin')" | python VKInfoSite/manage.py shell
 
-python3 /app/VKInfoSite/manage.py runserver 0.0.0.0:80 --noreload
-
+python VKInfoSite/manage.py runserver 0.0.0.0:80

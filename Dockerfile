@@ -1,20 +1,19 @@
-FROM amancevice/pandas:latest
+FROM snakepacker/python:all as builder
 MAINTAINER LeadNess
 
-RUN apt-get update \
- && apt-get install -y libc-dev \
- && apt-get install -y build-essential python3 \
- && apt-get install -y python3-setuptools \
- && apt-get install -y python3-pip \
- && python3 -m pip install --upgrade pip
+RUN python3.7 -m venv /usr/share/python3/venv
+RUN /usr/share/python3/venv/bin/pip install -U pip
 
-COPY requirements.txt /app/requirements.txt
-COPY VKInfoSite /app/VKInfoSite
-COPY deploy/container_settings /app/VKInfoSite/VKInfoSite/settings.py
+COPY requirements.txt /mnt/
+RUN /usr/share/python3/venv/bin/pip install -Ur /mnt/requirements.txt \
+ && file="$(echo "$(cat /usr/share/python3/venv/lib/python3.7/site-packages/pymongo/mongo_client.py)")" \
+ && echo "${file}" | sed 's/HOST = "localhost"/HOST = "mongo"/' > /usr/share/python3/venv/lib/python3.7/site-packages/pymongo/mongo_client.py
 
-RUN pip3 install --no-cache-dir -r /app/requirements.txt \
- && file="$(echo "$(cat /usr/local/lib/python3.7/site-packages/pymongo/mongo_client.py)")" \
- && echo "${file}" | sed 's/HOST = "localhost"/HOST = "mongo"/' > /usr/local/lib/python3.7/site-packages/pymongo/mongo_client.py
+FROM snakepacker/python:3.7 as api
+
+COPY --from=builder /usr/share/python3/venv /usr/share/python3/venv
+COPY VKInfoSite /usr/share/python3/VKInfoSite
+COPY deploy/container_settings /usr/share/python3/VKInfoSite/VKInfoSite/settings.py
 
 COPY deploy/entrypoint /entrypoint
 ENTRYPOINT ["/entrypoint"]

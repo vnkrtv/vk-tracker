@@ -28,7 +28,6 @@ services:
       - backend
 
   web:
-    build: .
     image: vk-tracker
     container_name: vk-tracker
     restart: unless-stopped
