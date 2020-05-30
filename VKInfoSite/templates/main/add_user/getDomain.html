@@ -19,7 +19,7 @@
     <form action="{% url 'main:add_user_result' %}" method="post">
 	    {% csrf_token %}
 	    <label for="domain">Enter user domain: </label>
-	    <input type="text" name="domain" id="domain"/><br/>
+	    <input type="text" name="domain"/><br/>
 	    <input type="submit" class="btn btn-dark" value="Add user" onclick="document.getElementById('loading-container').style.display =''">
     </form>
 </div>

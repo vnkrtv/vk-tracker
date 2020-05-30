@@ -1,4 +1,4 @@
-class VKAnalizer:
+class VKAnalyzer:
 
     def __init__(self, new_info: dict, old_info: dict):
         self._new_info = new_info

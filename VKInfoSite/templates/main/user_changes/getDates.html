@@ -6,7 +6,7 @@
     <form action="{% url 'main:get_user_changes' %}" method="post">
         {% csrf_token %}
         <label for="domain">
-            <input type="hidden" id="domain" name="domain" value="{{ domain }}">
+            <input type="hidden" name="domain" value="{{ domain }}">
         </label>
         <select size="5" required="required" name="date1">
         {% for date in dates %}

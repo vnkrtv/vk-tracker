@@ -1,0 +1,9 @@
+[run]
+source = ./VKInfoSite/main, ./VKInfoSite/vksearch, ./VKInfoSite/dashboard
+omit = ./venv/*,*tests*,*apps.py,*manage.py,*__init__.py,*migrations*,*asgi*,*wsgi*,*admin.py,*urls.py
+
+[report]
+omit = ./venv/*,*tests*,*apps.py,*manage.py,*__init__.py,*migrations*,*asgi*,*wsgi*,*admin.py,*urls.py
+
+[html]
+directory = ./htmlcov

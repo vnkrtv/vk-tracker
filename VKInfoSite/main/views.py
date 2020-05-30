@@ -6,7 +6,7 @@ from neobolt.exceptions import ServiceUnavailable
 from . import mongo
 from . import neo4j
 from .vk_models import VKInfo
-from .vk_analitics import VKAnalizer, VKRelation
+from .vk_analytics import VKAnalyzer, VKRelation
 from .models import VKToken
 from .decorators import unauthenticated_user, post_method, check_token
 
@@ -188,7 +188,7 @@ def get_user_changes(request):
     old_info = storage.get_user(
         domain=domain,
         date=request.POST['date2'])
-    cmp_info = VKAnalizer(new_info=new_info, old_info=old_info).get_changes()
+    cmp_info = VKAnalyzer(new_info=new_info, old_info=old_info).get_changes()
     context = {
         'title': 'Account changes | VK Tracker',
         'domain': domain,
