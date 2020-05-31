@@ -48,7 +48,7 @@ You can run application using docker-compose:
 
 These commands launch 3 related containers:
 
-- vkuserinfo - with web application
+- vk-tracker - with web application
 - mongo - with MongoDB
 - neo4j - with Neo4j
 
@@ -60,6 +60,7 @@ There two types of users in system:
 Both types of users can use all system features and have their own tokens.
 
 ### Testing
+
 Run all tests with coverage by running (venv must be activated):   
 - ```coverage run VKInfoSite/runtests.py```
 
@@ -87,4 +88,7 @@ For detailed report run:
 - ```coverage html```  
 - ```x-www-browser ./htmlcov/index.html``` for Linux or ```Invoke-Expression .\htmlcov\index.html``` for Windows
 
-  
+### Code inspection
+
+For main app - ```pylint VKInfoSite/main/*.py```:  
+- ```Your code has been rated at 10.00/10```

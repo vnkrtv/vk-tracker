@@ -1,10 +1,11 @@
-# pylint: disable=too-few-public-methods, invalid-name
+"""Classes for loading VK user's info using VK API"""
 import time
 from datetime import datetime
 import vk
 
 
 class VKUser:
+    """Base class for working with VK API"""
 
     _token: str
     _session: vk.API
@@ -15,7 +16,13 @@ class VKUser:
     _timeout: float = 0.35
     _api_version: str = '5.103'
 
-    def open_session(self, token: str, domain: str):
+    def open_session(self, token: str, domain: str) -> None:
+        """
+        Create VK API session using passed token, checks if passed domain is correct
+
+        :param token: VK token with all rights
+        :param domain: VK user domain
+        """
         self._token = token
         self._session = vk.API(vk.Session(access_token=token))
         request = self._session.users.get(
@@ -32,31 +39,61 @@ class VKUser:
         self._first_name = request[0]['first_name']
         self._last_name = request[0]['last_name']
 
-    def get_first_name(self):
+    def get_first_name(self) -> str:
+        """
+        Returns first name of user with passed domain
+
+        :return: VK user first name
+        """
         return self._first_name
 
-    def get_last_name(self):
+    def get_last_name(self) -> str:
+        """
+        Returns last name of user with passed domain
+
+        :return: VK user last name
+        """
         return self._last_name
 
-    def get_id(self):
+    def get_id(self) -> str:
+        """
+        Returns id of user with passed domain
+
+        :return: VK user id
+        """
         return self._id
 
-    def get_domain(self):
+    def get_domain(self) -> str:
+        """
+        Returns domain of user with passed domain
+
+        :return: VK user domain
+        """
         return self._domain
 
 
 class VKInfo(VKUser):
+    """Loading user's account info using VK API"""
 
     @staticmethod
     def get_user(token: str, domain: str):
+        """
+        Opens session with passed token for loading
+        information about user with passed domain
+
+        :param token: VK token with all rights
+        :param domain: VK user domain
+        :return: VKInfo object
+        """
         obj = VKInfo()
         obj.open_session(token, domain)
         return obj
 
     def get_main_info(self) -> dict:
         """
+        Loads user's page main info
 
-        :return: dict of vk user main info
+        :return: dict with user's main info
         """
         fields = 'counters,photo_id,verified,sex,bdate,city,country,home_town,' \
                  'domain,contacts,site,education,universities,schools,status,' \
@@ -72,18 +109,20 @@ class VKInfo(VKUser):
 
     def get_friends(self) -> dict:
         """
+        Loads user's friends
 
-        :return: dict of vk user's friends
+        :return: dict
         {
             'count': quantity of user's friends,
-            'items': {
+            'items': [
                 {
+                    'id': ...,
                     'first_name': ...,
                     'last_name': ...,
                     'bdate': ...,
-
-
-                }
+                    ...
+                },
+                ...
             ]
         }
 
@@ -100,8 +139,22 @@ class VKInfo(VKUser):
 
     def get_followers(self) -> dict:
         """
+        Loads user's followers
 
-        :return: dict of vk user's followers
+        :return: dict
+        {
+            'count': quantity of user's followers,
+            'items': [
+                {
+                    'id': ...,
+                    'first_name': ...,
+                    'last_name': ...,
+                    'bdate': ...,
+                    ...
+                },
+                ...
+            ]
+        }
         """
         fields = 'domain,sex,bdate,country,city,contacts,education'
         followers = self._session.users.getFollowers(user_id=self._id,
@@ -112,8 +165,34 @@ class VKInfo(VKUser):
 
     def get_photos(self) -> dict:
         """
+        Loads user's photos
 
-        :return: dict of
+        :return: dict
+        {
+            'count': quantity of user's photos,
+            'items': [
+                {
+                    'photo_id': ...,
+                    'likes': {
+                        'count': ...,
+                        'items': [
+                            {
+                                'id': ...,
+                                'first_name': ...,
+                                'last_name': ...,
+
+                            },
+                            ...
+                        ]
+                    }
+                    'comments': {
+                        'count': ...,
+                        'items': [ ... ]
+                    }
+                },
+                ...
+            ]
+        }
         """
         resp = self._session.photos.getAll(
             owner_id=self._id,
@@ -186,6 +265,37 @@ class VKInfo(VKUser):
         return photos
 
     def get_wall(self) -> dict:
+        """
+        Loads user's posts from wall
+
+        :return: dict
+        {
+            'count': quantity of user's posts,
+            'items': [
+                {
+                    'post_id': ...,
+                    'test': ...,
+                    'likes': {
+                        'count': ...,
+                        'items': [
+                            {
+                                'id': ...,
+                                'first_name': ...,
+                                'last_name': ...,
+
+                            },
+                            ...
+                        ]
+                    }
+                    'comments': {
+                        'count': ...,
+                        'items': [ ... ]
+                    }
+                },
+                ...
+            ]
+        }
+        """
         resp = self._session.wall.get(
             owner_id=self._id,
             count=100,
@@ -267,6 +377,23 @@ class VKInfo(VKUser):
         return wall
 
     def get_groups(self) -> dict:
+        """
+        Loads user's groups
+
+        :return: dict
+        {
+            'count': quantity of user's groups,
+            'items': {
+                {
+                    'id': ...,
+                    'screen_name': ...,
+                    'type': ...,
+                    ...
+                },
+                ...
+            ]
+        }
+        """
         groups = self._session.groups.get(user_id=self._id, count=200, extended=1,
                                           fields='id,name,screen_name', v=self._api_version)
         for item in groups['items']:
@@ -278,6 +405,12 @@ class VKInfo(VKUser):
         return groups
 
     def get_mutual_friends(self, _id: str) -> dict:
+        """
+        Loads mutual friends for user with passed domain and input _id
+
+        :param _id: VK user id
+        :return: dict with mutual friends
+        """
         friends = self._session.friends.getMutual(
             source_uid=self._id,
             target_uid=_id
@@ -287,6 +420,11 @@ class VKInfo(VKUser):
         return friends
 
     def get_all_info(self) -> dict:
+        """
+        Loads and returns all user's account info
+
+        :return: dict with all info
+        """
         date = datetime.now().timetuple()
         info = {
             'main_info': self.get_main_info(),

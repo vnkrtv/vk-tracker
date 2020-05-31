@@ -6,7 +6,7 @@ from django.conf import settings
 from urllib3.exceptions import MaxRetryError
 from . import mongo
 from . import neo4j
-from .vk_models import VKInfo
+from .vk_api import VKInfo
 from .vk_analytics import VKAnalyzer, VKRelation
 from .models import VKToken
 from .decorators import unauthenticated_user, post_method, check_token

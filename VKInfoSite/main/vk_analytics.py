@@ -1,13 +1,30 @@
+# pylint: disable=line-too-long, too-many-nested-blocks, too-many-locals, too-many-branches, too-many-statements
+"""Classes for analyzing vk user's pages"""
+
+
 class VKAnalyzer:
+    """Class for analyzing user's info changes between two dates"""
 
     def __init__(self, old_info: dict, new_info: dict):
+        """
+        Init old_info and new_info, checks dates for correctness
+
+        :param old_info: dict with old user info
+        :param new_info: dict with new user info
+        """
         self._old_info = old_info
         self._new_info = new_info
         self.check_dates(
             date1=old_info['date'],
             date2=new_info['date'])
 
-    def check_dates(self, date1, date2):
+    def check_dates(self, date1: str, date2: str) -> None:
+        """
+        Checks dates for correctness
+
+        :param date1: string with date of collecting old info
+        :param date2: string with date of collecting new info
+        """
 
         def swap_info():
             self._old_info, self._new_info = self._new_info, self._old_info
@@ -38,7 +55,12 @@ class VKAnalyzer:
                         if date1['min'] >= date2['min']:
                             swap_info()
 
-    def cmp_main_info(self):
+    def cmp_main_info(self) -> dict:
+        """
+        Compare changes in user's main info
+
+        :return: dict with user's main info changes
+        """
         old_main = self._old_info['main_info']
         new_main = self._new_info['main_info']
         cmp_dict = {}
@@ -60,7 +82,12 @@ class VKAnalyzer:
                         }
         return cmp_dict
 
-    def cmp_friends(self):
+    def cmp_friends(self) -> dict:
+        """
+        Compare user's friends list changes
+
+        :return: dict with user's friends list changes
+        """
         old_friends = self._old_info['friends']['items']
         new_friends = self._new_info['friends']['items']
         cmp_dict = {}
@@ -85,7 +112,12 @@ class VKAnalyzer:
                 changes_dict['deleted'].append(cmp_dict[item][0])
         return changes_dict
 
-    def cmp_followers(self):
+    def cmp_followers(self) -> dict:
+        """
+        Compare user's followers list changes
+
+        :return: dict with user's followers list changes
+        """
         old_followers = self._old_info['followers']['items']
         new_followers = self._new_info['followers']['items']
         cmp_dict = {}
@@ -110,7 +142,12 @@ class VKAnalyzer:
                 changes_dict['deleted'].append(cmp_dict[item][0])
         return changes_dict
 
-    def cmp_groups(self):
+    def cmp_groups(self) -> dict:
+        """
+        Compare user's groups list changes
+
+        :return: dict with user's groups list changes
+        """
         old_groups = self._old_info['groups']['items']
         new_groups = self._new_info['groups']['items']
         cmp_dict = {}
@@ -135,7 +172,12 @@ class VKAnalyzer:
                 changes_dict['deleted'].append(cmp_dict[item][0])
         return changes_dict
 
-    def cmp_photos(self):
+    def cmp_photos(self) -> dict:
+        """
+        Compare user's photos changes
+
+        :return: dict with user's photos changes
+        """
         old_photos = self._old_info['photos']['items']
         new_photos = self._new_info['photos']['items']
         old_ph_dict, new_ph_dict = {}, {}
@@ -243,7 +285,12 @@ class VKAnalyzer:
 
         return changes_dict
 
-    def cmp_wall(self):
+    def cmp_wall(self) -> dict:
+        """
+        Compare user's wall changes
+
+        :return: dict with user's wall changes
+        """
         old_wall = self._old_info['wall']['items']
         new_wall = self._new_info['wall']['items']
         old_wall_dict, new_wall_dict, text_dict = {}, {}, {}
@@ -369,10 +416,12 @@ class VKAnalyzer:
 
         return changes_dict
 
-    def get_changes(self):
-        if not self._old_info or not self._new_info:
-            raise ValueError('user information was not loaded')
+    def get_changes(self) -> dict:
+        """
+        Return result of comparing old and new user's info
 
+        :return: dict with all user's page changes
+        """
         changes_dict = {
             'main_info': self.cmp_main_info(),
             'friends':   self.cmp_friends(),
@@ -384,29 +433,31 @@ class VKAnalyzer:
             'id':        self._new_info['main_info']['id'],
             'fullname':  self._new_info['main_info']['first_name'] + ' ' + self._new_info['main_info']['last_name']
         }
-
         return changes_dict
 
 
 class VKRelation:
+    """Class for analyzing 2 user's relations"""
 
     def __init__(self, user1_info: dict, user2_info: dict):
+        """
+        Init first and second user info
+
+        :param user1_info: dict with first user info
+        :param user2_info: dict with second user info
+        """
         self._user1 = user1_info
         self._user2 = user2_info
-
-        self._user1_first_name = self._user1['main_info']['first_name']
-        self._user2_first_name = self._user2['main_info']['first_name']
-
-        self._user1_last_name = self._user1['main_info']['last_name']
-        self._user2_last_name = self._user2['main_info']['last_name']
 
         self._user1_id = self._user1['main_info']['id']
         self._user2_id = self._user2['main_info']['id']
 
-        self._user1_domain = self._user1['main_info']['domain']
-        self._user2_domain = self._user2['main_info']['domain']
+    def check_wall(self) -> list:
+        """
+        Checks users activity on each other's pages walls
 
-    def check_wall(self):
+        :return: list with 2 dicts with users activity on each other's pages walls
+        """
         user1_wall = self._user1['wall']
         user2_wall = self._user2['wall']
         result = [{
@@ -431,10 +482,10 @@ class VKRelation:
 
             for like in post['likes']['items']:
                 if like['id'] == self._user2_id:
-                    d = {
+                    liked_post = {
                         'post_id': post_id
                     }
-                    result[1]['likes']['items'].append(d)
+                    result[1]['likes']['items'].append(liked_post)
                     likes_count += 1
 
             for comm in post['comments']['items']:
@@ -454,10 +505,10 @@ class VKRelation:
 
             for like in post['likes']['items']:
                 if like['id'] == self._user1_id:
-                    d = {
+                    liked_post = {
                         'post_id': post_id
                     }
-                    result[0]['likes']['items'].append(d)
+                    result[0]['likes']['items'].append(liked_post)
                     likes_count += 1
 
             for comm in post['comments']['items']:
@@ -471,7 +522,12 @@ class VKRelation:
         result[0]['comments']['counter'] = comm_count
         return result
 
-    def check_photos(self):
+    def check_photos(self) -> list:
+        """
+        Check users activity on each other's photos
+
+        :return: list with 2 dicts with users activity on each other's photos
+        """
         user1_photos = self._user1['photos']
         user2_photos = self._user2['photos']
         result = [{
@@ -496,10 +552,10 @@ class VKRelation:
 
             for like in photo['likes']['items']:
                 if like['id'] == self._user2_id:
-                    d = {
+                    liked_photo = {
                         'photo_id': photo_id
                     }
-                    result[1]['likes']['items'].append(d)
+                    result[1]['likes']['items'].append(liked_photo)
                     likes_count += 1
 
             for comm in photo['comments']['items']:
@@ -519,10 +575,10 @@ class VKRelation:
 
             for like in photo['likes']['items']:
                 if like['id'] == self._user1_id:
-                    d = {
+                    liked_photo = {
                         'photo_id': photo_id
                     }
-                    result[0]['likes']['items'].append(d)
+                    result[0]['likes']['items'].append(liked_photo)
                     likes_count += 1
 
             for comm in photo['comments']['items']:
@@ -536,7 +592,12 @@ class VKRelation:
         result[0]['comments']['counter'] = comm_count
         return result
 
-    def check_friends(self):
+    def check_friends(self) -> dict:
+        """
+        Check users mutual friends
+
+        :return: dict with users mutual friends
+        """
         user1_friends = self._user1['friends']
         user2_friends = self._user2['friends']
         friends, result = {}, {
@@ -549,13 +610,18 @@ class VKRelation:
         for friend in user2_friends['items']:
             _id = friend['id']
             if _id in friends:
-                friend.pop('bdate') if 'bdate' in friend else None
+                friend.pop('bdate', None)
                 result['items'].append(friend)
 
         result['counter'] = len(result['items'])
         return result
 
-    def check_groups(self):
+    def check_groups(self) -> dict:
+        """
+        Check users mutual groups
+
+        :return: dict with users mutual groups
+        """
         user1_groups = self._user1['groups']
         user2_groups = self._user2['groups']
         groups, result = {}, {
@@ -572,17 +638,22 @@ class VKRelation:
         return result
 
     def get_mutual_activity(self):
+        """
+        Returns users activity on each other's pages
+
+        :return: dict with users activity on each other's pages
+        """
         result = {
             'user1_info': {
-                'first_name': self._user1_first_name,
-                'last_name':  self._user1_last_name,
-                'domain':     self._user1_domain,
+                'first_name': self._user1['main_info']['first_name'],
+                'last_name':  self._user1['main_info']['last_name'],
+                'domain':     self._user1['main_info']['domain'],
                 'id':         self._user1_id
             },
             'user2_info': {
-                'first_name': self._user2_first_name,
-                'last_name':  self._user2_last_name,
-                'domain':     self._user2_domain,
+                'first_name': self._user2['main_info']['first_name'],
+                'last_name':  self._user2['main_info']['last_name'],
+                'domain':     self._user2['main_info']['domain'],
                 'id':         self._user2_id
             },
             'mutual_friends': self.check_friends(),

@@ -25,11 +25,11 @@ def check_token(view_func):
                 'message': str(error).split('. ')[1] + '.'
             }
             return render(request, 'info.html', context)
-        except VkException as error:
+        except VkException as vk_error:
             context = {
                 'title': 'Error | VK Tracker',
                 'message_title': 'Error',
-                'message': error
+                'message': vk_error
             }
             return render(request, 'info.html', context)
         except requests.exceptions.ConnectionError:

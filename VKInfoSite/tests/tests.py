@@ -138,13 +138,13 @@ class AddUserTest(AuthorizedMainTest):
         self.assertContains(response, 'Add user')
         self.assertContains(response, 'Enter user domain:')
 
-    @mock.patch('main.vk_models.VKUser.open_session')
-    @mock.patch('main.vk_models.VKInfo.get_main_info')
-    @mock.patch('main.vk_models.VKInfo.get_friends')
-    @mock.patch('main.vk_models.VKInfo.get_followers')
-    @mock.patch('main.vk_models.VKInfo.get_photos')
-    @mock.patch('main.vk_models.VKInfo.get_wall')
-    @mock.patch('main.vk_models.VKInfo.get_groups')
+    @mock.patch('main.vk_api.VKUser.open_session')
+    @mock.patch('main.vk_api.VKInfo.get_main_info')
+    @mock.patch('main.vk_api.VKInfo.get_friends')
+    @mock.patch('main.vk_api.VKInfo.get_followers')
+    @mock.patch('main.vk_api.VKInfo.get_photos')
+    @mock.patch('main.vk_api.VKInfo.get_wall')
+    @mock.patch('main.vk_api.VKInfo.get_groups')
     def test_add_user_result(self, get_groups, get_wall, get_photos,
                              get_followers, get_friends, get_main_info, open_session) -> None:
         """
