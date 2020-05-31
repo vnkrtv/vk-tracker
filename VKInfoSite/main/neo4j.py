@@ -1,3 +1,5 @@
+# pylint: disable=global-statement, invalid-name, line-too-long, too-many-branches
+"""Class for working with Neo4j DB without Django ORM"""
 from django.conf import settings
 from py2neo import Graph, Node, Relationship
 
@@ -32,30 +34,45 @@ def get_conn() -> Graph:
 
 
 class Neo4jStorage:
-    """
-    Class for putting vk user info into neo4j database
+    """Class for putting vk user info in Neo4j DB"""
 
-    _graph: Graph object
-    """
+    graph: Graph
 
-    _graph: Graph
+    liked = Relationship.type('LIKED')
+    commented = Relationship.type('COMMENTED')
+    posted = Relationship.type('POSTED')
+    subscribe_on = Relationship.type('SUBSCRIBE_ON')
+    friend_of = Relationship.type('FRIEND_OF')
+    follows = Relationship.type('FOLLOWS')
 
     @staticmethod
     def connect(conn: Graph):
         """
+        Establish connection to Neo4jDB
 
         :param conn: Neo4j connection
         """
         obj = Neo4jStorage()
-        obj._graph = conn
+        obj.graph = conn
         return obj
 
-    def add_user(self, user) -> dict:
+    @staticmethod
+    def parse_user_info(user: dict) -> dict:
         """
-        :param user: json with vk user information
-        :return: information loaded to graph db
-        """
+        Parse dict with user info
 
+        :param user: <dict>
+          {
+            'main_info': { ... },
+            'friends': { ... },
+            'followers': { ... },
+            'groups': { ... },
+            'wall': { ... },
+            'photos': { ... },
+            'date': { ... }
+          }
+        :return: dict with user info for putting in Neo4j DB
+        """
         friends = [friend['id'] for friend in user['friends']['items']]
         followers = [follower['id'] for follower in user['followers']['items']]
         groups = [group['id'] for group in user['groups']['items']]
@@ -75,7 +92,7 @@ class Neo4jStorage:
         else:
             bday_year = user['main_info'].get('bdate', ' . . ').split('.')[2]
 
-        user_info = {
+        return {
             'first_name': user['main_info']['first_name'],
             'last_name': user['main_info']['last_name'],
             'domain': user['main_info']['domain'],
@@ -93,10 +110,27 @@ class Neo4jStorage:
             'groups': groups
         }
 
+    def add_user(self, user) -> None:
+        """
+        Add user to DB
+
+        :param user: <dict>
+          {
+            'main_info': { ... },
+            'friends': { ... },
+            'followers': { ... },
+            'groups': { ... },
+            'wall': { ... },
+            'photos': { ... },
+            'date': { ... }
+          }
+        """
+
+        user_info = Neo4jStorage.parse_user_info(user)
         added_user = Node('Person', **user_info)
-        for person in self._graph.nodes.match('Person'):
+        for person in self.graph.nodes.match('Person'):
             if person['domain'] == user_info['domain']:
-                self._graph.evaluate("""
+                self.graph.evaluate("""
 
                             MATCH (n:Person) WHERE n.domain="%s"
                             OPTIONAL MATCH (n)-[l_rel:LIKED]-()
@@ -114,35 +148,29 @@ class Neo4jStorage:
                                    
                                      """
 
-                                     % user_info['domain'])
+                                    % user_info['domain'])
 
-        self._graph.create(added_user)
+        self.graph.create(added_user)
 
-        liked = Relationship.type('LIKED')
-
-        for post in self._graph.nodes.match('Post'):
-            for person in self._graph.nodes.match('Person'):
+        for post in self.graph.nodes.match('Post'):
+            for person in self.graph.nodes.match('Person'):
                 if person['id'] in post['likes']:
-                    self._graph.merge(liked(person, post))
+                    self.graph.merge(self.liked(person, post))
 
-        for photo in self._graph.nodes.match('Photo'):
-            for person in self._graph.nodes.match('Person'):
+        for photo in self.graph.nodes.match('Photo'):
+            for person in self.graph.nodes.match('Person'):
                 if person['id'] in photo['likes']:
-                    self._graph.merge(liked(person, photo))
+                    self.graph.merge(self.liked(person, photo))
 
-        commented = Relationship.type('COMMENTED')
-
-        for post in self._graph.nodes.match('Post'):
-            for person in self._graph.nodes.match('Person'):
+        for post in self.graph.nodes.match('Post'):
+            for person in self.graph.nodes.match('Person'):
                 if person['id'] in post['comments']:
-                    self._graph.merge(commented(person, post))
+                    self.graph.merge(self.commented(person, post))
 
-        for photo in self._graph.nodes.match('Photo'):
-            for person in self._graph.nodes.match('Person'):
+        for photo in self.graph.nodes.match('Photo'):
+            for person in self.graph.nodes.match('Person'):
                 if person['id'] in photo['comments']:
-                    self._graph.merge(commented(person, photo))
-
-        posted = Relationship.type('POSTED')
+                    self.graph.merge(self.commented(person, photo))
 
         for post in user['wall']['items']:
             post_info = {
@@ -155,16 +183,16 @@ class Neo4jStorage:
             }
             node = Node('Post', **post_info)
 
-            self._graph.create(node)
-            self._graph.merge(posted(added_user, node))
+            self.graph.create(node)
+            self.graph.merge(self.posted(added_user, node))
 
-            for person in self._graph.nodes.match('Person'):
+            for person in self.graph.nodes.match('Person'):
                 if user_info['id'] in post_info['likes']:
-                    self._graph.merge(liked(person, node))
+                    self.graph.merge(self.liked(person, node))
 
-            for person in self._graph.nodes.match('Person'):
+            for person in self.graph.nodes.match('Person'):
                 if user_info['id'] in post_info['comments']:
-                    self._graph.merge(commented(person, node))
+                    self.graph.merge(self.commented(person, node))
 
         for photo in user['photos']['items']:
             photo_info = {
@@ -176,46 +204,38 @@ class Neo4jStorage:
             }
             node = Node('Photo', **photo_info)
 
-            self._graph.create(node)
-            self._graph.merge(posted(added_user, node))
+            self.graph.create(node)
+            self.graph.merge(self.posted(added_user, node))
 
-            for person in self._graph.nodes.match('Person'):
+            for person in self.graph.nodes.match('Person'):
                 if user_info['id'] in photo_info['likes']:
-                    self._graph.merge(liked(person, node))
+                    self.graph.merge(self.liked(person, node))
 
-            for person in self._graph.nodes.match('Person'):
+            for person in self.graph.nodes.match('Person'):
                 if user_info['id'] in photo_info['comments']:
-                    self._graph.merge(commented(person, node))
-
-        subscribe_on = Relationship.type('SUBSCRIBE_ON')
+                    self.graph.merge(self.commented(person, node))
 
         groups_id = []
-        for group in self._graph.nodes.match('Group'):
+        for group in self.graph.nodes.match('Group'):
             groups_id.append(group['id'])
 
         for group in user['groups']['items']:
             if group['id'] not in groups_id:
                 node = Node('Group', **group)
-                self._graph.create(node)
+                self.graph.create(node)
 
-        for group in self._graph.nodes.match('Group'):
+        for group in self.graph.nodes.match('Group'):
             _id = group['id']
-            for person in self._graph.nodes.match('Person'):
+            for person in self.graph.nodes.match('Person'):
                 if _id in person['groups']:
-                    self._graph.merge(subscribe_on(person, group))
+                    self.graph.merge(self.subscribe_on(person, group))
 
-        friend_of = Relationship.type('FRIEND_OF')
-
-        for person in self._graph.nodes.match('Person'):
+        for person in self.graph.nodes.match('Person'):
             if (user_info['id'] in person['friends']) or (person['id'] in user_info['friends']):
-                self._graph.merge(friend_of(person, added_user) | friend_of(added_user, person))
+                self.graph.merge(self.friend_of(person, added_user) | self.friend_of(added_user, person))
 
-        follows = Relationship.type('FOLLOWS')
-
-        for person in self._graph.nodes.match('Person'):
+        for person in self.graph.nodes.match('Person'):
             if user_info['id'] in person['followers']:
-                self._graph.merge(follows(added_user, person))
+                self.graph.merge(self.follows(added_user, person))
             elif person['id'] in user_info['followers']:
-                self._graph.merge(follows(person, added_user))
-
-        return user_info
+                self.graph.merge(self.follows(person, added_user))

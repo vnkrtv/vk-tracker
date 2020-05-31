@@ -1,6 +1,7 @@
-# pylint: disable=too-few-public-methods, invalid-name
-import pymongo
+# pylint: disable=too-few-public-methods, invalid-name, global-statement
+"""Custom classes for working with MongoDB without Django ORM"""
 from urllib.parse import quote_plus
+import pymongo
 from django.conf import settings
 
 _db_conn: pymongo.database.Database = None
@@ -42,12 +43,7 @@ def get_conn() -> pymongo.database.Database:
 
 
 class MongoDB:
-    """
-    Base class for classes working with MongoDB
-
-    _db:     MongoDB database
-    _col:    MongoDB collection
-    """
+    """Base class for classes working with MongoDB"""
 
     _db: pymongo.database.Database
     _col: pymongo.collection.Collection
@@ -83,18 +79,29 @@ class VKInfoStorage(MongoDB):
             collection_name='info')
         return storage
 
-    def add_user(self, user) -> None:
+    def add_user(self, user: dict) -> None:
         """
+        Add user to database collection 'info'
 
-        :param user: json with vk user information
+        :param user: <dict>
+          {
+            'main_info': { ... },
+            'friends': { ... },
+            'followers': { ... },
+            'groups': { ... },
+            'wall': { ... },
+            'photos': { ... },
+            'date': { ... }
+          }
         """
         user['id'] = user['main_info']['id']
         user['domain'] = user['main_info']['domain']
         user['date'] = "{hour:02}-{minutes:02} {day}-{month:02}-{year}".format(**user['date'])
         self._col.insert_one(user)
 
-    def check_domain(self, domain) -> bool:
+    def check_domain(self, domain: str) -> bool:
         """
+        Check if user's contained in DB
 
         :param domain: vk user domain
         :return: True if user exist in db, False else
@@ -103,11 +110,12 @@ class VKInfoStorage(MongoDB):
             return True
         return False
 
-    def get_fullname(self, domain) -> str:
+    def get_fullname(self, domain: str) -> str:
         """
+        VK user fullname
 
         :param domain: vk user domain
-        :return: str '${first_name} ${last_name}'
+        :return: '${first_name} ${last_name}'
         """
         if self.check_domain(domain):
             info = self._col.find_one({'domain': domain})['main_info']
@@ -117,9 +125,9 @@ class VKInfoStorage(MongoDB):
     def get_user(self, _id: int = 0, domain: str = '', date: str = '') -> dict:
         """
 
-        :param _id: vk user id (if input)
-        :param domain: vk user domain (if input)
-        :param date: vk user information collected this date (if not input - latest info)
+        :param _id: vk user id (if passed)
+        :param domain: vk user domain (if passed)
+        :param date: date when information was collected (if not passed - latest info)
         :return: dict with vk user information
         """
         info = {}
@@ -137,10 +145,11 @@ class VKInfoStorage(MongoDB):
 
     def get_user_info_dates(self, _id=0, domain='') -> list:
         """
+        Dates when info about user was collected
 
         :param _id: vk user id
         :param domain: vk user domain
-        :return: list of dates when vk user information was collected
+        :return: list of dates when info was collected
         """
         info_list = []
         if _id != 0:
@@ -148,55 +157,3 @@ class VKInfoStorage(MongoDB):
         if domain != '':
             info_list = self._col.find({'domain': domain})
         return [info['date'] for info in info_list] if info_list else []
-
-
-class VKOnlineInfoStorage(MongoDB):
-
-    @staticmethod
-    def connect(db: pymongo.database.Database):
-        """
-        Establish connection to database collection 'online_info'
-
-        :param db: Database - connection to MongoDB database
-        :return: VKOnlineInfoStorage object
-        """
-        storage = VKOnlineInfoStorage()
-        storage.set_collection(
-            db=db,
-            collection_name='info')
-        return storage
-
-    def load_activity(self, _id: str, last_seen_timestamp: int, online: int, platform: int) -> None:
-        info = 0b00000000000000000000000000000000
-
-        # first bit - online info
-        info |= (online << 31)
-
-        # 2-5 bits - platform
-        info |= (platform << 28)
-
-        if self._db.find_one({'id': id}):
-            # 5 - 32 bits - info
-            time = last_seen_timestamp - self._db.find_one({'id': id})['start_monitoring_timestamp']
-            info |= time
-            self._db.find_one_and_update({'id': id}, {'$push': {
-                'activity': info
-            }})
-        else:
-            self._db.insert_one({
-                'user_id': _id,
-                'start_monitoring_timestamp': last_seen_timestamp,
-                'activity': [info]
-            })
-
-    def get_activity(self, _id: int) -> tuple:
-        """
-
-        :param _id:
-        :return: tuple of (start_monitoring_timestamp, activity info list)
-                 if user is tracked; None, None else
-        """
-        data = self._db.find_one({'user_id': _id})
-        if data:
-            return data['start_monitoring_timestamp'], data['activity']
-        return None, None

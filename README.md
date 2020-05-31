@@ -61,17 +61,17 @@ Both types of users can use all system features and have their own tokens.
 
 ### Testing
 Run all tests with coverage by running (venv must be activated):   
-- ```coverage run VKInfoSite/manage.py test main vksearch dashboard```
+- ```coverage run VKInfoSite/runtests.py```
 
 ```
 Name                                          Stmts   Miss  Cover
 -----------------------------------------------------------------
 VKInfoSite/dashboard/graphs.py                  215    173    20%
 VKInfoSite/dashboard/views.py                    28     17    39%
-VKInfoSite/main/decorators.py                    30      9    70%
+VKInfoSite/main/decorators.py                    29      9    69%
 VKInfoSite/main/models.py                        10      1    90%
-VKInfoSite/main/mongo.py                         76     23    70%
-VKInfoSite/main/neo4j.py                        101     13    87%
+VKInfoSite/main/mongo.py                         57      8    86%
+VKInfoSite/main/neo4j.py                        104     33    68%
 VKInfoSite/main/templatetags/main_extras.py      29      9    69%
 VKInfoSite/main/views.py                        114     20    82%
 VKInfoSite/main/vk_analytics.py                 362     96    73%
@@ -80,7 +80,7 @@ VKInfoSite/vksearch/mongo.py                     18      9    50%
 VKInfoSite/vksearch/views.py                    195    159    18%
 VKInfoSite/vksearch/vkscripts.py                 16      4    75%
 -----------------------------------------------------------------
-TOTAL                                          1298    603    54%
+TOTAL                                          1281    608    53%
 ```
 For detailed report run:
 - ```coverage report```  

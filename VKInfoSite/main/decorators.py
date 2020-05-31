@@ -1,4 +1,3 @@
-# pylint: disable=import-error, no-else-return
 """Custom decorators"""
 import requests
 from django.shortcuts import redirect, render
@@ -10,8 +9,7 @@ def unauthenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.user.is_authenticated:
             return view_func(request, *args, **kwargs)
-        else:
-            return redirect('/')
+        return redirect('/')
     return wrapper_func
 
 
@@ -20,18 +18,18 @@ def check_token(view_func):
     def wrapper_func(request, *args, **kwargs):
         try:
             return view_func(request, *args, **kwargs)
-        except VkAPIError as e:
+        except VkAPIError as error:
             context = {
                 'title': 'Error | VK Tracker',
                 'message_title': 'Error',
-                'message': str(e).split('. ')[1] + '.'
+                'message': str(error).split('. ')[1] + '.'
             }
             return render(request, 'info.html', context)
-        except VkException as e:
+        except VkException as error:
             context = {
                 'title': 'Error | VK Tracker',
                 'message_title': 'Error',
-                'message': e
+                'message': error
             }
             return render(request, 'info.html', context)
         except requests.exceptions.ConnectionError:
@@ -49,6 +47,5 @@ def post_method(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.method != 'POST':
             return redirect('/add_user')
-        else:
-            return view_func(request, *args, **kwargs)
+        return view_func(request, *args, **kwargs)
     return wrapper_func
