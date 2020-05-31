@@ -2,7 +2,7 @@
 
 ### Description
 Web application for tracking VK users and searching users by specified filters.  
-Implemented on django, data is stored in MongoDB and Neo4j.  
+Implemented on django and dash, data is stored in MongoDB and Neo4j.  
 System features:
 - loading and storing vk users information:
   - main information
@@ -10,7 +10,14 @@ System features:
   - friends
   - followers
   - photos
-  - posts
+  - posts  
+- visualization of user information using Dash:
+  - age distribution of user friends as graph pie chart
+  - cities distribution of user friends as graph pie chart
+  - universities distribution of user friends as graph pie chart
+  - countries distribution of user friends as graph pie chart
+  - gender distribution of user friends as graph pie chart
+  - user friends scatter plot with 3 axis - mutual friends, likes and comments on user's page 
 - tracking changes on the user page - show all changes between page information collected in different time  
 - shows 2 user relationship:
   - mutual friends  
@@ -26,18 +33,17 @@ Requirements:
 - vk token with all permissions
 
 ### Installation
-- ```git clone https://github.com/LeadNess/VKUserInfo.git```
-- ```cd VKUserInfo```
-- ```./build_for_linux``` - build application 
-- ```./build_docker``` - create docker container
+- ```git clone https://github.com/LeadNess/vk-tracker.git```
+- ```cd vk-tracker```
+- ```./build_for_linux``` - build application on host system
+- ```./deploy_containers``` - configure settings for vk-tracker container and docker-compose, if allowed will be added as a service in systemd as vk-tracker.service. 
 
 ### Usage
 
 You can run application using docker-compose:  
-- ```git clone https://github.com/LeadNess/VKUserInfo.git```
-- ```cd VKUserInfo```
-- ```./build_docker```
-- ```cd docker```
+- ```git clone https://github.com/LeadNess/vk-tracker.git```
+- ```cd vk-tracker```
+- ```./deploy_containers```
 - ```docker-compose up```
 
 These commands launch 3 related containers:
@@ -48,13 +54,39 @@ These commands launch 3 related containers:
 
 There two types of users in system:
 - superusers
-  - can change settings
   - can enter admin panel and add new users
 - users
 
-Both types of users can use all system features.
+Both types of users can use all system features and have their own tokens.
 
 ### Testing
 
-Coming soon...
+### Testing    
+Run all tests with coverage by running (venv must be activated):   
+- ```coverage run VKInfoSite/manage.py test main vksearch dashboard```
+
+```
+Name                                          Stmts   Miss  Cover
+-----------------------------------------------------------------
+VKInfoSite/dashboard/graphs.py                  215    173    20%
+VKInfoSite/dashboard/views.py                    28     17    39%
+VKInfoSite/main/decorators.py                    26      7    73%
+VKInfoSite/main/models.py                        10      1    90%
+VKInfoSite/main/mongo.py                         76     29    62%
+VKInfoSite/main/neo4j.py                        101     13    87%
+VKInfoSite/main/templatetags/main_extras.py      29      9    69%
+VKInfoSite/main/views.py                        122     55    55%
+VKInfoSite/main/vk_analytics.py                 360    343     5%
+VKInfoSite/main/vk_models.py                    104     70    33%
+VKInfoSite/vksearch/mongo.py                     18      9    50%
+VKInfoSite/vksearch/views.py                    195    159    18%
+VKInfoSite/vksearch/vkscripts.py                 16      4    75%
+-----------------------------------------------------------------
+TOTAL                                          1300    889    32%
+```
+For detailed report run:
+- ```coverage report```  
+- ```coverage html```  
+- ```x-www-browser ./htmlcov/index.html``` for Linux or ```Invoke-Expression .\htmlcov\index.html``` for Windows
+
   
