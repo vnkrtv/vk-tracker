@@ -1,8 +1,18 @@
+# pylint: disable=no-member, unused-variable, eval-used, too-few-public-methods, duplicate-code
+"""Class and function for working with VK API"""
 import vk
 from main.models import VKToken
 
 
-def vk_api(request, method, **kwargs):
+def vk_api(request, method: str, **kwargs) -> dict:
+    """
+    Function for making VK API requests
+
+    :param request: HttpRequest object
+    :param method: VK API method
+    :param kwargs: method's kwargs
+    :return: dict with response
+    """
     query = VKToken.objects.filter(user__id=request.user.id)
     token = query[0].token if query else ''
     session = vk.API(vk.Session(access_token=token))
@@ -10,6 +20,7 @@ def vk_api(request, method, **kwargs):
 
 
 class VKSearchScripts:
+    """VK Scripts for using execute VK API method"""
     by_groups_cities_universities = """
                             var universities = {universities};
                             var cities = {cities};

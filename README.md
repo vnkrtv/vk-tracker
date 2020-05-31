@@ -92,3 +92,6 @@ For detailed report run:
 
 For main app - ```pylint VKInfoSite/main/*.py```:  
 - ```Your code has been rated at 10.00/10```
+  
+For vksearch app - ```pylint --disable=duplicate-code VKInfoSite/vksearch```:  
+- ```Your code has been rated at 10.00/10``` - duplicate-code disabled as pylint swears on vk script code

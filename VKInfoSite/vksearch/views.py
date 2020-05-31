@@ -1,18 +1,23 @@
+# pylint: disable=unused-argument, no-self-use, too-many-locals, too-many-branches, too-many-statements
+"""VK Search app backend"""
 import ast
 import json
-import vk
 import time
+import vk
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from main import mongo
 from main.decorators import unauthenticated_user, post_method, check_token
 from .mongo import VKSearchFiltersStorage
-from .vkscripts import vk_api, VKSearchScripts
+from .vk_scripts import vk_api, VKSearchScripts
 
 
 @unauthenticated_user
 def get_search_params(request):
+    """
+    'search/' page view - displays page with search arguments
+    """
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     context = {
         'title': 'Search | VK Tracker',
@@ -22,6 +27,8 @@ def get_search_params(request):
 
 
 class SearchView(View):
+    """Search result page view"""
+
     template_name = 'vksearch/searchResultPage.html'
     title = 'Search results | VK Tracker'
     search_by_groups_cities_universities = VKSearchScripts.by_groups_cities_universities
@@ -46,6 +53,13 @@ class SearchView(View):
 
     @staticmethod
     def parse_response(response):
+        """
+        Parse response dict with multiple
+        search results into one dict
+
+        :param response: dict with multiple search results
+        :return: merged dict with all search results
+        """
         result = {
             'count': 0,
             'items': []
@@ -56,10 +70,12 @@ class SearchView(View):
         return result
 
     def get(self, request):
+        """Get method - redirects ro '/search' page"""
         return redirect('/search')
 
     @method_decorator(check_token, unauthenticated_user)
     def post(self, request):
+        """Post method - loads users and displays results"""
         if 'groups_selected' not in request.POST \
                 and 'cities_selected' not in request.POST \
                 and 'universities_selected' not in request.POST \
@@ -176,13 +192,19 @@ class SearchView(View):
 @check_token
 @unauthenticated_user
 def add_search_filter(request):
+    """
+    'add_filter/1/' page view - displays page with params of new search filter:
+     - Country
+     - Cities
+     - Universities parameters
+    """
     kwargs = {
-        'title': 'Add search filter | VK Tracker',
         'need_all': 1,
         'count': 1000
     }
     countries = vk_api(request, 'database.getCountries', **kwargs)
     context = {
+        'title': 'Add search filter | VK Tracker',
         'countries': [item for item in countries['items'] if item['id'] < 5]
     }
     return render(request, 'vksearch/addFilter1.html', context)
@@ -191,13 +213,25 @@ def add_search_filter(request):
 @post_method
 @unauthenticated_user
 def get_new_filter_2(request):
+    """
+    'add_filter/2/' page view - displays page with params of new search filter:
+     - Filter name
+     - Universities names
+     - Friends
+     - Groups
+    """
     country_id = request.POST['country_id']
     cities_ids, un_cities_ids, cities_titles = [], [], []
     for key in request.POST:
         if key.startswith('city'):
-            req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
+            req = vk_api(request,
+                         method='database.getCities',
+                         q=request.POST[key],
+                         country_id=country_id)
             if req['count'] == 0:
-                country = vk_api(request, 'database.getCountriesById', country_ids=country_id)[0]['title']
+                country = vk_api(request,
+                                 method='database.getCountriesById',
+                                 country_ids=country_id)[0]['title']
                 context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
@@ -207,9 +241,14 @@ def get_new_filter_2(request):
             cities_ids.append(req['items'][0]['id'])
             cities_titles.append(request.POST[key])
         if key.startswith('un_city'):
-            req = vk_api(request, 'database.getCities', q=request.POST[key], country_id=country_id)
+            req = vk_api(request,
+                         method='database.getCities',
+                         q=request.POST[key],
+                         country_id=country_id)
             if req['count'] == 0:
-                country = vk_api(request, 'database.getCountriesById', country_ids=country_id)[0]['title']
+                country = vk_api(request,
+                                 method='database.getCountriesById',
+                                 country_ids=country_id)[0]['title']
                 context = {
                     'title': 'Error | VK Tracker',
                     'message_title': 'Error',
@@ -247,7 +286,7 @@ def get_new_filter_2(request):
         req = vk_api(request, 'execute', code=code)
         time.sleep(0.35)
         for search_by_q in req:
-            universities += [item for item in search_by_q['items']]
+            universities += search_by_q['items']
     if not universities and un_filter:
         context = {
             'title': 'Error | VK Tracker',
@@ -268,6 +307,10 @@ def get_new_filter_2(request):
 @post_method
 @unauthenticated_user
 def add_filter_result(request):
+    """
+    'add_filter/result/' page view - displays
+    result of adding new search filter
+    """
     country_id = int(request.POST['country_id'])
     cities_ids = request.POST['cities_ids']
     cities_titles = request.POST['cities_titles']
@@ -335,6 +378,10 @@ def add_filter_result(request):
 
 @unauthenticated_user
 def delete_filter(request):
+    """
+    'delete_filter/' page view - displays
+    selector with all search filters
+    """
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     context = {
         'title': 'Delete search filter | VK Tracker',
@@ -346,6 +393,10 @@ def delete_filter(request):
 @post_method
 @unauthenticated_user
 def delete_filter_result(request):
+    """
+    'delete_filter/result/' page view - displays
+    result of deleting search filter
+    """
     filter_name = request.POST['filter']
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.delete_philter(filter_name)
