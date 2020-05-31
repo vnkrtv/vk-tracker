@@ -133,7 +133,7 @@ class VKInfoStorage(MongoDB):
                 info = self._col.find_one({'domain': domain, 'date': date})
             else:
                 info = self._col.find_one({'domain': domain})
-        return info
+        return info if info else {}
 
     def get_user_info_dates(self, _id=0, domain='') -> list:
         """

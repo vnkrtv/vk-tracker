@@ -4,6 +4,8 @@ Main app tests, covered views.py, models.py, mongo.py, neo4j.py, vk_analytics.py
 """
 from django.test import TestCase, Client
 from unittest import mock
+from bson import ObjectId
+from datetime import datetime
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -397,11 +399,77 @@ class AddUserTest(MainTest):
         """
         Test for adding user by web interface
         """
+        domain = FIRST_USER['main_info']['domain']
+
+        storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+        user_info = storage.get_user(domain=domain)
+        self.assertEqual(user_info, {})
+
         response = self.client.post(reverse('main:add_user_result'), {
-            'domain': FIRST_USER['main_info']['domain']
+            'domain': domain
         }, follow=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Add result')
         self.assertContains(response, 'First User')
         self.assertContains(response, 'was successfully added to databases!')
+
+        user_info = storage.get_user(domain=domain)
+        user_info.pop('_id')
+        user_info.pop('date')
+        self.maxDiff = None
+        self.assertEqual(user_info, FIRST_USER)
+
+
+class UserInfoTest(MainTest):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.client = Client()
+        self.client.post(reverse('main:login_page'), {
+            'username': self.user.username,
+            'password': 'top_secret'
+        }, follow=True)
+
+        date = datetime.now().timetuple()
+        self.info = FIRST_USER
+        self.info['date'] = {
+            'year': date[0],
+            'month': date[1],
+            'day': date[2],
+            'hour': date[3],
+            'minutes': date[4]
+        }
+        self.info['_id'] = str(ObjectId())
+        storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+        storage.add_user(user=self.info)
+
+    def test_user_info_get_method(self):
+        response = self.client.get(reverse('main:user_info'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Get info')
+        self.assertContains(response, 'Enter user domain:')
+
+    def test_get_user_info(self) -> None:
+        """
+        Test for adding user by web interface
+        """
+        domain = self.info['main_info']['domain']
+        response = self.client.post(reverse('main:get_user_info'), {
+            'domain': domain
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Information about')
+        self.assertContains(response, 'First User')
+
+        for friend in self.info['friends']['items']:
+            self.assertContains(response, friend['id'])
+        for follower in self.info['followers']['items']:
+            self.assertContains(response, follower['id'])
+        for group in self.info['groups']['items']:
+            self.assertContains(response, group['id'])
+        for post in self.info['wall']['items']:
+            self.assertContains(response, post['post_id'])
+        for photo in self.info['photos']['items']:
+            self.assertContains(response, photo['photo_id'])
