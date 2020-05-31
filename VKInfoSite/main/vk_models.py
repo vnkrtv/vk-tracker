@@ -106,7 +106,7 @@ class VKInfo(VKUser):
         fields = 'domain,sex,bdate,country,city,contacts,education'
         followers = self._session.users.getFollowers(user_id=self._id,
                                                      fields=fields,
-                                                     v='5.65')
+                                                     v=self._api_version)
         time.sleep(self._timeout)
         return followers
 

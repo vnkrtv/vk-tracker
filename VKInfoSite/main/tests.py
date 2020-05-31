@@ -3,6 +3,7 @@
 Main app tests, covered views.py, models.py, mongo.py, neo4j.py, vk_analytics.py and vk_models.py
 """
 from django.test import TestCase, Client
+from unittest import mock
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -365,3 +366,42 @@ class RedirectTest(MainTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Login page')
 
+
+class AddUserTest(MainTest):
+    """
+    Tests for 'add_user' and 'add_user_result' pages
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.client = Client()
+        self.client.post(reverse('main:login_page'), {
+            'username': self.user.username,
+            'password': 'top_secret'
+        }, follow=True)
+
+    def test_add_user_get_method(self) -> None:
+        response = self.client.get(reverse('main:add_user'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Add user')
+        self.assertContains(response, 'Enter user domain:')
+
+    @mock.patch('main.vk_models.VKUser.open_session', return_value=None)
+    @mock.patch('main.vk_models.VKInfo.get_main_info', return_value=FIRST_USER['main_info'])
+    @mock.patch('main.vk_models.VKInfo.get_friends', return_value=FIRST_USER['friends'])
+    @mock.patch('main.vk_models.VKInfo.get_followers', return_value=FIRST_USER['followers'])
+    @mock.patch('main.vk_models.VKInfo.get_photos', return_value=FIRST_USER['photos'])
+    @mock.patch('main.vk_models.VKInfo.get_wall', return_value=FIRST_USER['wall'])
+    @mock.patch('main.vk_models.VKInfo.get_groups', return_value=FIRST_USER['groups'])
+    def test_add_user_result(self, *args) -> None:
+        """
+        Test for adding user by web interface
+        """
+        response = self.client.post(reverse('main:add_user_result'), {
+            'domain': FIRST_USER['main_info']['domain']
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Add result')
+        self.assertContains(response, 'First User')
+        self.assertContains(response, 'was successfully added to databases!')
