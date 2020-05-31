@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name,
+# pylint: disable=invalid-name, too-many-arguments
 """
 Main app tests, covered views.py, models.py, mongo.py, neo4j.py, vk_analytics.py and vk_models.py
 """
@@ -20,12 +20,8 @@ class MainTest(TestCase):
 
     def setUp(self) -> None:
         """
-        Add objects to temporary test database:
-        - groups 'lecturer' and 'student'
-        - 'lecturer' user and 'student' user
-        - study subject 'Subject'
-        - Subject 'Subject' test 'Hard test'
-        - 2 questions for 'Hard test'
+        Add user to temporary test database and
+        set connection for custom classes
         """
         self.user = User.objects.create_user(
             username='user',
@@ -103,8 +99,14 @@ class RedirectTest(MainTest):
 
 
 class AuthorizedMainTest(MainTest):
+    """
+    Base class for testing auth user requests
+    """
 
     def setUp(self) -> None:
+        """
+        Log in user and load 3 json files with test users information
+        """
         super().setUp()
         self.client = Client()
         self.client.post(reverse('main:login_page'), {
@@ -128,6 +130,9 @@ class AddUserTest(AuthorizedMainTest):
     """
 
     def test_add_user_get_method(self) -> None:
+        """
+        Test for displaying 'add_user/' page
+        """
         response = self.client.get(reverse('main:add_user'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Add user')
@@ -176,8 +181,14 @@ class AddUserTest(AuthorizedMainTest):
 
 
 class UserInfoTest(AuthorizedMainTest):
+    """
+    Test for users info pages
+    """
 
     def setUp(self) -> None:
+        """
+        Add first_user to temporary DB
+        """
         super().setUp()
         date = datetime.now().timetuple()
         self.first_user['date'] = {
@@ -192,6 +203,9 @@ class UserInfoTest(AuthorizedMainTest):
         storage.add_user(user=self.first_user)
 
     def test_user_info_get_method(self):
+        """
+        Test for displaying 'user_info/' page
+        """
         response = self.client.get(reverse('main:user_info'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Get info')
@@ -223,8 +237,14 @@ class UserInfoTest(AuthorizedMainTest):
 
 
 class UserChangesTest(AuthorizedMainTest):
+    """
+    Test for users changes info pages
+    """
 
     def setUp(self) -> None:
+        """
+        Add normal and changed info about first_user to temporary DB
+        """
         super().setUp()
         date = datetime.now().timetuple()
 
@@ -251,6 +271,9 @@ class UserChangesTest(AuthorizedMainTest):
         storage.add_user(user=self.changed_first_user)
 
     def test_get_changes_get_method(self):
+        """
+        Test for displaying 'get_changes/' page
+        """
         response = self.client.get(reverse('main:get_changes'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Get changes')
@@ -289,18 +312,24 @@ class UserChangesTest(AuthorizedMainTest):
         deleted_follower = self.first_user['followers']['items'][0]
         deleted_group = self.first_user['groups']['items'][1]
         deleted_photo = self.first_user['photos']['items'][1]
-        new_like_info = '<a href="https://vk.com/id771335">SecondFriendName SecondFriendSurname</a>[NEW]'
+        new_like = '<a href="https://vk.com/id771335">SecondFriendName SecondFriendSurname</a>[NEW]'
 
         self.assertContains(response, deleted_friend['id'])
         self.assertContains(response, deleted_follower['id'])
         self.assertContains(response, deleted_group['id'])
         self.assertContains(response, deleted_photo['photo_id'])
-        self.assertContains(response, new_like_info)
+        self.assertContains(response, new_like)
 
 
 class UsersRelationTest(AuthorizedMainTest):
+    """
+    Tests fo users relation info pages
+    """
 
     def setUp(self) -> None:
+        """
+        Add first_user and second_user info to temporary DB
+        """
         super().setUp()
         date = datetime.now().timetuple()
 
@@ -327,6 +356,9 @@ class UsersRelationTest(AuthorizedMainTest):
         storage.add_user(user=self.second_user)
 
     def test_get_relation_get_method(self):
+        """
+        Test for displaying 'mutual_activity/' page
+        """
         response = self.client.get(reverse('main:get_mutual_activity'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Get users domains')
