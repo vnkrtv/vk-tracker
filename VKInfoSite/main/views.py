@@ -207,13 +207,13 @@ def get_user_changes(request):
     """
     domain = request.POST['domain']
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
-    new_info = storage.get_user(
-        domain=domain,
-        date=request.POST['date1'])
     old_info = storage.get_user(
         domain=domain,
         date=request.POST['date2'])
-    cmp_info = VKAnalyzer(new_info=new_info, old_info=old_info).get_changes()
+    new_info = storage.get_user(
+        domain=domain,
+        date=request.POST['date1'])
+    cmp_info = VKAnalyzer(old_info=old_info, new_info=new_info).get_changes()
     context = {
         'title': 'Account changes | VK Tracker',
         'domain': domain,

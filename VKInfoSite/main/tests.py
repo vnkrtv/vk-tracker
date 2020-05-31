@@ -9,9 +9,6 @@ from datetime import datetime
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
-from .models import VKToken
-from .vk_models import VKInfo
-from .vk_analytics import VKAnalyzer, VKRelation
 from . import mongo
 
 FIRST_USER = {
@@ -328,7 +325,7 @@ CHANGED_FIRST_USER = {
       ]
     },
     "groups": {
-      "count": 2,
+      "count": 1,
       "items": [
         {
           "id": 29905644,
@@ -493,7 +490,7 @@ class RedirectTest(MainTest):
     Tests for redirection in the application
     """
 
-    def test_redirect(self) -> None:
+    def test_redirect_unauthenticated_users(self) -> None:
         """
         Test redirection of unauthenticated users
         """
@@ -501,6 +498,25 @@ class RedirectTest(MainTest):
         response = client.post(reverse('main:add_user'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Login page')
+
+    def test_redirect_get_methods(self) -> None:
+        """
+        Test redirection to 'add_user/' page if method is not post
+        """
+        client = Client()
+        client.post(reverse('main:login_page'), {
+            'username': self.user.username,
+            'password': 'top_secret'
+        }, follow=True)
+
+        response = client.get(reverse('main:add_user_result'))
+        self.assertEqual(response.status_code, 302)
+
+        response = client.get(reverse('main:get_user_changes'))
+        self.assertEqual(response.status_code, 302)
+
+        response = client.get(reverse('main:get_relations'))
+        self.assertEqual(response.status_code, 302)
 
 
 class AuthorizedMainTest(MainTest):
@@ -611,6 +627,7 @@ class UserChangesTest(AuthorizedMainTest):
     def setUp(self) -> None:
         super().setUp()
         date = datetime.now().timetuple()
+
         self.info = FIRST_USER
         self.info['date'] = {
             'year': date[0],
@@ -620,5 +637,64 @@ class UserChangesTest(AuthorizedMainTest):
             'minutes': date[4]
         }
         self.info['_id'] = str(ObjectId())
+
+        self.changed_info = CHANGED_FIRST_USER
+        self.changed_info['date'] = {
+            'year': date[0],
+            'month': date[1],
+            'day': date[2],
+            'hour': date[3],
+            'minutes': date[4] + 1
+        }
+        self.changed_info['_id'] = str(ObjectId())
+
         storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
         storage.add_user(user=self.info)
+        storage.add_user(user=self.changed_info)
+
+    def test_get_changes_get_method(self):
+        response = self.client.get(reverse('main:get_changes'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Get changes')
+        self.assertContains(response, 'Enter user domain:')
+
+    def test_get_changes_dates(self) -> None:
+        """
+        Test for getting dates user info was collected by web interface
+        """
+        domain = self.info['main_info']['domain']
+        response = self.client.post(reverse('main:get_dates'), {
+            'domain': domain
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Get dates')
+        self.assertContains(response, self.info['date'])
+        self.assertContains(response, self.changed_info['date'])
+
+    def test_get_changes(self) -> None:
+        """
+        Test for getting user account info changes by web interface
+        """
+        domain = self.info['main_info']['domain']
+        response = self.client.post(reverse('main:get_user_changes'), {
+            'domain': domain,
+            'date1': self.info['date'],
+            'date2': self.changed_info['date']
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'First User')
+        self.assertContains(response, 'account changes')
+
+        deleted_friend = self.info['friends']['items'][1]
+        deleted_follower = self.info['followers']['items'][0]
+        deleted_group = self.info['groups']['items'][1]
+        deleted_photo = self.info['photos']['items'][1]
+        new_like_info = '<a href="https://vk.com/id771335">SecondFriendName SecondFriendSurname</a>[NEW]'
+
+        self.assertContains(response, deleted_friend['id'])
+        self.assertContains(response, deleted_follower['id'])
+        self.assertContains(response, deleted_group['id'])
+        self.assertContains(response, deleted_photo['photo_id'])
+        self.assertContains(response, new_like_info)

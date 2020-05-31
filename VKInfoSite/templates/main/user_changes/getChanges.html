@@ -427,7 +427,7 @@
                     <td>{{ post.likes.count }}</td>
                     <td>{{ post.text }}</td>
                     <td>
-                        {% for like in post.likes %}
+                        {% for like in post.likes.items %}
                             {% if like.status %}
                                 <p><a href="https://vk.com/id{{ like.id }}">{{ like.first_name }} {{ like.last_name }}</a>[NEW]</p>
                             {% else %}
@@ -436,7 +436,7 @@
                         {% endfor %}
                     </td>
                     <td>
-                        {% for comment in post.comments %}
+                        {% for comment in post.comments.items %}
                             {% if comment.status %}
                                 <p>[NEW]</p>
                                 <p><a href="https://vk.com/id{{ comment.from_id }}">From</a></p>

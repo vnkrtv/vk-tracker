@@ -1,26 +1,42 @@
 class VKAnalyzer:
 
-    def __init__(self, new_info: dict, old_info: dict):
-        self._new_info = new_info
+    def __init__(self, old_info: dict, new_info: dict):
         self._old_info = old_info
+        self._new_info = new_info
+        self.check_dates(
+            date1=old_info['date'],
+            date2=new_info['date'])
 
     def check_dates(self, date1, date2):
-        date1 = tuple(map(int, date1.replace(' ', '-').split('-')))
-        date2 = tuple(map(int, date2.replace(' ', '-').split('-')))
-        for i in range(4, 1, -1):
-            if date1[i] != date2[i]:
-                if date2[i] > date1[i]:
-                    buff_dict = self._new_info
-                    self._new_info = self._old_info
-                    self._old_info = buff_dict
-                    return
-        for i in range(0, 2):
-            if date1[i] != date2[i]:
-                if date2[i] > date1[i]:
-                    buff_dict = self._new_info
-                    self._new_info = self._old_info
-                    self._old_info = buff_dict
-                    return
+
+        def swap_info():
+            self._old_info, self._new_info = self._new_info, self._old_info
+
+        def parse_date(date):
+            date_tuple = tuple(map(int, date.replace(' ', '-').split('-')))
+            return {
+                'year': date_tuple[4],
+                'month': date_tuple[3],
+                'date': date_tuple[2],
+                'hour': date_tuple[1],
+                'min': date_tuple[1]
+            }
+        date1 = parse_date(date1)
+        date2 = parse_date(date2)
+        if date1['year'] >= date2['year']:
+            swap_info()
+        else:
+            if date1['month'] >= date2['month']:
+                swap_info()
+            else:
+                if date1['date'] >= date2['date']:
+                    swap_info()
+                else:
+                    if date1['hour'] >= date2['hour']:
+                        swap_info()
+                    else:
+                        if date1['min'] >= date2['min']:
+                            swap_info()
 
     def cmp_main_info(self):
         old_main = self._old_info['main_info']
