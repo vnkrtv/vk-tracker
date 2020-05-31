@@ -73,14 +73,14 @@ VKInfoSite/main/models.py                        10      1    90%
 VKInfoSite/main/mongo.py                         76     23    70%
 VKInfoSite/main/neo4j.py                        101     13    87%
 VKInfoSite/main/templatetags/main_extras.py      29      9    69%
-VKInfoSite/main/views.py                        114     36    68%
-VKInfoSite/main/vk_analytics.py                 362    178    51%
+VKInfoSite/main/views.py                        114     20    82%
+VKInfoSite/main/vk_analytics.py                 362     96    73%
 VKInfoSite/main/vk_models.py                    104     70    33%
 VKInfoSite/vksearch/mongo.py                     18      9    50%
 VKInfoSite/vksearch/views.py                    195    159    18%
 VKInfoSite/vksearch/vkscripts.py                 16      4    75%
 -----------------------------------------------------------------
-TOTAL                                          1298    701    46%
+TOTAL                                          1298    603    54%
 ```
 For detailed report run:
 - ```coverage report```  

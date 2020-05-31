@@ -188,7 +188,16 @@ FIRST_USER = {
           "text": "",
           "likes": {
             "count": 0,
-            "items": []
+            "items": [
+              {
+                "type": "profile",
+                "id": 726666,
+                "first_name": "FirstFriendName",
+                "last_name": "FirstFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              }
+            ]
           },
           "comments": {
             "count": 0,
@@ -222,22 +231,18 @@ SECOND_USER = {
       "count": 1,
       "items": [
         {
-          "id": 1234567,
-          "first_name": "First",
-          "last_name": "User",
-          "is_closed": True,
-          "can_access_closed": False,
+          "id": 771335,
+          "first_name": "SecondFriendName",
+          "last_name": "SecondFriendSurname",
+          "is_closed": False,
+          "can_access_closed": True,
           "sex": 2,
-          "domain": "id1234567",
+          "domain": "friend2",
+          "bdate": "16.1.1964",
           "city": {
-            "id": 1,
-            "title": "Москва"
-          },
-          "country": {
-            "id": 1,
-            "title": "Россия"
-          },
-          "track_code": "708c102aX4WsYM3deGhjj7vgetw4_LUSeUySFcV-h90VzQU_9WI-5pRVnt19Z2OLvQC3USyLoWAQ"
+              "id": 1,
+              "title": "Москва"
+          }
         }
       ]
     },
@@ -698,3 +703,84 @@ class UserChangesTest(AuthorizedMainTest):
         self.assertContains(response, deleted_group['id'])
         self.assertContains(response, deleted_photo['photo_id'])
         self.assertContains(response, new_like_info)
+
+
+class UsersRelationTest(AuthorizedMainTest):
+
+    def setUp(self) -> None:
+        super().setUp()
+        date = datetime.now().timetuple()
+
+        self.first_user = FIRST_USER
+        self.first_user['date'] = {
+            'year': date[0],
+            'month': date[1],
+            'day': date[2],
+            'hour': date[3],
+            'minutes': date[4]
+        }
+        self.first_user['_id'] = str(ObjectId())
+
+        self.second_user = SECOND_USER
+        self.second_user['date'] = {
+            'year': date[0],
+            'month': date[1],
+            'day': date[2],
+            'hour': date[3],
+            'minutes': date[4] + 1
+        }
+        self.second_user['_id'] = str(ObjectId())
+
+        storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+        storage.add_user(user=self.first_user)
+        storage.add_user(user=self.second_user)
+
+    def test_get_relation_get_method(self):
+        response = self.client.get(reverse('main:get_mutual_activity'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Get users domains')
+        self.assertContains(response, 'Enter first user domain:')
+        self.assertContains(response, 'Enter second user domain:')
+
+    def test_get_changes_dates(self) -> None:
+        """
+        Test for getting dates users info was collected
+        """
+        response = self.client.post(reverse('main:get_users_dates'), {
+            'first_domain': self.first_user['main_info']['domain'],
+            'second_domain': self.second_user['main_info']['domain']
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Get dates')
+        self.assertContains(response, 'First User')
+        self.assertContains(response, 'FirstFriendName FirstFriendSurname')
+        self.assertContains(response, self.first_user['date'])
+        self.assertContains(response, self.second_user['date'])
+
+    def test_get_changes(self) -> None:
+        """
+        Test for getting users mutual activity by web interface
+        """
+        response = self.client.post(reverse('main:get_relations'), {
+            'first_domain': self.first_user['main_info']['domain'],
+            'second_domain': self.second_user['main_info']['domain'],
+            'date1': self.first_user['date'],
+            'date2': self.second_user['date']
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Mutual activity')
+        self.assertContains(response, self.first_user['main_info']['domain'])
+        self.assertContains(response, self.second_user['main_info']['domain'])
+
+        mutual_friend = self.first_user['friends']['items'][1]
+        mutual_group = self.first_user['groups']['items'][1]
+        post_liked_by_second_user = self.first_user['wall']['items'][0]
+        photos_liked_by_second_user = self.first_user['photos']['items']
+
+        self.assertContains(response, mutual_friend['id'])
+        self.assertContains(response, mutual_group['id'])
+        self.assertContains(response, post_liked_by_second_user['post_id'])
+        for photo in photos_liked_by_second_user:
+            self.assertContains(response, photo['photo_id'])
