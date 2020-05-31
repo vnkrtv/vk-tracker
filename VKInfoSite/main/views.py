@@ -1,8 +1,9 @@
+# pylint: disable=no-member
+"""Main app backend"""
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.conf import settings
-from urllib3.exceptions import MaxRetryError, ConnectionError
-from neobolt.exceptions import ServiceUnavailable
+from urllib3.exceptions import MaxRetryError
 from . import mongo
 from . import neo4j
 from .vk_models import VKInfo
@@ -12,6 +13,10 @@ from .decorators import unauthenticated_user, post_method, check_token
 
 
 def login_page(request):
+    """
+    'login/' page view - redirect to 'add_user/' page
+    in case of successful authorization
+    """
     logout(request)
     if 'username' not in request.POST or 'password' not in request.POST:
         return render(request, 'login.html')
@@ -20,28 +25,25 @@ def login_page(request):
         password=request.POST['password'])
     if user is not None:
         if user.is_active:
-
-            try:
-                neo4j.set_conn(
-                    url=settings.DATABASES['neo4j']['URL'],
-                    user=settings.DATABASES['neo4j']['USER'],
-                    password=settings.DATABASES['neo4j']['PASSWORD'])
-            except ServiceUnavailable:
-                render(request, 'login.html', {'error': 'Neo4j is not connected.'})
-
+            neo4j.set_conn(
+                url=settings.DATABASES['neo4j']['URL'],
+                user=settings.DATABASES['neo4j']['USER'],
+                password=settings.DATABASES['neo4j']['PASSWORD'])
             mongo.set_conn(
                 host=settings.DATABASES['default']['HOST'],
                 port=settings.DATABASES['default']['PORT'],
                 db_name=settings.DATABASES['default']['NAME'])
             login(request, user)
             return redirect('/add_user/')
-        else:
-            return render(request, 'login.html', {'error': 'user account is disabled.'})
+        return render(request, 'login.html', {'error': 'user account is disabled.'})
     return render(request, 'login.html', {'error': 'username and password are incorrect.'})
 
 
 @unauthenticated_user
 def change_settings(request):
+    """
+    'settings/' page view - displays page with user's VK token
+    """
     query = VKToken.objects.filter(user__id=request.user.id)
     token = query[0].token if query else ''
     context = {
@@ -54,6 +56,10 @@ def change_settings(request):
 @post_method
 @unauthenticated_user
 def change_settings_result(request):
+    """
+    'change_settings_result/' page view - displays
+    result of changing user's VK token
+    """
     token = VKToken(
         user=request.user,
         token=request.POST['vk_token'])
@@ -68,6 +74,9 @@ def change_settings_result(request):
 
 @unauthenticated_user
 def add_user(request):
+    """
+    'add_user/' page view - displays page with domain input field
+    """
     context = {
         'title': 'Add user | VK Tracker',
     }
@@ -78,36 +87,34 @@ def add_user(request):
 @post_method
 @unauthenticated_user
 def add_user_result(request):
+    """
+    'add_user/result/' page view - displays
+    result of adding user to DBs
+    """
     query = VKToken.objects.filter(user__id=request.user.id)
     token = query[0].token if query else ''
-    error = ''
 
     try:
         vk_user = VKInfo.get_user(token=token, domain=request.POST['domain'])
-        user_info = vk_user.get_all_info()
+        info = vk_user.get_all_info()
 
         neo4j_storage = neo4j.Neo4jStorage.connect(conn=neo4j.get_conn())
-        neo4j_storage.add_user(user_info)
+        neo4j_storage.add_user(info)
 
         mongo_storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
-        mongo_storage.add_user(user_info)
+        mongo_storage.add_user(info)
 
         context = {
             'title': 'User was added | VK Tracker',
-            'first_name': user_info['main_info']['first_name'],
-            'last_name': user_info['main_info']['last_name'],
-            'domain': user_info['main_info']['domain']
+            'first_name': info['main_info']['first_name'],
+            'last_name': info['main_info']['last_name'],
+            'domain': info['main_info']['domain']
         }
-    except ConnectionError:
-        error = 'No connection to the internet.'
     except MaxRetryError:
-        error = 'No connection to Neo4j. Is it running?'
-
-    if error:
         context = {
             'title': 'Error | VK Tracker',
             'message_title': 'Error',
-            'message': error
+            'message': 'No connection to Neo4j. Is it running?'
         }
         return render(request, 'info.html', context)
 
@@ -116,6 +123,9 @@ def add_user_result(request):
 
 @unauthenticated_user
 def user_info(request):
+    """
+    'user_info/' page view - displays page with domain input field
+    """
     context = {
         'title': 'User information | VK Tracker',
     }
@@ -125,11 +135,15 @@ def user_info(request):
 @post_method
 @unauthenticated_user
 def get_user_info(request):
+    """
+    'user_info/show_info/' page view - displays information
+    about user and link to 'dashboard/${domain}' page
+    """
     domain = request.POST['domain']
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
-    user_info = storage.get_user(domain=domain)
+    info = storage.get_user(domain=domain)
 
-    if not user_info:
+    if not info:
         context = {
             'title': 'Error | VK Tracker',
             'message_title': 'Error',
@@ -139,16 +153,19 @@ def get_user_info(request):
 
     context = {
         'title': 'User information | VK Tracker',
-        'info': user_info,
+        'info': info,
         'fullname': storage.get_fullname(domain=domain),
         'domain': domain,
-        'id': user_info['main_info']['id']
+        'id': info['main_info']['id']
     }
     return render(request, 'main/user_info/userInfo.html', context)
 
 
 @unauthenticated_user
 def get_changes(request):
+    """
+    'user_changes/' page view - displays page with domain input field
+    """
     context = {
         'title': 'Account changes | VK Tracker',
     }
@@ -158,6 +175,10 @@ def get_changes(request):
 @post_method
 @unauthenticated_user
 def get_dates(request):
+    """
+    'user_changes/get_dates/' page view - displays page with
+    2 date selectors for which user information was collected
+    """
     domain = request.POST['domain']
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
 
@@ -180,6 +201,10 @@ def get_dates(request):
 @post_method
 @unauthenticated_user
 def get_user_changes(request):
+    """
+    'user_changes/show/' page view - displays page with
+    changes on the user’s page between two dates
+    """
     domain = request.POST['domain']
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
     new_info = storage.get_user(
@@ -200,6 +225,9 @@ def get_user_changes(request):
 
 @unauthenticated_user
 def get_mutual_activity(request):
+    """
+    'users_relation/' page view - displays page with 2 domain input fields
+    """
     context = {
         'title': 'Mutual activity | VK Tracker'
     }
@@ -209,6 +237,10 @@ def get_mutual_activity(request):
 @post_method
 @unauthenticated_user
 def get_users_dates(request):
+    """
+    'users_relation/get_dates/' page view - displays page with 2 date
+    selectors for 2 users which information about them was collected
+    """
     first_domain = request.POST['first_domain']
     second_domain = request.POST['second_domain']
     error = ''
@@ -242,6 +274,9 @@ def get_users_dates(request):
 @post_method
 @unauthenticated_user
 def get_relations(request):
+    """
+    'users_relation/show/' page view - displays mutual activity of 2 users
+    """
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
     user1_info = storage.get_user(
         domain=request.POST['first_domain'],

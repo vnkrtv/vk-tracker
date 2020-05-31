@@ -16,11 +16,11 @@ urlpatterns = [
     url(r'^user_info/show_info/$', views.get_user_info, name='get_user_info'),
 
     url(r'^user_changes/$', views.get_changes, name='get_changes'),
-    url(r'^user_changes/get_date/$', views.get_dates, name='get_dates'),
-    url(r'^user_changes/show_changes/$', views.get_user_changes, name='get_user_changes'),
+    url(r'^user_changes/get_dates/$', views.get_dates, name='get_dates'),
+    url(r'^user_changes/show/$', views.get_user_changes, name='get_user_changes'),
 
     url(r'^users_relation/$', views.get_mutual_activity, name='get_mutual_activity'),
     url(r'^users_relation/get_dates/$', views.get_users_dates, name='get_users_dates'),
-    url(r'^users_relation/show_relation/$', views.get_relations, name='get_relations'),
+    url(r'^users_relation/show/$', views.get_relations, name='get_relations'),
 ]
 #leaflet/folium instagram_scrapper

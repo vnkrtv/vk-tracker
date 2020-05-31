@@ -298,6 +298,140 @@ SECOND_USER = {
     }
 }
 
+CHANGED_FIRST_USER = {
+    "domain": "id1234567",
+    "followers": {
+      "count": 0,
+      "items": []
+    },
+    "friends": {
+      "count": 1,
+      "items": [
+        {
+          "id": 726666,
+          "first_name": "FirstFriendName",
+          "last_name": "FirstFriendSurname",
+          "is_closed": True,
+          "can_access_closed": False,
+          "sex": 2,
+          "domain": "friend1",
+          "city": {
+            "id": 1,
+            "title": "Москва"
+          },
+          "country": {
+            "id": 1,
+            "title": "Россия"
+          },
+          "track_code": "708c102aX4WsYM3deGhjj7vgetw4_LUSeUySFcV-h90VzQU_9WI-5pRVnt19Z2OLvQC3USyLoWAQ"
+        }
+      ]
+    },
+    "groups": {
+      "count": 2,
+      "items": [
+        {
+          "id": 29905644,
+          "name": "First Group",
+          "screen_name": "group1",
+          "is_closed": 0,
+          "type": "page",
+          "is_admin": 0,
+          "is_member": 0,
+          "is_advertiser": 0
+        }
+      ]
+    },
+    "id": 1234567,
+    "main_info": {
+      "id": 1234567,
+      "first_name": "First",
+      "last_name": "User",
+      "is_closed": False,
+      "can_access_closed": True,
+      "sex": 2,
+      "domain": "id1234567",
+      "bdate": "22.3",
+      "photo_id": "1432599_323470242",
+      "mobile_phone": "",
+      "home_phone": "",
+      "site": "",
+      "status": "",
+      "verified": 0,
+      "followers_count": 0,
+      "counters": {
+        "albums": 1,
+        "videos": 14,
+        "audios": 0,
+        "photos": 2,
+        "friends": 1,
+        "mutual_friends": 0,
+        "followers": 0,
+        "subscriptions": 0,
+        "pages": 2
+      }
+    },
+    "photos": {
+      "count": 1,
+      "items": [
+        {
+          "photo_id": 323470247,
+          "likes": {
+            "count": 2,
+            "items": [
+              {
+                "type": "profile",
+                "id": 726666,
+                "first_name": "FirstFriendName",
+                "last_name": "FirstFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              },
+              {
+                "type": "profile",
+                "id": 771335,
+                "first_name": "SecondFriendName",
+                "last_name": "SecondFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              }
+            ]
+          },
+          "comments": {
+            "count": 0,
+            "items": []
+          }
+        }
+      ]
+    },
+    "wall": {
+      "count": 1,
+      "items": [
+        {
+          "post_id": 179,
+          "text": "",
+          "likes": {
+            "count": 1,
+            "items": [
+              {
+                "type": "profile",
+                "id": 771335,
+                "first_name": "SecondFriendName",
+                "last_name": "SecondFriendSurname",
+                "is_closed": False,
+                "can_access_closed": True
+              }
+            ]
+          },
+          "comments": {
+            "count": 0,
+            "items": []
+          }
+        }
+      ]
+    }
+}
+
 
 class MainTest(TestCase):
     """
@@ -369,10 +503,7 @@ class RedirectTest(MainTest):
         self.assertContains(response, 'Login page')
 
 
-class AddUserTest(MainTest):
-    """
-    Tests for 'add_user' and 'add_user_result' pages
-    """
+class AuthorizedMainTest(MainTest):
 
     def setUp(self) -> None:
         super().setUp()
@@ -381,6 +512,12 @@ class AddUserTest(MainTest):
             'username': self.user.username,
             'password': 'top_secret'
         }, follow=True)
+
+
+class AddUserTest(AuthorizedMainTest):
+    """
+    Tests for 'add_user' and 'add_user_result' pages
+    """
 
     def test_add_user_get_method(self) -> None:
         response = self.client.get(reverse('main:add_user'), follow=True)
@@ -421,16 +558,10 @@ class AddUserTest(MainTest):
         self.assertEqual(user_info, FIRST_USER)
 
 
-class UserInfoTest(MainTest):
+class UserInfoTest(AuthorizedMainTest):
 
     def setUp(self) -> None:
         super().setUp()
-        self.client = Client()
-        self.client.post(reverse('main:login_page'), {
-            'username': self.user.username,
-            'password': 'top_secret'
-        }, follow=True)
-
         date = datetime.now().timetuple()
         self.info = FIRST_USER
         self.info['date'] = {
@@ -473,3 +604,21 @@ class UserInfoTest(MainTest):
             self.assertContains(response, post['post_id'])
         for photo in self.info['photos']['items']:
             self.assertContains(response, photo['photo_id'])
+
+
+class UserChangesTest(AuthorizedMainTest):
+
+    def setUp(self) -> None:
+        super().setUp()
+        date = datetime.now().timetuple()
+        self.info = FIRST_USER
+        self.info['date'] = {
+            'year': date[0],
+            'month': date[1],
+            'day': date[2],
+            'hour': date[3],
+            'minutes': date[4]
+        }
+        self.info['_id'] = str(ObjectId())
+        storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
+        storage.add_user(user=self.info)
