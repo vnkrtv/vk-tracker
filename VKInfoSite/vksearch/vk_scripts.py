@@ -16,7 +16,7 @@ def vk_api(request, method: str, **kwargs) -> dict:
     query = VKToken.objects.filter(user__id=request.user.id)
     token = query[0].token if query else ''
     session = vk.API(vk.Session(access_token=token))
-    return eval('vk.API(vk.Session(access_token=token)).' + method)(v=5.103, **kwargs)
+    return eval('session.' + method)(v=5.103, **kwargs)
 
 
 class VKSearchScripts:

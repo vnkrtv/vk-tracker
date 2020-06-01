@@ -357,7 +357,7 @@ def add_filter_result(request):
                 return render(request, 'info.html', context)
             time.sleep(0.34)
             groups_ids.append(_id)
-    _filter = {
+    new_filter = {
         'name':          filter_name,
         'country_id':    country_id,
         'cities':        ast.literal_eval(cities_ids),
@@ -367,7 +367,7 @@ def add_filter_result(request):
         'groups':        groups_ids
     }
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
-    storage.add_filter(_filter)
+    storage.add_filter(new_filter)
     context = {
         'title': 'New search filter was added | VK Tracker',
         'message_title': 'Adding result',

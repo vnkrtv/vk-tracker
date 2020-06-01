@@ -77,11 +77,11 @@ VKInfoSite/main/templatetags/main_extras.py      30      9    70%
 VKInfoSite/main/views.py                        118     13    89%
 VKInfoSite/main/vk_analytics.py                 355     95    73%
 VKInfoSite/main/vk_api.py                       104     70    33%
-VKInfoSite/vksearch/mongo.py                     19      9    53%
-VKInfoSite/vksearch/views.py                    196    159    19%
+VKInfoSite/vksearch/mongo.py                     19      3    84%
+VKInfoSite/vksearch/views.py                    196    103    47%
 VKInfoSite/vksearch/vk_scripts.py                17      4    76%
 -----------------------------------------------------------------
-TOTAL                                          1216    471    61%
+TOTAL                                          1216    409    66%
 ```
 For detailed report run:
 - ```coverage report```  

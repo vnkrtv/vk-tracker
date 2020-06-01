@@ -64,7 +64,7 @@ class VKSearchFiltersStorage(MongoDB):
             }
         """
         _filter = self._col.find_one({'name': filter_name})
-        return _filter
+        return _filter if _filter else {}
 
     def delete_philter(self, filter_name: str) -> None:
         """
