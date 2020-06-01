@@ -67,21 +67,21 @@ Run all tests with coverage by running (venv must be activated):
 ```
 Name                                          Stmts   Miss  Cover
 -----------------------------------------------------------------
-VKInfoSite/dashboard/graphs.py                  215    173    20%
-VKInfoSite/dashboard/views.py                    28     17    39%
+VKInfoSite/dashboard/graphs.py                  145     64    56%
+VKInfoSite/dashboard/views.py                    32     17    47%
 VKInfoSite/main/decorators.py                    29      9    69%
 VKInfoSite/main/models.py                        10      1    90%
 VKInfoSite/main/mongo.py                         57      8    86%
-VKInfoSite/main/neo4j.py                        104     33    68%
-VKInfoSite/main/templatetags/main_extras.py      29      9    69%
-VKInfoSite/main/views.py                        114     20    82%
-VKInfoSite/main/vk_analytics.py                 362     96    73%
-VKInfoSite/main/vk_models.py                    104     70    33%
-VKInfoSite/vksearch/mongo.py                     18      9    50%
-VKInfoSite/vksearch/views.py                    195    159    18%
-VKInfoSite/vksearch/vkscripts.py                 16      4    75%
+VKInfoSite/main/neo4j.py                        104     13    88%
+VKInfoSite/main/templatetags/main_extras.py      30      9    70%
+VKInfoSite/main/views.py                        118     13    89%
+VKInfoSite/main/vk_analytics.py                 355     95    73%
+VKInfoSite/main/vk_api.py                       104     70    33%
+VKInfoSite/vksearch/mongo.py                     19      9    53%
+VKInfoSite/vksearch/views.py                    196    159    19%
+VKInfoSite/vksearch/vk_scripts.py                17      4    76%
 -----------------------------------------------------------------
-TOTAL                                          1281    608    53%
+TOTAL                                          1216    471    61%
 ```
 For detailed report run:
 - ```coverage report```  

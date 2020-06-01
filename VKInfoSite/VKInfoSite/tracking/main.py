@@ -15,6 +15,37 @@ if __name__ == '__main__':
         json.dump(data, file)
 
 
+class OnlineGraph:
+
+    def __init__(self, activity_list, **kwargs):
+        self._df = pd.DataFrame({
+            'online':   [item['online'] for item in activity_list],
+            'platform': [item['platform'] for item in activity_list],
+            'time':     [item['time'] for item in activity_list]
+        })
+
+    def create_graph(self):
+        graph = html.Div([
+            html.H4('Online', style={'text-align': 'center'}),
+            dcc.Graph(
+                id='online-graph',
+                figure=go.Figure(
+                    layout=dict(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)'
+                    ),
+                    data=[go.Scatter(
+                        x=self._df['time'],
+                        y=self._df['online'],
+                        name=self._df.at[i, 'platform'],
+                        xaxis_range=['2016-07-01', '2016-12-31']
+                    ) for i in range(len(self._df))]
+                )
+            )
+        ])
+        return graph
+
+
 class VKUserActivity(VKUser):
 
     def check_user_activity(self):
