@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name, too-many-arguments
+# pylint: disable=invalid-name, too-many-arguments, no-member
 """
 Main app tests, covered views.py, models.py, mongo.py, neo4j.py, vk_analytics.py and vk_models.py
 """
@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
 from bson import ObjectId
+from main.models import VKToken
 from main import mongo
 
 
@@ -98,6 +99,61 @@ class RedirectTest(MainTest):
         self.assertEqual(response.status_code, 302)
 
 
+class ChangeSettingsTest(MainTest):
+    """
+    Class for changing settings page
+    """
+
+    def setUp(self) -> None:
+        """
+        Log in user and set up his vk token
+        """
+        super().setUp()
+        self.client = Client()
+        self.client.post(reverse('main:login_page'), {
+            'username': self.user.username,
+            'password': 'top_secret'
+        }, follow=True)
+        VKToken.objects.create(
+            user=self.user,
+            token='vk_token')
+
+    def test_change_settings_get_method(self):
+        """
+        Test for displaying 'settings/' page
+        """
+        response = self.client.get(reverse('main:change_settings'), follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        query = VKToken.objects.filter(user__id=self.user.id)
+        token = query[0].token
+
+        self.assertContains(response, 'Settings')
+        self.assertContains(response, 'VK token')
+        self.assertContains(response, token)
+
+    def test_change_settings_result(self):
+        """
+        Test for changing VK token by web interface
+        """
+        query = VKToken.objects.filter(user__id=self.user.id)
+        old_token = query[0].token
+        self.assertEqual(old_token, 'vk_token')
+
+        new_vk_token = 'new_vk_token'
+        response = self.client.post(reverse('main:change_settings_result'), {
+            'vk_token': new_vk_token
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Change result')
+        self.assertContains(response, 'Settings have been successfully changed.')
+
+        query = VKToken.objects.filter(user__id=self.user.id)
+        token = query[0].token
+        self.assertEqual(token, new_vk_token)
+        self.assertNotEqual(token, old_token)
+
+
 class AuthorizedMainTest(MainTest):
     """
     Base class for testing auth user requests
@@ -114,13 +170,13 @@ class AuthorizedMainTest(MainTest):
             'password': 'top_secret'
         }, follow=True)
 
-        with open('VKInfoSite/tests/test_data/first_user.json', 'r') as file:
+        with open('VKInfoSite/tests/tests_data/first_user.json', 'r') as file:
             self.first_user = json.load(file)
 
-        with open('VKInfoSite/tests/test_data/changed_first_user.json', 'r') as file:
+        with open('VKInfoSite/tests/tests_data/changed_first_user.json', 'r') as file:
             self.changed_first_user = json.load(file)
 
-        with open('VKInfoSite/tests/test_data/second_user.json', 'r') as file:
+        with open('VKInfoSite/tests/tests_data/second_user.json', 'r') as file:
             self.second_user = json.load(file)
 
 

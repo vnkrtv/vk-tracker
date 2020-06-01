@@ -6,7 +6,7 @@
 
 <div class="jumbotron">
     <h2>Add new filter (1/2)</h2>
-    <form action="{% url 'vksearch:get_new_filter_2' %}" method="post">
+    <form action="{% url 'vksearch:add_search_filter_2' %}" method="post">
         {% csrf_token %}
         <h4>Country</h4>
         <div class="form-group">    

@@ -60,10 +60,15 @@ def change_settings_result(request):
     'change_settings_result/' page view - displays
     result of changing user's VK token
     """
-    token = VKToken(
-        user=request.user,
-        token=request.POST['vk_token'])
-    token.save()
+    query = VKToken.objects.filter(user__id=request.user.id)
+    if query:
+        token_obj = query[0]
+        token_obj.token = request.POST['vk_token']
+        token_obj.save()
+    else:
+        VKToken.objects.create(
+            user=request.user,
+            token=request.POST['vk_token'])
     context = {
         'title': 'Settings | VK Tracker',
         'message_title': 'Change result',

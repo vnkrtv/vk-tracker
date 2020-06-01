@@ -191,7 +191,7 @@ class SearchView(View):
 
 @check_token
 @unauthenticated_user
-def add_search_filter(request):
+def add_search_filter_1(request):
     """
     'add_filter/1/' page view - displays page with params of new search filter:
      - Country
@@ -212,7 +212,7 @@ def add_search_filter(request):
 
 @post_method
 @unauthenticated_user
-def get_new_filter_2(request):
+def add_search_filter_2(request):
     """
     'add_filter/2/' page view - displays page with params of new search filter:
      - Filter name
