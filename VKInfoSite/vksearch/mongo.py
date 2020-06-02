@@ -21,11 +21,11 @@ class VKSearchFiltersStorage(MongoDB):
             collection_name='filters')
         return storage
 
-    def add_filter(self, _filter: dict) -> None:
+    def add_filter(self, new_filter: dict) -> None:
         """
         Add search filter to DB
 
-        :param _filter: dict
+        :param new_filter: dict
             {
                 'name': filter_name(str),
                 'country_id': country_id(int),
@@ -36,7 +36,7 @@ class VKSearchFiltersStorage(MongoDB):
                 'groups': groups_ids(list of int)
             }
         """
-        self._col.insert_one(_filter)
+        self._col.insert_one(new_filter)
 
     def get_all_philters_names(self) -> list:
         """

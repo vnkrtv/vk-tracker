@@ -1,0 +1,46 @@
+[
+    {
+        "count": 3,
+        "items": [
+            {
+                "id": 198768517,
+                "first_name": "AnotherRandomName",
+                "last_name": "AnotherRandomSurname",
+                "is_closed": true,
+                "can_access_closed": false,
+                "sex": 2,
+                "domain": "privet_andrey",
+                "photo_400_orig": "https://sun1-89.userapi.com/TzXDBZm3wvPmcn0eiO38Wf_HgzB1PKoVz3moVA/lfngBobZlfU.jpg?ava=1",
+                "online": 0,
+                "track_code": "34605241ZJLkYbyP-Zbwwo0Zpp0U-4k9U2eNTzW9bcKrQ-ULg0UJ-b1V0Nv-kPadkLNsPZKQ-ilKa5ohUQ",
+                "relation": 0
+            },
+            {
+                "id": 99910192,
+                "first_name": "FirstName",
+                "last_name": "FirstSurname",
+                "is_closed": true,
+                "can_access_closed": false,
+                "sex": 2,
+                "domain": "first_domain",
+                "photo_400_orig": "https://sun1-89.userapi.com/c846018/v846018081/94e33/yI0_z6p2L3E.jpg?ava=1",
+                "online": 0,
+                "track_code": "092400dcN3Hcm-96vHIBKSDYx4W-FD14s8jnTCNfhcG9GF2DX-JaGtb4gyy4IVJ7AncOFFNzXXWk04Ii",
+                "relation": 0
+            },
+            {
+                "id": 101434517,
+                "first_name": "SecondName",
+                "last_name": "SecondSurname",
+                "is_closed": false,
+                "can_access_closed": true,
+                "sex": 2,
+                "domain": "second_domain",
+                "photo_400_orig": "https://sun1-84.userapi.com/2SBkvJWvQmyqXBx2oBt_A-CgmVuEolLwIRAVFA/By2kJH2f2II.jpg?ava=1",
+                "online": 0,
+                "track_code": "01088193B7ozrYEcEGIc1s2fhWGrBLjzyNEZW46Miz6a7cc9wC9q0W2UuE1BZUrTrzdGxC1vy-fR3Q416g",
+                "relation": 0
+            }
+        ]
+    }
+]

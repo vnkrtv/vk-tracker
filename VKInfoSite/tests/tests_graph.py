@@ -83,3 +83,16 @@ class CitiesDistributionPieChartTest(MainTest):
         """
         graph = graphs.CitiesDistributionPieChart(user_info=self.user)
         graph.create_graph()
+
+
+class CitiesDistributionPieChartTest(MainTest):
+    """
+
+    """
+
+    def test_creating_graph(self):
+        """
+
+        """
+        graph = graphs.CitiesDistributionPieChart(user_info=self.user)
+        graph.create_graph()

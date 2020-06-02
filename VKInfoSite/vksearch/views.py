@@ -81,7 +81,8 @@ class SearchView(View):
                 and 'universities_selected' not in request.POST \
                 and 'friends_selected' not in request.POST:
             context = {
-                'title': 'Error',
+                'title': 'Error | VK Tracker',
+                'message_title': 'Error',
                 'message': 'You must specify at least 1 search parameter'
             }
             return render(request, 'info.html', context)
@@ -90,7 +91,7 @@ class SearchView(View):
         count = 1000
 
         storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
-        _filter = storage.get_filter(filter_name)
+        search_filter = storage.get_filter(filter_name)
 
         kwargs = {
             'q': '"' + request.POST['q'] + '"' if request.POST['q'] else '""',
@@ -99,7 +100,7 @@ class SearchView(View):
             'age_to': request.POST['age_to'],
             'has_photo': 1 if 'has_photo' in request.POST else 0,
             'count': count,
-            'country_id': _filter['country_id']
+            'country_id': search_filter['country_id']
         }
 
         cities_selected = request.POST.get('cities_selected')
@@ -108,17 +109,17 @@ class SearchView(View):
         friends_selected = request.POST.get('friends_selected')
 
         if cities_selected:
-            kwargs['cities'] = _filter['cities_titles']
+            kwargs['cities'] = search_filter['cities_titles']
         if universities_selected:
-            kwargs['universities'] = _filter['universities']
+            kwargs['universities'] = search_filter['universities']
         if groups_selected:
-            kwargs['groups'] = _filter['groups']
+            kwargs['groups'] = search_filter['groups']
 
         result = []
         if groups_selected and cities_selected and universities_selected:
             response = []
             kwargs.pop('groups')
-            for group_id in _filter['groups']:
+            for group_id in search_filter['groups']:
                 kwargs['group_id'] = group_id
                 code = self.search_by_groups_cities_universities.format(**kwargs)
                 response += vk_api(request, 'execute', code=code)
@@ -149,7 +150,7 @@ class SearchView(View):
                 result.append(SearchView.parse_response(response))
 
         if friends_selected:
-            code = self.search_by_friends.format(friends=_filter['friends'])
+            code = self.search_by_friends.format(friends=search_filter['friends'])
             result += vk_api(request, 'execute', code=code)
 
         result_ids = []
@@ -369,7 +370,7 @@ def add_filter_result(request):
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.add_filter(new_filter)
     context = {
-        'title': 'New search filter was added | VK Tracker',
+        'title': 'Add search filter | VK Tracker',
         'message_title': 'Adding result',
         'message': f"Filter '{filter_name}' was successfully added to base."
     }
@@ -401,7 +402,7 @@ def delete_filter_result(request):
     storage = VKSearchFiltersStorage.connect(db=mongo.get_conn())
     storage.delete_philter(filter_name)
     context = {
-        'title': 'Search filter was deleted | VK Tracker',
+        'title': 'Delete search filter | VK Tracker',
         'message_title': 'Deleting result',
         'message': f"Filter '{filter_name}' was successfully deleted."
     }
