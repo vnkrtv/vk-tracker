@@ -1,12 +1,15 @@
+# pylint: disable=invalid-name, no-member, global-statement
+"""
+DjangoDash app and dash view
+"""
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from django.shortcuts import render
-from . import graphs
 from django_plotly_dash import DjangoDash
-from main import mongo
 from main.models import VKToken
-
+from main import mongo
+from . import graphs
 
 app = DjangoDash(name='Graphs',
                  id='domain_id,token_id',
@@ -41,10 +44,11 @@ app.layout = html.Div([
         dcc.Input(id='domain_id', type='hidden', value=''),
         dcc.Input(id='token_id', type='hidden', value=''),
         html.Div(id='graphs')
-    ])],
-    className='jumbotron'
-)
+    ])
+], className='jumbotron')
+
 cached_graphs = {}
+
 
 @app.callback(
     dash.dependencies.Output('graphs', 'children'),
@@ -52,26 +56,37 @@ cached_graphs = {}
      dash.dependencies.Input('domain_id', 'value'),
      dash.dependencies.Input('token_id', 'value')])
 def update_graph(selected_graphs, domain, token):
+    """
+    Updates graph in case of input Dropdown values
+
+    :param selected_graphs: list of selected graph names
+    :param domain: VK user domain
+    :param token: VK token with all rights
+    """
     active_graphs = []
     storage = mongo.VKInfoStorage.connect(db=mongo.get_conn())
     user_info = storage.get_user(domain=domain)
 
-    for i, graph_name in enumerate(selected_graphs):
+    for graph_name in selected_graphs:
         try:
             if graph_name not in cached_graphs:
                 graph = graphs_dict[graph_name](user_info=user_info, token=token)
-                cached_graphs[graph_name] = graph.create_graph()
+                cached_graphs[graph_name] = graph.create()
             active_graphs.append(cached_graphs[graph_name])
         except KeyError:
             active_graphs.append(html.H4(
-                f"{graph_name} graph is not available: no information about user with domain '{domain}' in DB",
+                f"{graph_name} is not available: no info about user with domain '{domain}' in DB",
                 style={'marginTop': 20, 'marginBottom': 20}
             ))
 
     return active_graphs
 
 
-def dash(request, domain):
+def dashboard(request, domain):
+    """
+    'dashboard/${domain}' page view - displays
+    iframe with DjangoDash 'Graphs' app
+    """
     global cached_graphs
     cached_graphs = {}
     query = VKToken.objects.filter(user__id=request.user.id)

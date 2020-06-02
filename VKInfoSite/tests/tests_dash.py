@@ -32,7 +32,7 @@ class GenderDistributionPieChartTest(MainTest):
         Test for creating GenderDistributionPieChart graph
         """
         graph = graphs.GenderDistributionPieChart(user_info=self.user)
-        graph.create_graph()
+        graph.create()
 
 
 class UniversityDistributionPieChartTest(MainTest):
@@ -45,7 +45,7 @@ class UniversityDistributionPieChartTest(MainTest):
         Test for creating UniversityDistributionPieChart graph
         """
         graph = graphs.UniversityDistributionPieChart(user_info=self.user)
-        graph.create_graph()
+        graph.create()
 
 
 class AgeDistributionPieChartTest(MainTest):
@@ -58,7 +58,7 @@ class AgeDistributionPieChartTest(MainTest):
         Test for creating AgeDistributionPieChart graph
         """
         graph = graphs.AgeDistributionPieChart(user_info=self.user)
-        graph.create_graph()
+        graph.create()
 
 
 class CountriesDistributionPieChartTest(MainTest):
@@ -71,7 +71,7 @@ class CountriesDistributionPieChartTest(MainTest):
         Test for creating CountriesDistributionPieChart
         """
         graph = graphs.CountriesDistributionPieChart(user_info=self.user)
-        graph.create_graph()
+        graph.create()
 
 
 class CitiesDistributionPieChartTest(MainTest):
@@ -84,7 +84,7 @@ class CitiesDistributionPieChartTest(MainTest):
         Test for creating CitiesDistributionPieChart graph
         """
         graph = graphs.CitiesDistributionPieChart(user_info=self.user)
-        graph.create_graph()
+        graph.create()
 
 
 class FriendsActivityScatterPlotTest(MainTest):
@@ -100,7 +100,7 @@ class FriendsActivityScatterPlotTest(MainTest):
             user = json.load(file)
         vk_api.execute.return_value = user['friends']['items']
         graph = graphs.FriendsActivityScatterPlot(user_info=self.user, token='token')
-        graph.create_graph()
+        graph.create()
 
 
 class DashViewTest(MainTest):

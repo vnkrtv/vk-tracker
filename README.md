@@ -67,8 +67,8 @@ Run all tests with coverage by running (venv must be activated):
 ```
 Name                                          Stmts   Miss  Cover
 -----------------------------------------------------------------
-VKInfoSite/dashboard/graphs.py                  141     25    82%
-VKInfoSite/dashboard/views.py                    32     12    62%
+VKInfoSite/dashboard/graphs.py                  141     18    87%
+VKInfoSite/dashboard/views.py                    33     12    64%
 VKInfoSite/main/decorators.py                    29      9    69%
 VKInfoSite/main/models.py                        10      1    90%
 VKInfoSite/main/mongo.py                         57      8    86%
@@ -81,7 +81,7 @@ VKInfoSite/vksearch/mongo.py                     19      0   100%
 VKInfoSite/vksearch/views.py                    196     37    81%
 VKInfoSite/vksearch/vk_scripts.py                17      4    76%
 -----------------------------------------------------------------
-TOTAL                                          1212    296    76%
+TOTAL                                          1213    289    76%
 ```
 For detailed report run:
 - ```coverage report```  
@@ -90,7 +90,7 @@ For detailed report run:
 
 ### Code inspection
 
-For main, vksearch apps and tests - ```pylint --disable=duplicate-code VKInfoSite/{main/*.py,vksearch,tests}```:  
+For main, vksearch, dashboard apps and tests - ```pylint --disable=duplicate-code VKInfoSite/{main/*.py,vksearch,dashboard,tests}```:  
 - ```Your code has been rated at 10.00/10```
   
 Duplicate code option disabled as pylint swears on vk script code.

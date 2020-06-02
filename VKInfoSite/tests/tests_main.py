@@ -453,12 +453,12 @@ class UsersRelationTest(AuthorizedMainTest):
         self.assertContains(response, self.first_user['main_info']['domain'])
         self.assertContains(response, self.second_user['main_info']['domain'])
 
-        # mutual_friend = self.first_user['friends']['items'][1]
+        mutual_friend = self.first_user['friends']['items'][1]
         mutual_group = self.first_user['groups']['items'][1]
         post_liked_by_second_user = self.first_user['wall']['items'][0]
         photos_liked_by_second_user = self.first_user['photos']['items']
 
-        # self.assertContains(response, mutual_friend['id'])
+        self.assertContains(response, mutual_friend['id'])
         self.assertContains(response, mutual_group['id'])
         self.assertContains(response, post_liked_by_second_user['post_id'])
         for photo in photos_liked_by_second_user:
