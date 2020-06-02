@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 class GenderDistributionPieChart:
-    def __init__(self, user_info, **kwargs):
+    def __init__(self, user_info, **_):
         """
         :param friends_list: list of friends JSONs
         """
@@ -88,7 +88,7 @@ class UniversityDistributionPieChart:
 
 class CitiesDistributionPieChart:
 
-    def __init__(self, user_info, **kwargs):
+    def __init__(self, user_info, **_):
         self._df = pd.DataFrame({'City': [], 'Count': []})
 
         for friend in user_info['friends']['items']:
@@ -125,7 +125,7 @@ class CitiesDistributionPieChart:
 
 class CountriesDistributionPieChart:
 
-    def __init__(self, user_info, **kwargs):
+    def __init__(self, user_info, **_):
         self._df = pd.DataFrame({'Country': [], 'Count': []})
 
         for friend in user_info['friends']['items']:
@@ -162,7 +162,7 @@ class CountriesDistributionPieChart:
 
 class AgeDistributionPieChart:
 
-    def __init__(self, user_info, **kwargs):
+    def __init__(self, user_info, **_):
         self._df = pd.DataFrame({'Age': [], 'Count': []})
         for friend in user_info['friends']['items']:
             try:
@@ -204,7 +204,7 @@ class FriendsActivityScatterPlot:
     _token: str
     _timeout: float = 0.35
 
-    def __init__(self, user_info, token, **kwargs):
+    def __init__(self, user_info, token, **_):
         self._token = token
         df = pd.DataFrame({'Likes': [], 'Comments': [], 'Fullname': [], 'Mutual friends': []})
         for post in user_info['wall']['items']:
@@ -293,25 +293,10 @@ class FriendsActivityScatterPlot:
         self._df = df
 
     def create_graph(self):
-        def get_hovertext(df):
-            kwargs = {
-                'name': df['Fullname'],
-                'likes_count': df['Likes'],
-                'comments_count': df['Comments'],
-                'mut_friends_count': df['Mutual friends']
-            }
-            text = """
-            {name}
-            Likes: {likes_count}
-            Comments: {comments_count}
-            Mutual friends: {mut_friends_count}
-            """.format(**kwargs)
-            return text
-
         graph = html.Div([
             html.H4('Friends activity', style={'text-align': 'center'}),
             dcc.Graph(
-                id='activity-distribution',
+                id='activity-scatter',
                 figure={
                     'data': [
                         go.Scatter3d(

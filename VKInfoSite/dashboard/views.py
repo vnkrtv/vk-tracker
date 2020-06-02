@@ -46,7 +46,6 @@ app.layout = html.Div([
 )
 cached_graphs = {}
 
-
 @app.callback(
     dash.dependencies.Output('graphs', 'children'),
     [dash.dependencies.Input('info-graphs-input', 'value'),
@@ -63,9 +62,9 @@ def update_graph(selected_graphs, domain, token):
                 graph = graphs_dict[graph_name](user_info=user_info, token=token)
                 cached_graphs[graph_name] = graph.create_graph()
             active_graphs.append(cached_graphs[graph_name])
-        except ValueError:
+        except KeyError:
             active_graphs.append(html.H4(
-                '{} graph is not available'.format(graph_name),
+                f"{graph_name} graph is not available: no information about user with domain '{domain}' in DB",
                 style={'marginTop': 20, 'marginBottom': 20}
             ))
 
