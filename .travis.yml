@@ -16,4 +16,4 @@ before_script:
   - echo "${entrypoint/manage.py runserver 0.0.0.0:80/runtests.py}" > deploy/entrypoint
 
 script:
-  - docker-compose up
+  - docker-compose exec web
