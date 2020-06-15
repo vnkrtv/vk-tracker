@@ -2,15 +2,40 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - '*'
   pull_request:
-    branches: [ master ]
+    branches:
+      - '*'
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: 3.6.8
 
     services:
       - docker
 
-    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install docker-compose
+      - name: Configure app
+        run: |
+          echo SECRET_KEY >> cfg
+          echo NEO4J_PWD >> cfg
+          echo n >> cfg
+          ./deploy/deploy_containers < cfg
+          entrypoint="$(echo "$(cat deploy/entrypoint)")"
+          echo "${entrypoint/manage.py runserver 0.0.0.0:80/runtests.py}" > deploy/entrypoint
+      - name: Build docker container & running tests
+        run: |
+          docker-compose run web sh -c "echo Passed all tests!"
