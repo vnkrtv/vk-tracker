@@ -14,4 +14,5 @@ before_script:
   - ./deploy/deploy_containers < cfg
 
 script:
-  - docker-compose run web sh -c "python /usr/share/python3/VKInfoSite/runtests.py"
+  - docker-compose run
+  - docker-compose exec web sh -c "python /usr/share/python3/VKInfoSite/runtests.py"
