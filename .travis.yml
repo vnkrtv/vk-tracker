@@ -14,5 +14,6 @@ before_script:
   - ./deploy/deploy_containers < cfg
 
 script:
-  - docker-compose up
+  - docker-compose up &
+  - sleep 60
   - docker-compose exec web sh -c "python /usr/share/python3/VKInfoSite/runtests.py"
