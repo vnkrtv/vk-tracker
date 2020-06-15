@@ -8,6 +8,10 @@ services:
 
 before_script:
   - pip install docker-compose
+  - echo SECRET_KEY >> cfg
+  - echo NEO4J_PWD >> cfg
+  - echo n >> cfg
+  - ./deploy/deploy_containers < cfg
 
 script:
   - docker-compose run web sh -c "python /usr/share/python3/VKInfoSite/runtests.py"
