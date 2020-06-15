@@ -34,6 +34,5 @@ jobs:
           entrypoint="$(echo "$(cat deploy/entrypoint)")"
           echo "${entrypoint/manage.py runserver 0.0.0.0:80/runtests.py}" > deploy/entrypoint
       - name: Build docker container & running tests
-        using: docker
         run: |
           docker-compose run web sh -c "echo Passed all tests!"
