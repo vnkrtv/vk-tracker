@@ -12,8 +12,7 @@ before_script:
   - echo NEO4J_PWD >> cfg
   - echo n >> cfg
   - ./deploy/deploy_containers < cfg
+  - docker-compose build
 
 script:
-  - docker-compose up &
-  - sleep 60
   - docker-compose exec web sh -c "python /usr/share/python3/VKInfoSite/runtests.py"
