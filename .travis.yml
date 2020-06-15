@@ -1,0 +1,13 @@
+language: python
+
+python:
+  - "3.6.8"
+
+services:
+  - docker
+
+before_script:
+  - pip install docker-compose
+
+script:
+  - docker-compose run web sh -c "python /usr/share/python3/VKInfoSite/runtests.py"
