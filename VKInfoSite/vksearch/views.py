@@ -126,22 +126,22 @@ class SearchView(View):
                 time.sleep(0.34)
             result.append(SearchView.parse_response(response))
         else:
-            if groups_selected and cities_selected:
+            if groups_selected and cities_selected and not universities_selected:
                 code = self.search_by_groups_cities.format(**kwargs)
 
-            if groups_selected and universities_selected:
+            if groups_selected and universities_selected and not cities_selected:
                 code = self.search_by_groups_universities.format(**kwargs)
 
-            if cities_selected and universities_selected:
+            if cities_selected and universities_selected and not groups_selected:
                 code = self.search_by_cities_universities.format(**kwargs)
 
-            if groups_selected:
+            if groups_selected and not cities_selected and not universities_selected:
                 code = self.search_by_groups.format(**kwargs)
 
-            if cities_selected:
+            if cities_selected and not groups_selected and not universities_selected:
                 code = self.search_by_cities.format(**kwargs)
 
-            if universities_selected:
+            if universities_selected and not groups_selected and not cities_selected:
                 code = self.search_by_universities.format(**kwargs)
 
             if groups_selected or cities_selected or universities_selected:
