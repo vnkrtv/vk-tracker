@@ -25,7 +25,7 @@ jobs:
       - name: Running MongoDB & Neo4j containers
         run: |
           docker run -p 127.0.0.1:27017:27017 -d mongo
-          docker run -p 127.0.0.1:7474:7474 -d neo4j
+          docker run -p 0.0.0.0:7474:7474 -p 0.0.0.0:7687:7687 -d neo4j
       - name: Build app
         run: |
           echo localhost >> cfg
