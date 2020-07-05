@@ -1,6 +1,8 @@
 # vk-tracker  
 [![Build Status](https://travis-ci.com/LeadNess/vk-tracker.svg?branch=master)](https://travis-ci.com/LeadNess/vk-tracker)
-![CI](https://github.com/LeadNess/vk-tracker/workflows/CI/badge.svg)
+![Docker](https://github.com/LeadNess/vk-tracker/workflows/Docker/badge.svg)
+![Ubuntu](https://github.com/LeadNess/vk-tracker/workflows/Ubuntu/badge.svg)
+
 ### Description
 Web application for tracking VK users and searching users by specified filters.  
 Implemented on django and dash, data is stored in MongoDB and Neo4j.  
