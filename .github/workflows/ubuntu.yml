@@ -25,7 +25,11 @@ jobs:
       - name: Running MongoDB & Neo4j containers
         run: |
           docker run -p 127.0.0.1:27017:27017 -d mongo
-          docker run -p 0.0.0.0:7474:7474 -p 0.0.0.0:7687:7687 -d neo4j
+          docker run \
+            -p 7474:7474 \
+            -p 7687:7687 \
+            -e NEO4J_AUTH=neo4j/pass \
+            -d neo4j
       - name: Build app
         run: |
           echo localhost >> cfg
@@ -33,7 +37,7 @@ jobs:
           echo vktracker >> cfg
           echo http://localhost:7474 >> cfg
           echo neo4j >> cfg
-          echo neo4j >> cfg
+          echo pass >> cfg
           ./deploy/build_for_linux < cfg
       - name: Running tests
         run: |
