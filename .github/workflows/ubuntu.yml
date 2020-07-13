@@ -24,7 +24,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Running MongoDB & Neo4j containers
         run: |
-          docker run -p 127.0.0.1:27017:27017 -d mongo
+          docker run -p 27017:27017 -d mongo
           docker run \
             -p 7474:7474 \
             -p 7687:7687 \
@@ -32,6 +32,9 @@ jobs:
             -d neo4j
       - name: Build app
         run: |
+          main_tests="$(echo "$(cat VKInfoSite/tests/tests_main.py)")"
+          main_tests="${main_tests/mock/mock, skip}"
+          "${main_tests/mock.patch(\'main.vk_api.VKUser.open_session\')/skip}" > VKInfoSite/tests/tests_main.py
           echo localhost >> cfg
           echo 27017 >> cfg
           echo vktracker >> cfg
