@@ -34,7 +34,7 @@ jobs:
         run: |
           main_tests="$(echo "$(cat VKInfoSite/tests/tests_main.py)")"
           main_tests="${main_tests/mock/mock, skip}"
-          "${main_tests/mock.patch(\'main.vk_api.VKUser.open_session\')/skip}" > VKInfoSite/tests/tests_main.py
+          echo "${main_tests/mock.patch(\'main.vk_api.VKUser.open_session\')/skip}" > VKInfoSite/tests/tests_main.py
           echo localhost >> cfg
           echo 27017 >> cfg
           echo vktracker >> cfg
