@@ -27,7 +27,6 @@ jobs:
           brew install docker docker-machine
           docker-machine create default
           eval $(docker-machine env default)
-          docker-machine start default
       - name: Running MongoDB & Neo4j containers
         run: |
           docker run -p 27017:27017 -d mongo
