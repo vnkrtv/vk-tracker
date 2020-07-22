@@ -1,0 +1,47 @@
+name: MacOS
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        python-version: [3.6.8, 3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Running MongoDB & Neo4j containers
+        run: |
+          docker run -p 27017:27017 -d mongo
+          docker run \
+            -p 7474:7474 \
+            -p 7687:7687 \
+            -e NEO4J_AUTH=neo4j/pass \
+            -d neo4j
+      - name: Build app
+        run: |
+          main_tests="$(echo "$(cat VKInfoSite/tests/tests_main.py)")"
+          main_tests="${main_tests/mock/mock, skip}"
+          echo "${main_tests/mock.patch(\'main.vk_api.VKUser.open_session\')/skip}" > VKInfoSite/tests/tests_main.py
+          echo localhost >> cfg
+          echo 27017 >> cfg
+          echo vktracker >> cfg
+          echo http://localhost:7474 >> cfg
+          echo neo4j >> cfg
+          echo pass >> cfg
+          ./deploy/build_for_linux < cfg
+      - name: Running tests
+        run: |
+          ./venv/bin/python ./VKInfoSite/runtests.py
