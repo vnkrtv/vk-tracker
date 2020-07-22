@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/LeadNess/vk-tracker/badge.svg?branch=master)](https://coveralls.io/github/LeadNess/vk-tracker?branch=master)
 ![Docker](https://github.com/LeadNess/vk-tracker/workflows/Docker/badge.svg)
 ![Ubuntu](https://github.com/LeadNess/vk-tracker/workflows/Ubuntu/badge.svg)
-![MacOS](https://github.com/LeadNess/vk-tracker/workflows/Ubuntu/badge.svg)
+![MacOS](https://github.com/LeadNess/vk-tracker/workflows/MacOS/badge.svg)
 
 ### Description
 Web application for tracking VK users and searching users by specified filters.  
@@ -40,15 +40,15 @@ Requirements:
 ### Installation
 - ```git clone https://github.com/LeadNess/vk-tracker.git```
 - ```cd vk-tracker```
-- ```./build_for_linux``` - build application on host system
-- ```./deploy_containers``` - configure settings for vk-tracker container and docker-compose, if allowed will be added as a service in systemd as vk-tracker.service. 
+- ```./deploy/build_for_linux``` - build application on host system
+- ```./deploy/deploy_containers``` - configure settings for vk-tracker container and docker-compose, if allowed will be added as a service in systemd as vk-tracker.service. 
 
 ### Usage
 
 You can run application using docker-compose:  
 - ```git clone https://github.com/LeadNess/vk-tracker.git```
 - ```cd vk-tracker```
-- ```./deploy_containers```
+- ```./deploy/deploy_containers```
 - ```docker-compose up```
 
 These commands launch 3 related containers:
