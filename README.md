@@ -1,5 +1,6 @@
 # vk-tracker  
 [![Build Status](https://travis-ci.com/LeadNess/vk-tracker.svg?branch=master)](https://travis-ci.com/LeadNess/vk-tracker)
+[![Coverage Status](https://coveralls.io/repos/github/LeadNess/vk-tracker/badge.svg?branch=master)](https://coveralls.io/github/LeadNess/vk-tracker?branch=master)
 ![Docker](https://github.com/LeadNess/vk-tracker/workflows/Docker/badge.svg)
 ![Ubuntu](https://github.com/LeadNess/vk-tracker/workflows/Ubuntu/badge.svg)
 

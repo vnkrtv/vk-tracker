@@ -2,12 +2,13 @@ language: python
 
 python:
   - "3.6.8"
+  - "3.8"
 
 services:
   - docker
 
 before_script:
-  - pip install docker-compose
+  - pip install docker-compose coveralls
   - echo SECRET_KEY >> cfg
   - echo NEO4J_PWD >> cfg
   - echo n >> cfg
@@ -17,3 +18,5 @@ before_script:
 
 script:
   - docker-compose run web sh -c "echo Passed all tests!"
+
+after_success: coveralls
