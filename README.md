@@ -2,7 +2,6 @@
 [![Build Status](https://travis-ci.com/LeadNess/vk-tracker.svg?branch=master)](https://travis-ci.com/LeadNess/vk-tracker)
 ![Docker](https://github.com/LeadNess/vk-tracker/workflows/Docker/badge.svg)
 ![Ubuntu](https://github.com/LeadNess/vk-tracker/workflows/Ubuntu/badge.svg)
-![MacOS](https://github.com/LeadNess/vk-tracker/workflows/MacOS/badge.svg)
 
 ### Description
 Web application for tracking VK users and searching users by specified filters.  
