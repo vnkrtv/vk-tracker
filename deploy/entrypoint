@@ -7,4 +7,5 @@ python VKInfoSite/manage.py makemigrations
 python VKInfoSite/manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'admin')" | python VKInfoSite/manage.py shell
 
-python VKInfoSite/manage.py runserver 0.0.0.0:80
+cd VKInfoSite
+gunicorn VKInfoSite.wsgi:application -b 0.0.0.0:80

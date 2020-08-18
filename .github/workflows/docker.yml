@@ -32,7 +32,7 @@ jobs:
           echo n >> cfg
           ./deploy/deploy_containers < cfg
           entrypoint="$(echo "$(cat deploy/entrypoint)")"
-          echo "${entrypoint/manage.py runserver 0.0.0.0:80/runtests.py}" > deploy/entrypoint
+          echo "${entrypoint/gunicorn VKInfoSite.wsgi:application -b 0.0.0.0:80/python runtests.py}" > deploy/entrypoint
       - name: Build docker container & running tests
         run: |
           docker-compose run web sh -c "echo Passed all tests!"

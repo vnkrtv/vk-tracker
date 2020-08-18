@@ -6,7 +6,7 @@ PROJECT_ROOT = os.path.join(BASE_DIR, 'VKInfoSite')
 
 SECRET_KEY = 'GENERATED_SECRET_KEY'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '*'
