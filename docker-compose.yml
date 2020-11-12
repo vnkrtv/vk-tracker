@@ -9,7 +9,7 @@ services:
       - "17687:7687"
       - "17474:7474"
     environment:
-      - NEO4J_AUTH=neo4j/NEO4J_PWD
+      - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=1G
       - NEO4J_dbms.memory.heap.initial_size=1G
       - NEO4J_dbms_memory_heap_max__size=1G
@@ -21,7 +21,7 @@ services:
     container_name: vk-mongo
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_DATABASE=MONGO_DBNAME
+      - MONGO_INITDB_DATABASE=vktracker
     ports:
       - "27034:27017"
     networks:
